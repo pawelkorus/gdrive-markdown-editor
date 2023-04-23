@@ -101,6 +101,25 @@ import { default as showdown } from 'showdown'
         }
     }
 
+    function onClickEditBtn(ev:MouseEvent) {
+        const editorEle = document.getElementById("editor") as HTMLDivElement
+        editorEle.classList.toggle("d-none")
+
+        const editBtn = ev.target as HTMLButtonElement
+        editBtn.classList.toggle("d-none")
+
+        const saveBtn = document.getElementById("btn-save")
+        saveBtn.classList.toggle("d-none")
+
+        const previewBtn = document.getElementById("btn-preview")
+        previewBtn.classList.toggle("d-none")
+    }
+
+    function onClickPreviewBtn(ev:MouseEvent) {
+        const viewerEle = document.getElementById("viewer") as HTMLDivElement
+        viewerEle.classList.toggle("d-none")
+    }
+
     const apiEle = document.createElement('script') as HTMLScriptElement
     apiEle.defer = true
     apiEle.src = "https://apis.google.com/js/api.js"
@@ -112,6 +131,12 @@ import { default as showdown } from 'showdown'
     gisEle.src = "https://accounts.google.com/gsi/client"
     gisEle.addEventListener("load", gisLibaryLoaded)
     document.body.appendChild(gisEle)
+
+    const editBtn = document.getElementById("btn-edit") as HTMLButtonElement
+    editBtn.onclick = onClickEditBtn
+
+    const previewBtn = document.getElementById("btn-preview") as HTMLButtonElement
+    previewBtn.onclick = onClickPreviewBtn
 })()
 
 interface StateFromGoogle {

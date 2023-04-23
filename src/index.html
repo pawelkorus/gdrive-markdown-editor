@@ -7,19 +7,38 @@
     <meta charset="UTF-8">
 </head>
 
-<body class="container-lg mt-4">
+<body>
 
     <noscript>
         This website requires Javascript to be enabled. Please turn on Javascript
         and reload the page.
     </noscript>
 
-    <div id="root">
-        <h1>Hello world</h1>
-        <p>fnsfnjsdnf dsf hdsb fbdsh bfsd bfhsdb jhdsb bsd fbsd bfdb fdb fhdsb fhbsdf bds fbdsf bsdfb sdb fdbfdb fdsb fjsdb fdbs fbsdj fbs bfsdb 
-        fsdb sddfb bf dsb fsdb fdbs</p>
-        <p>n sadb hsbd hsab dhsab dhsba hdbsah dbash dbsah das</p>
-        <h2>fdsf ndshf bdshb fhdsf</h2>
+    <div class="container-fluid p-2">
+        <div class="d-flex flex-row">
+            <h1 class="me-auto me-2">Filename</h1>
+            <button class="btn btn-primary ms-1" id="btn-edit" type="button">Edit</button>
+            <button class="btn btn-primary ms-1 d-none" id="btn-save" type="button">Save</button>
+            <button class="btn btn-primary ms-1 d-none" id="btn-preview" type="button">Preview</button>
+        </div>
+    </div>
+
+    <div class="container-lg mt-4">
+        <div class="row"> 
+            <div id="editor" class="col d-none">
+                    <textarea class="form-control w-100 h-100">
+    # Editor
+                    </textarea>
+            </div>
+
+            <div id="viewer" class="col">
+                <h1>Hello world</h1>
+                <p>fnsfnjsdnf dsf hdsb fbdsh bfsd bfhsdb jhdsb bsd fbsd bfdb fdb fhdsb fhbsdf bds fbdsf bsdfb sdb fdbfdb fdsb fjsdb fdbs fbsdj fbs bfsdb 
+                fsdb sddfb bf dsb fsdb fdbs</p>
+                <p>n sadb hsbd hsab dhsab dhsba hdbsah dbash dbsah das</p>
+                <h2>fdsf ndshf bdshb fhdsf</h2>
+            </div>
+        </div>
     </div>
 </body>
 </html>
