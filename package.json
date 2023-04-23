@@ -1,0 +1,45 @@
+{
+  "name": "pass-man",
+  "version": "1.0.0",
+  "devDependencies": {
+    "@types/gapi": "^0.0.44",
+    "@types/gapi.client.drive": "3.0.15",
+    "@types/google.accounts": "^0.0.7",
+    "@types/jquery": "3.5.16  ",
+    "@types/showdown": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "5.58.0",
+    "@typescript-eslint/parser": "5.58.0",
+    "clean-webpack-plugin": "4.0.0",
+    "css-loader": "6.7.3",
+    "eslint": "8.38.0",
+    "html-webpack-plugin": "5.5.1",
+    "mini-css-extract-plugin": "2.7.5",
+    "node-sass": "8.0.0",
+    "postcss": "8.4.22",
+    "postcss-loader": "7.2.4",
+    "precss": "4.0.0",
+    "sass-loader": "13.2.2",
+    "style-loader": "3.3.2",
+    "ts-loader": "9.4.2",
+    "typescript": "5.0.4",
+    "webpack": "5.79.0",
+    "webpack-cli": "5.0.1",
+    "webpack-dev-server": "4.13.3"
+  },
+  "engines": {
+    "node": ">18.0.0"
+  },
+  "scripts": {
+    "build-prod": "webpack --mode production --config webpack.js",
+    "build-debug": "webpack --mode development --config webpack.js",
+    "develop-prod": "webpack serve --mode production --config webpack.js",
+    "develop-debug": "webpack serve --mode development --config webpack.js",
+    "develop-local": "webpack serve --mode development --env local --config webpack.js",
+    "lint": "eslint . --ext .ts",
+    "lint-and-fix": "eslint . --ext .ts --fix"
+  },
+  "dependencies": {
+    "showdown": "2.1.0",
+    "bootstrap": "5.2.3"
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "outDir": "target/",
+        "sourceMap": true,
+        "noImplicitAny": true,
+        "target": "es5",
+        "allowJs": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "module": "es2020",
+        "importHelpers": true,
+        "downlevelIteration": true,
+        "types": [ 
+            "gapi", 
+            "gapi.client.drive",
+            "google.accounts" 
+        ],
+        "lib": [
+            "es2015",
+            "dom"
+        ]
+    }
+}
