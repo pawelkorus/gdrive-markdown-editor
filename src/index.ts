@@ -1,6 +1,18 @@
 import './main.scss';
 import { default as showdown } from 'showdown'
 
+interface StateFromGoogle {
+    action: StateFromGoogleAction
+    fileId: string
+    userId: string
+}
+
+enum StateFromGoogleAction {
+    New,
+    Open,
+    Unsupported
+}
+
 (function() {
     const converter = new showdown.Converter()
     
@@ -9,6 +21,7 @@ import { default as showdown } from 'showdown'
     const DISCOVERY_DOC = "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest";
     const SCOPES = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install";
     const searchParams = new URLSearchParams(window.location.search)
+    const state = parseState()
     let tokenClient:google.accounts.oauth2.TokenClient = null
     let gapiInited = false;
     let gisInited = false;
@@ -58,14 +71,43 @@ import { default as showdown } from 'showdown'
             alt: "media"
         })
 
-        const target = document.getElementById('root')
+        const editor = document.getElementById("editor")
+        const textArea = editor.getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
+        textArea.value = response.body
+
+        const viewer = document.getElementById("viewer")
         const html = converter.makeHtml(response.body);
-        target.innerHTML = html;
+        viewer.innerHTML = html;
+    }
+
+    async function save(state:StateFromGoogle) {
+        const editorEle = document.getElementById("editor") as HTMLDivElement
+        const textArea = editorEle.getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
+        
+        // according to https://stackoverflow.com/questions/40600725/google-drive-api-v3-javascript-update-file-contents
+        // google drive javascript library doesn't support body upload
+        await gapi.client.request({
+            path: "/upload/drive/v3/files/" + state.fileId,
+            method: "PATCH",
+            params: {
+                uploadType: "media"
+            },
+            body: textArea.value
+        })
+
+        editorEle.classList.toggle("d-none")
+
+        const editBtn = document.getElementById("btn-edit")
+        editBtn.classList.toggle("d-none")
+
+        const saveBtn = document.getElementById("btn-save")
+        saveBtn.classList.toggle("d-none")
+
+        const previewBtn = document.getElementById("btn-preview")
+        previewBtn.classList.toggle("d-none")
     }
 
     function authorize() {
-        const state = parseState()
-
         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID,
             scope: SCOPES,
@@ -105,7 +147,7 @@ import { default as showdown } from 'showdown'
         const editorEle = document.getElementById("editor") as HTMLDivElement
         editorEle.classList.toggle("d-none")
 
-        const editBtn = ev.target as HTMLButtonElement
+        const editBtn = document.getElementById("btn-edit")
         editBtn.classList.toggle("d-none")
 
         const saveBtn = document.getElementById("btn-save")
@@ -118,6 +160,12 @@ import { default as showdown } from 'showdown'
     function onClickPreviewBtn(ev:MouseEvent) {
         const viewerEle = document.getElementById("viewer") as HTMLDivElement
         viewerEle.classList.toggle("d-none")
+    }
+
+    function onClickSaveBtn(ev:MouseEvent) {
+        if(state != null) {
+            save(state)
+        }
     }
 
     const apiEle = document.createElement('script') as HTMLScriptElement
@@ -137,16 +185,7 @@ import { default as showdown } from 'showdown'
 
     const previewBtn = document.getElementById("btn-preview") as HTMLButtonElement
     previewBtn.onclick = onClickPreviewBtn
+
+    const saveBtn = document.getElementById("btn-save") as HTMLButtonElement
+    saveBtn.onclick = onClickSaveBtn
 })()
-
-interface StateFromGoogle {
-    action: StateFromGoogleAction
-    fileId: string
-    userId: string
-}
-
-enum StateFromGoogleAction {
-    New,
-    Open,
-    Unsupported
-}
