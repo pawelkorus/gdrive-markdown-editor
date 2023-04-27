@@ -243,27 +243,7 @@ type Events = {type: 'edit'}
 
     const converter = new showdown.Converter()
     const searchParams = new URLSearchParams(window.location.search)
-    // const state = parseState()
     let tokenClient:google.accounts.oauth2.TokenClient = null
-    // let gapiInited = false;
-    // let gisInited = false;
-
-    // function gisLibaryLoaded() {
-    //     gisInited = true
-    // }
-
-    // function apiLibraryLoaded() {
-    //     gapi.load('client', initializeGapiClient);
-    // }
-
-    // async function initializeGapiClient() {
-    //     await gapi.client.init({
-    //         apiKey: API_KEY,
-    //         discoveryDocs: [DISCOVERY_DOC],
-    //     });
-    //     // gapiInited = true;
-    //     maybeAuthorize();
-    // }
 
     async function loadFile(state:StateFromGoogle) {
         // https://developers.google.com/drive/api/v3/reference/files
