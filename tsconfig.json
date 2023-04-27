@@ -12,7 +12,7 @@
         "downlevelIteration": true,
         "types": [ 
             "gapi", 
-            "gapi.client.drive",
+            "gapi.client.drive-v3",
             "google.accounts" 
         ],
         "lib": [
