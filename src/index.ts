@@ -1,5 +1,6 @@
 import './main.scss';
 import { default as showdown } from 'showdown'
+import { createMachine, interpret } from "xstate";
 
 interface StateFromGoogle {
     action: StateFromGoogleAction
@@ -14,6 +15,139 @@ enum StateFromGoogleAction {
 }
 
 (function() {
+
+    function loadGapi() {
+        return new Promise((resolve, reject) => {
+            const apiEle = document.createElement('script') as HTMLScriptElement
+            apiEle.defer = true
+            apiEle.src = "https://apis.google.com/js/api.js"
+            apiEle.addEventListener("load", () => resolve(true))
+            document.body.appendChild(apiEle)
+        })
+    }
+
+    function loadGis() {
+        return new Promise((resolve, reject) => {
+            const gisEle = document.createElement('script') as HTMLScriptElement
+            gisEle.defer = true
+            gisEle.src = "https://accounts.google.com/gsi/client"
+            gisEle.addEventListener("load", () => { resolve(true) })
+            document.body.appendChild(gisEle)
+        })
+    }
+
+    const machine = createMachine({
+        "id": "Grive editor",
+        "initial": "Loading scripts",
+        "states": {
+          "Loading scripts": {
+            "type": "parallel",
+            "states": {
+                "Load gapi": {
+                    "invoke": {
+                        "id": "getGapi",
+                        "src": (context:any, event:any) => { return loadGapi() }
+                    }
+                },
+                "Load gis": {
+                    "invoke": {
+                        "src": (context:any, event:any) => { return loadGis() }
+                    }
+                }
+            },
+            "onDone": "Authenticating"
+          },
+          "Viewing": {
+            "on": {
+              "edit": {
+                "target": "Editing"
+              }
+            }
+          },
+          "Editing": {
+            "on": {
+              "save": {
+                "target": "Saving"
+              },
+              "close": {
+                "target": "Viewing"
+              },
+              "toggle preview": {}
+            }
+          },
+          "Saving": {
+            "on": {
+              "saved": {
+                "target": "Editing"
+              },
+              "on error": {
+                "target": "Editing"
+              }
+            }
+          },
+          "Authenticating": {
+            "on": {
+              "process google state": {
+                "target": "Google state processing"
+              }
+            }
+          },
+          "Loading file": {
+            "on": {
+              "file loaded": {
+                "target": "Viewing"
+              },
+              "on error": {
+                "target": "Error view"
+              }
+            }
+          },
+          "App info": {},
+          "Google state processing": {
+            "on": {
+              "google state processed": [
+                {
+                  "target": "Loading file",
+                  "cond": "areFileDetailsPresent"
+                },
+                {
+                  "target": "Editing",
+                  "cond": "isNewFile"
+                },
+                {
+                  "target": "App info"
+                }
+              ]
+            }
+          },
+          "Error view": {
+            "type": "final"
+          }
+        },
+        "schema": {
+            events: {} as 
+            {type: 'edit'} |   
+            {type: 'saved'} | 
+            {type: 'save'} | 
+            {type: 'close'} | 
+            {type: 'toggle preview'} | 
+            {type: 'scripts loaded'} | 
+            {type: 'google state processed'} | 
+            {type: 'file loaded'} | 
+            {type: 'process google state'} | 
+            {type: 'on error'}
+        }
+      },
+      {
+        "actions": {
+    
+        },
+      }
+    )
+    interpret(machine)
+      .onTransition((state) => { console.log(state.value) })
+      .start()
+
     const converter = new showdown.Converter()
     
     const CLIENT_ID = "413355556847-pd76u4ckm8d8jisjg2fmlamgisejh4nn.apps.googleusercontent.com";
@@ -168,17 +302,17 @@ enum StateFromGoogleAction {
         }
     }
 
-    const apiEle = document.createElement('script') as HTMLScriptElement
-    apiEle.defer = true
-    apiEle.src = "https://apis.google.com/js/api.js"
-    apiEle.addEventListener("load", apiLibraryLoaded)
-    document.body.appendChild(apiEle)
+    // const apiEle = document.createElement('script') as HTMLScriptElement
+    // apiEle.defer = true
+    // apiEle.src = "https://apis.google.com/js/api.js"
+    // apiEle.addEventListener("load", apiLibraryLoaded)
+    // document.body.appendChild(apiEle)
 
-    const gisEle = document.createElement('script') as HTMLScriptElement
-    gisEle.defer = true
-    gisEle.src = "https://accounts.google.com/gsi/client"
-    gisEle.addEventListener("load", gisLibaryLoaded)
-    document.body.appendChild(gisEle)
+    // const gisEle = document.createElement('script') as HTMLScriptElement
+    // gisEle.defer = true
+    // gisEle.src = "https://accounts.google.com/gsi/client"
+    // gisEle.addEventListener("load", gisLibaryLoaded)
+    // document.body.appendChild(gisEle)
 
     const editBtn = document.getElementById("btn-edit") as HTMLButtonElement
     editBtn.onclick = onClickEditBtn

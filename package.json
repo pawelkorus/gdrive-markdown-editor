@@ -39,7 +39,8 @@
     "lint-and-fix": "eslint . --ext .ts --fix"
   },
   "dependencies": {
+    "bootstrap": "5.2.3",
     "showdown": "2.1.0",
-    "bootstrap": "5.2.3"
+    "xstate": "4.37.2"
   }
 }
