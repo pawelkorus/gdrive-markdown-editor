@@ -10,8 +10,7 @@ interface StateFromGoogle {
 
 enum StateFromGoogleAction {
     New,
-    Open,
-    Unsupported
+    Open
 }
 
 interface Context {
@@ -72,129 +71,77 @@ type Events = {type: 'edit'}
       console.log(event.data)
     }
 
+    const handleFile = createMachine({
+        "predictableActionArguments": true,
+        "id": "handleFile",
+        "context": {
+            action: StateFromGoogleAction.New,
+            fileId: "",
+            userId: ""
+        },
+        "states": {
+            "Loading file": {
+            },
+            "Viewing": {
+            },
+            "Editing": {
+            },
+            "Saving": {
+            }
+        },
+        schema: {
+            context: {} as {
+                action: StateFromGoogleAction,
+                fileId: string,
+                userId: string
+            }
+        }
+    })
+
     const machine = createMachine({
         "predictableActionArguments": true,
         "id": "Grive editor",
-        "initial": "Loading scripts",
+        "initial": "Initialize google",
         "context": {
           converter: new showdown.Converter()
         },
         "states": {
-          "Loading scripts": {
-            "type": "parallel",
-            "states": {
-              "Load gapi": {
-                "initial": "loading",
-                "states": {
-                  "loading": {
-                    "invoke": {
-                      "src": (context:any, event:any) => loadGapi,
-                      "onDone": {
-                        "target": "success",
-                      },
-                      "onError": "fail"
-                    },
-                  },
-                  "initialize client": {
-                    "invoke": {
-                      "src": (context:any, event:any) => initializeGapiClient,
-                      "onDone": {
-                        "target": "success"
-                      },
-                      "onError": "fail"
-                    }
-                  },
-                  "success": {
-                    "type": "final"
-                  },
-                  "fail": {
-                    "entry": logInvokeFail
-                  }
+            "Initialize google": {
+                "invoke": {
+                    "src": (context, event) => Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient),
+                    "onDone": "Google state processing"
+                },
+            },
+            "Authorizing": {
+            },
+            "Handling file": {
+                invoke: {
+                    src: handleFile,
                 }
             },
-            "Load gis": {
-                "initial": "loading",
-                "states": {
-                  "loading": {
-                    "invoke": {
-                        "src": (context:any, event:any) => loadGis,
-                        "onDone": "success",
-                        "onError": "fail"
+            "App info": {},
+            "Google state processing": {
+                "invoke": {
+                    "src": "parseStateTransition"
+                },
+                "on": {
+                    "google state processed": [
+                        {
+                        "target": "Loading file",
+                        //   "cond": "areFileDetailsPresent"
+                        // },
+                        // {
+                        //   "target": "Editing",
+                        //   "cond": "isNewFile"
+                        // },
+                        // {
+                        //   "target": "App info"
+                        }
+                    ],
+                    "google state invalid": {
+                        "target": "Error view"
                     }
-                  },
-                  "success": {
-                    "type": "final"
-                  },
-                  "fail": {
-                  }
                 }
-              }
-          },
-          "onDone": "Google state processing"
-          },
-          "Viewing": {
-            "on": {
-              "edit": {
-                "target": "Editing"
-              }
-            }
-          },
-          "Editing": {
-            "on": {
-              "save": {
-                "target": "Saving"
-              },
-              "close": {
-                "target": "Viewing"
-              },
-              "toggle preview": {}
-            }
-          },
-          "Saving": {
-            "on": {
-              "saved": {
-                "target": "Editing"
-              },
-              "on error": {
-                "target": "Editing"
-              }
-            }
-          },
-          "Authorizing": {
-          },
-          "Loading file": {
-            "on": {
-              "file loaded": {
-                "target": "Viewing"
-              },
-              "on error": {
-                "target": "Error view"
-              }
-            }
-          },
-          "App info": {},
-          "Google state processing": {
-            "invoke": {
-              "src": "parseStateTransition"
-            },
-            "on": {
-              "google state processed": [
-                {
-                  "target": "Loading file",
-                //   "cond": "areFileDetailsPresent"
-                // },
-                // {
-                //   "target": "Editing",
-                //   "cond": "isNewFile"
-                // },
-                // {
-                //   "target": "App info"
-                }
-              ],
-              "google state invalid": {
-                "target": "Error view"
-              }
-            }
           },
           "Error view": {
             "type": "final"
@@ -241,10 +188,6 @@ type Events = {type: 'edit'}
       .onTransition((state) => { console.log(state.value) })
       .start()
 
-    const converter = new showdown.Converter()
-    const searchParams = new URLSearchParams(window.location.search)
-    let tokenClient:google.accounts.oauth2.TokenClient = null
-
     async function loadFile(state:StateFromGoogle) {
         // https://developers.google.com/drive/api/v3/reference/files
         const response = await gapi.client.drive.files.get({
@@ -257,8 +200,8 @@ type Events = {type: 'edit'}
         textArea.value = response.body
 
         const viewer = document.getElementById("viewer")
-        const html = converter.makeHtml(response.body);
-        viewer.innerHTML = html;
+        // const html = converter.makeHtml(response.body);
+        // viewer.innerHTML = html;
     }
 
     async function save(state:StateFromGoogle) {
