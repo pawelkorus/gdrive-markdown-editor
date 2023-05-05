@@ -1,6 +1,7 @@
 import './main.scss';
 import { default as showdown } from 'showdown'
-import { assign, createMachine, interpret, raise } from "xstate";
+import { actions, assign, createMachine, interpret, raise, send } from "xstate";
+import { sendTo } from 'xstate/lib/actions';
 
 interface StateFromGoogle {
     action: StateFromGoogleAction
@@ -10,33 +11,42 @@ interface StateFromGoogle {
 
 enum StateFromGoogleAction {
     New,
-    Open
+    Open,
+    Install,
+    Unsupported
 }
 
 interface Context {
-    converter: showdown.Converter,
-    tokenClient?: google.accounts.oauth2.TokenClient,
-    state?: StateFromGoogle
+    action: StateFromGoogleAction,
+    fileId: string,
+    userId: string
 }
 
-type Events = {type: 'edit'}   
-| {type: 'saved'}
-| {type: 'save'} 
-| {type: 'close'} 
-| {type: 'toggle preview'}
-| {type: 'scripts loaded'} 
-| {type: 'google state processed'}
-| {type: 'google state invalid'}
-| {type: 'file loaded'}
-| {type: 'process google state'}
-| {type: 'on error'}
+type Events = {type: "edit"}   
+| {type: "saved"}
+| {type: "save"} 
+| {type: "close"} 
+| {type: "toggle preview"}
+| {type: "scripts loaded"} 
+| {type: "google state processed"}
+| {type: "google state processing" }
+| {type: "google state invalid"}
+| {type: "file loaded"}
+| {type: "process google state"}
+| {type: "on error"}
+| {type: "editButtonClicked"}
+| {type: "previewButtonClicked"}
+| {type: "saveButtonClicked"}
+| {type: "closeButtonClicked"}
 
 (function() {
 
+    const converter: showdown.Converter = new showdown.Converter();
     const CLIENT_ID = "413355556847-pd76u4ckm8d8jisjg2fmlamgisejh4nn.apps.googleusercontent.com";
     const API_KEY = "AIzaSyCQLy4XRrT2HWbALEcxhSf2rWNoeQvT6bA";
     const DISCOVERY_DOC = "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest";
-    const SCOPES = "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.install";
+    const SCOPE_FILE_ACCESS = "https://www.googleapis.com/auth/drive.file"
+    const SCOPE_INSTALL = "https://www.googleapis.com/auth/drive.install"
 
     async function initializeGapiClient() {
       await gapi.client.init({
@@ -67,85 +77,338 @@ type Events = {type: 'edit'}
         })
     }
 
+    async function parseGoogleState():Promise<StateFromGoogle> {
+        const searchParams = new URLSearchParams(window.location.search)
+    
+        // https://developers.google.com/drive/api/guides/integrate-open
+        const state = JSON.parse(searchParams.get("state"));
+        if(state == null) {
+            return {
+                action: StateFromGoogleAction.Install,
+                fileId: "",
+                userId: ""
+            }
+        }
+
+        const fileIds = state["ids"] as Array<string>;
+        if(fileIds.length != 1) throw Error("Invalid state parameter: to many file ids");
+
+        let action = StateFromGoogleAction.Unsupported
+        if(state["action"] == "open") action = StateFromGoogleAction.Open
+        if(state["action"] == "new") action = StateFromGoogleAction.New
+
+        const userId = state["userId"]
+
+        return {
+            action: action,
+            fileId: fileIds[0],
+            userId: userId
+        }
+    }
+
+    async function authorizeInstall() {
+        return new Promise((resolve, reject) => {
+            const tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPE_INSTALL,
+                callback: async (tokenResponse:google.accounts.oauth2.TokenResponse) => {
+                    if (tokenResponse.error !== undefined) {
+                        throw (tokenResponse);
+                    }
+
+                    resolve(true)
+                }
+            });
+
+            tokenClient.requestAccessToken({
+                prompt: 'consent',
+            });
+        })
+    }
+
+    async function authorizeFileAccess(userId: string) {
+        return new Promise((resolve, reject) => {
+            const tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPE_FILE_ACCESS,
+                callback: async (tokenResponse:google.accounts.oauth2.TokenResponse) => {
+                    if (tokenResponse.error !== undefined) {
+                        throw (tokenResponse);
+                    }
+
+                    resolve(true)
+                }
+            })
+                
+            tokenClient.requestAccessToken({
+                prompt: '',
+                hint: userId
+            });
+        })
+    }
+
     function logInvokeFail(context:any, event:any) {
-      console.log(event.data)
+        console.log(event.data)
+    }
+
+    function enterViewerView(content:string) {
+        const viewer = document.getElementById("viewer") as HTMLDivElement
+        viewer.classList.remove("d-none")
+
+        const editBtn = document.getElementById("btn-edit")
+        editBtn.classList.remove("d-none")
+
+        const html = converter.makeHtml(content);
+        viewer.innerHTML = html;
+    }
+
+    function exitViewerView() {
+        const viewer = document.getElementById("viewer") as HTMLDivElement
+        viewer.classList.add("d-none")
+
+        const editBtn = document.getElementById("btn-edit")
+        editBtn.classList.add("d-none")
+    }
+
+    function enterEditorView(content:string) {
+        const editorEle = document.getElementById("editor") as HTMLDivElement
+        editorEle.classList.remove("d-none")
+        const textArea = editorEle.getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
+        textArea.value = content
+
+        const viewer = document.getElementById("viewer") as HTMLDivElement
+        viewer.classList.remove("d-none")
+
+        const saveBtn = document.getElementById("btn-save")
+        saveBtn.classList.remove("d-none")
+
+        const previewBtn = document.getElementById("btn-preview")
+        previewBtn.classList.remove("d-none")
+
+        const closeBtn = document.getElementById("btn-close")
+        closeBtn.classList.remove("d-none")
+    }
+
+    function exitEditorView() {
+        const editorEle = document.getElementById("editor") as HTMLDivElement
+        editorEle.classList.add("d-none")
+
+        const viewer = document.getElementById("viewer") as HTMLDivElement
+        viewer.classList.add("d-none")
+
+        const saveBtn = document.getElementById("btn-save")
+        saveBtn.classList.add("d-none")
+
+        const previewBtn = document.getElementById("btn-preview")
+        previewBtn.classList.add("d-none")
+
+        const closeBtn = document.getElementById("btn-close")
+        closeBtn.classList.add("d-none")
+    }
+
+    function getEditorContent() {
+        const editorEle = document.getElementById("editor") as HTMLDivElement
+        const textArea = editorEle.getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
+        return textArea.value
     }
 
     const handleFile = createMachine({
         "predictableActionArguments": true,
         "id": "handleFile",
+        "initial": "Loading file",
         "context": {
             action: StateFromGoogleAction.New,
             fileId: "",
-            userId: ""
+            userId: "",
+            content: ""
         },
         "states": {
             "Loading file": {
+                invoke: {
+                    src: (context, event) => 
+                        Promise.resolve("# Hello world")
+                        // authorizeFileAccess(context.userId)
+                        //     .then(() => loadFile(context.fileId))
+                        ,
+                    onDone: {
+                        target: "Loaded",
+                        actions: [
+                            assign({content: (context, event) => event.data})
+                        ]
+                    },
+                    onError: {
+                        target: "Error",
+                        actions: logInvokeFail
+                    }
+                }
+            },
+            "Loaded": {
+                always: [
+                    {
+                        target: "Viewing",
+                        cond: (context, event) => context.action == StateFromGoogleAction.Open
+                    },
+                    {
+                        target: "Editing"
+                    }
+                ]
             },
             "Viewing": {
+                entry: [
+                    () => console.log("viewing"),
+                    (context, event) => { enterViewerView(context.content) }
+                ],
+                exit: [
+                    () => exitViewerView()
+                ],
+                on: {
+                    "enableEditMode": {
+                        target: "Editing"
+                    }
+                }
             },
             "Editing": {
+                initial: "Typing",
+                entry: [
+                    (context, event) => { enterEditorView(context.content) }
+                ],
+                exit: [
+                    (context, event) => { exitEditorView() }
+                ],
+                states: {
+                    "Typing": {
+                        on: {
+                            "save": {
+                                target: "Saving",
+                                actions: [
+                                    assign({
+                                        content: () => getEditorContent()
+                                    })
+                                ]
+                            },
+                            "closeEditor": {
+                                target: "Exiting"
+                            }
+                        }
+                    },
+                    "Saving": {
+                        invoke: {
+                            src: (context, event) => save(context.fileId, context.content),
+                            onDone: "Typing",
+                            onError: "Typing"
+                        }
+                    },
+                    "Exiting": {
+                        type: "final" 
+                    }
+                },
+                onDone: "Viewing"
             },
-            "Saving": {
+            "Error": {
+                type: 'final'
             }
         },
         schema: {
             context: {} as {
                 action: StateFromGoogleAction,
                 fileId: string,
-                userId: string
+                userId: string,
+                content: string
             }
         }
     })
 
     const machine = createMachine({
         "predictableActionArguments": true,
-        "id": "Grive editor",
-        "initial": "Initialize google",
+        "id": "Gdrive editor",
+        "initial": "Initialize",
         "context": {
-          converter: new showdown.Converter()
+          action: StateFromGoogleAction.Unsupported,
+          fileId: "",
+          userId: ""
         },
         "states": {
-            "Initialize google": {
+            "Initialize": {
                 "invoke": {
-                    "src": (context, event) => Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient),
-                    "onDone": "Google state processing"
-                },
+                    src: (context, event) => Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient).then(parseGoogleState),
+                    onDone: {
+                        target: "Routing",
+                        actions: assign((context, event) => {
+                            return {
+                                action: event.data.action,
+                                fileId: event.data.fileId,
+                                userId: event.data.userId
+                            }
+                        })
+                    },
+                    onError: "Error view"
+                }
             },
-            "Authorizing": {
+            "Routing": {
+                always: [
+                    {
+                        target: "Handling file",
+                        cond: "isOpenAction"
+                    },
+                    {
+                        target: "Handling file",
+                        cond: "isNewAction"
+                    },
+                    {
+                        target: "Installing",
+                        cond: "isInstallAction"
+                    },
+                    { target: "App info" }
+                ]
+            },
+            "Installing": {
+                invoke: {
+                    src: (context, event) => authorizeInstall,
+                    onDone: "App info",
+                    onError: "Error view"
+                }
             },
             "Handling file": {
                 invoke: {
+                    id: "handleFile",
                     src: handleFile,
-                }
-            },
-            "App info": {},
-            "Google state processing": {
-                "invoke": {
-                    "src": "parseStateTransition"
+                    data: {
+                        action: (context:any) => context.action,
+                        fileId: (context:any) => context.fileId,
+                        userId: (context:any) => context.userId
+                    }
                 },
-                "on": {
-                    "google state processed": [
-                        {
-                        "target": "Loading file",
-                        //   "cond": "areFileDetailsPresent"
-                        // },
-                        // {
-                        //   "target": "Editing",
-                        //   "cond": "isNewFile"
-                        // },
-                        // {
-                        //   "target": "App info"
-                        }
-                    ],
-                    "google state invalid": {
-                        "target": "Error view"
+                on: {
+                    "editButtonClicked": {
+                        actions: [
+                            sendTo("handleFile", "enableEditMode")
+                        ]
+                    },
+                    "previewButtonClicked": {
+                        actions: [
+                            sendTo("handleFile", "togglePreview")
+                        ]
+                    },
+                    "saveButtonClicked": {
+                        actions: [
+                            sendTo("handleFile", "save")
+                        ]
+                    },
+                    "closeButtonClicked": {
+                        actions: [
+                            logInvokeFail,
+                            sendTo("handleFile", "closeEditor")
+                        ]
                     }
                 }
-          },
-          "Error view": {
-            "type": "final"
-          }
+            },
+            "App info": {
+
+            },
+            "Google state processing": {},
+            "Error view": {
+                "type": "final"
+            }
         },
         "schema": {
             events: {} as Events,
@@ -153,156 +416,58 @@ type Events = {type: 'edit'}
         },
       },
       {
+        actions: {
+        },
         services: {
-          parseStateTransition: (context, event) => (callback, onReceive) => {
-            const searchParams = new URLSearchParams(window.location.search)
-            
-            // https://developers.google.com/drive/api/guides/integrate-open
-            const state = JSON.parse(searchParams.get("state"));
-            if(state == null) callback("google state invalid")
-      
-            const fileIds = state["ids"] as Array<string>;
-            // if(fileIds.length != 1) throw Error("Invalid state parameter: to many file ids");
-            if(fileIds.length != 1) callback("google state invalid")
-      
-            let action = StateFromGoogleAction.Unsupported
-            if(state["action"] == "open") action = StateFromGoogleAction.Open
-            if(state["action"] == "new") action = StateFromGoogleAction.New
-      
-            const userId = state["userId"]
-      
-            context.state = {
-                fileId: fileIds[0],
-                action: action,
-                userId: userId
-            }
-            callback("google state processed")
-          }
         },
         guards: {
-
+            isOpenAction: (context, event) => StateFromGoogleAction.Open == context.action,
+            isNewAction: (context, event) => StateFromGoogleAction.New == context.action,
+            isInstallAction: (context, event) => StateFromGoogleAction.Install == context.action
         }
       }
     )
-    interpret(machine)
+    const machineService = interpret(machine)
       .onTransition((state) => { console.log(state.value) })
       .start()
 
-    async function loadFile(state:StateFromGoogle) {
+    async function loadFile(fileId:string) {
         // https://developers.google.com/drive/api/v3/reference/files
         const response = await gapi.client.drive.files.get({
-            fileId: state.fileId,
+            fileId: fileId,
             alt: "media"
         })
-
-        const editor = document.getElementById("editor")
-        const textArea = editor.getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
-        textArea.value = response.body
-
-        const viewer = document.getElementById("viewer")
-        // const html = converter.makeHtml(response.body);
-        // viewer.innerHTML = html;
+        return response.body
     }
 
-    async function save(state:StateFromGoogle) {
-        const editorEle = document.getElementById("editor") as HTMLDivElement
-        const textArea = editorEle.getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
-        
+    async function save(fileId:string, content:string) {
         // according to https://stackoverflow.com/questions/40600725/google-drive-api-v3-javascript-update-file-contents
         // google drive javascript library doesn't support body upload
         await gapi.client.request({
-            path: "/upload/drive/v3/files/" + state.fileId,
+            path: "/upload/drive/v3/files/" + fileId,
             method: "PATCH",
             params: {
                 uploadType: "media"
             },
-            body: textArea.value
+            body: content
         })
-
-        editorEle.classList.toggle("d-none")
-
-        const editBtn = document.getElementById("btn-edit")
-        editBtn.classList.toggle("d-none")
-
-        const saveBtn = document.getElementById("btn-save")
-        saveBtn.classList.toggle("d-none")
-
-        const previewBtn = document.getElementById("btn-preview")
-        previewBtn.classList.toggle("d-none")
     }
 
-    // function authorize() {
-    //     tokenClient = google.accounts.oauth2.initTokenClient({
-    //         client_id: CLIENT_ID,
-    //         scope: SCOPES,
-    //         callback: async (tokenResponse:google.accounts.oauth2.TokenResponse) => {
-    //             if (tokenResponse.error !== undefined) {
-    //               throw (tokenResponse);
-    //             }
-
-    //             if(state != null && state.action == StateFromGoogleAction.Open) {
-    //                 loadFile(state)
-    //             } else {
-    //                 // should open editor with new file
-    //                 throw new Error("Unsupported yet")
-    //             }
-    //         }
-    //     });
-        
-    //     if(state == null) {
-    //         tokenClient.requestAccessToken({
-    //             prompt: 'consent',
-    //         });
-    //     } else {
-    //         tokenClient.requestAccessToken({
-    //             prompt: '',
-    //             hint: state.userId
-    //         });
-    //     }
-    // }
-
-    // function maybeAuthorize() {
-    //     if(gapiInited && gisInited) {
-    //         authorize()
-    //     }
-    // }
-
     function onClickEditBtn(ev:MouseEvent) {
-        const editorEle = document.getElementById("editor") as HTMLDivElement
-        editorEle.classList.toggle("d-none")
-
-        const editBtn = document.getElementById("btn-edit")
-        editBtn.classList.toggle("d-none")
-
-        const saveBtn = document.getElementById("btn-save")
-        saveBtn.classList.toggle("d-none")
-
-        const previewBtn = document.getElementById("btn-preview")
-        previewBtn.classList.toggle("d-none")
+        machineService.send("editButtonClicked")
     }
 
     function onClickPreviewBtn(ev:MouseEvent) {
-        const viewerEle = document.getElementById("viewer") as HTMLDivElement
-        viewerEle.classList.toggle("d-none")
+        machineService.send("previewButtonClicked")
     }
 
     function onClickSaveBtn(ev:MouseEvent) {
-        // if(state != null) {
-        //     save(state)
-        // }
+        machineService.send("saveButtonClicked")
     }
 
-    // const apiEle = document.createElement('script') as HTMLScriptElement
-    // apiEle.defer = true
-    // apiEle.src = "https://apis.google.com/js/api.js"
-    // apiEle.addEventListener("load", apiLibraryLoaded)
-    // document.body.appendChild(apiEle)
-
-    // const gisEle = document.createElement('script') as HTMLScriptElement
-    // gisEle.defer = true
-    // gisEle.src = "https://accounts.google.com/gsi/client"
-    // gisEle.addEventListener("load", gisLibaryLoaded)
-    // document.body.appendChild(gisEle)
+    function onClickCloseBtn(ev:MouseEvent) {
+        machineService.send("closeButtonClicked")
+    }
 
     const editBtn = document.getElementById("btn-edit") as HTMLButtonElement
     editBtn.onclick = onClickEditBtn
@@ -312,4 +477,7 @@ type Events = {type: 'edit'}
 
     const saveBtn = document.getElementById("btn-save") as HTMLButtonElement
     saveBtn.onclick = onClickSaveBtn
-})()
+
+    const closeBtn = document.getElementById("btn-close") as HTMLButtonElement
+    closeBtn.onclick = onClickCloseBtn
+})() 
