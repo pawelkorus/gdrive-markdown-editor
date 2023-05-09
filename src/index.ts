@@ -1,6 +1,6 @@
 import './main.scss';
 import { default as showdown } from 'showdown'
-import { actions, assign, createMachine, interpret, raise, send } from "xstate";
+import { assign, createMachine, interpret } from "xstate";
 import { sendTo } from 'xstate/lib/actions';
 
 interface StateFromGoogle {
@@ -38,6 +38,10 @@ type Events = {type: "edit"}
 | {type: "previewButtonClicked"}
 | {type: "saveButtonClicked"}
 | {type: "closeButtonClicked"}
+| {type: "contentChanged"}
+| {type: "enableEditMode"}
+| {type: "togglePreview"}
+| {type: "closeEditor"}
 
 (function() {
 
@@ -147,19 +151,51 @@ type Events = {type: "edit"}
         })
     }
 
+    async function loadFile(fileId:string) {
+        // https://developers.google.com/drive/api/v3/reference/files
+        const response = await gapi.client.drive.files.get({
+            fileId: fileId,
+            alt: "media"
+        })
+        return response.body
+    }
+
+    async function save(fileId:string, content:string) {
+        // according to https://stackoverflow.com/questions/40600725/google-drive-api-v3-javascript-update-file-contents
+        // google drive javascript library doesn't support body upload
+        await gapi.client.request({
+            path: "/upload/drive/v3/files/" + fileId,
+            method: "PATCH",
+            params: {
+                uploadType: "media"
+            },
+            body: content
+        })
+    }
+
     function logInvokeFail(context:any, event:any) {
         console.log(event.data)
+    }
+
+    function updateViewer(content:string) {
+        const viewer = document.getElementById("viewer") as HTMLDivElement
+        const html = converter.makeHtml(content);
+        viewer.innerHTML = html;
+    }
+
+    function toggleViewer() {
+        const viewer = document.getElementById("viewer") as HTMLDivElement
+        viewer.classList.toggle("d-none")
     }
 
     function enterViewerView(content:string) {
         const viewer = document.getElementById("viewer") as HTMLDivElement
         viewer.classList.remove("d-none")
-
+        
         const editBtn = document.getElementById("btn-edit")
         editBtn.classList.remove("d-none")
-
-        const html = converter.makeHtml(content);
-        viewer.innerHTML = html;
+        
+        updateViewer(content)
     }
 
     function exitViewerView() {
@@ -187,6 +223,8 @@ type Events = {type: "edit"}
 
         const closeBtn = document.getElementById("btn-close")
         closeBtn.classList.remove("d-none")
+
+        updateViewer(content)
     }
 
     function exitEditorView() {
@@ -255,7 +293,6 @@ type Events = {type: "edit"}
             },
             "Viewing": {
                 entry: [
-                    () => console.log("viewing"),
                     (context, event) => { enterViewerView(context.content) }
                 ],
                 exit: [
@@ -270,10 +307,10 @@ type Events = {type: "edit"}
             "Editing": {
                 initial: "Typing",
                 entry: [
-                    (context, event) => { enterEditorView(context.content) }
+                    (context, event) => enterEditorView(context.content)
                 ],
                 exit: [
-                    (context, event) => { exitEditorView() }
+                    (context, event) => exitEditorView()
                 ],
                 states: {
                     "Typing": {
@@ -288,6 +325,21 @@ type Events = {type: "edit"}
                             },
                             "closeEditor": {
                                 target: "Exiting"
+                            },
+                            "contentChanged": {
+                                target: "Typing",
+                                actions: [
+                                    assign({
+                                        content: () => getEditorContent()
+                                    }),
+                                    (context) => updateViewer(context.content)
+                                ]
+                            },
+                            "togglePreview": {
+                                target: "Typing",
+                                actions: [
+                                    () => toggleViewer()
+                                ]
                             }
                         }
                     },
@@ -299,7 +351,7 @@ type Events = {type: "edit"}
                         }
                     },
                     "Exiting": {
-                        type: "final" 
+                        type: "final"
                     }
                 },
                 onDone: "Viewing"
@@ -372,40 +424,17 @@ type Events = {type: "edit"}
                 invoke: {
                     id: "handleFile",
                     src: handleFile,
+                    autoForward: true,
                     data: {
                         action: (context:any) => context.action,
                         fileId: (context:any) => context.fileId,
                         userId: (context:any) => context.userId
-                    }
-                },
-                on: {
-                    "editButtonClicked": {
-                        actions: [
-                            sendTo("handleFile", "enableEditMode")
-                        ]
-                    },
-                    "previewButtonClicked": {
-                        actions: [
-                            sendTo("handleFile", "togglePreview")
-                        ]
-                    },
-                    "saveButtonClicked": {
-                        actions: [
-                            sendTo("handleFile", "save")
-                        ]
-                    },
-                    "closeButtonClicked": {
-                        actions: [
-                            logInvokeFail,
-                            sendTo("handleFile", "closeEditor")
-                        ]
                     }
                 }
             },
             "App info": {
 
             },
-            "Google state processing": {},
             "Error view": {
                 "type": "final"
             }
@@ -431,53 +460,31 @@ type Events = {type: "edit"}
       .onTransition((state) => { console.log(state.value) })
       .start()
 
-    async function loadFile(fileId:string) {
-        // https://developers.google.com/drive/api/v3/reference/files
-        const response = await gapi.client.drive.files.get({
-            fileId: fileId,
-            alt: "media"
-        })
-        return response.body
-    }
-
-    async function save(fileId:string, content:string) {
-        // according to https://stackoverflow.com/questions/40600725/google-drive-api-v3-javascript-update-file-contents
-        // google drive javascript library doesn't support body upload
-        await gapi.client.request({
-            path: "/upload/drive/v3/files/" + fileId,
-            method: "PATCH",
-            params: {
-                uploadType: "media"
-            },
-            body: content
-        })
-    }
-
-    function onClickEditBtn(ev:MouseEvent) {
-        machineService.send("editButtonClicked")
-    }
-
-    function onClickPreviewBtn(ev:MouseEvent) {
-        machineService.send("previewButtonClicked")
-    }
-
-    function onClickSaveBtn(ev:MouseEvent) {
-        machineService.send("saveButtonClicked")
-    }
-
-    function onClickCloseBtn(ev:MouseEvent) {
-        machineService.send("closeButtonClicked")
-    }
-
     const editBtn = document.getElementById("btn-edit") as HTMLButtonElement
-    editBtn.onclick = onClickEditBtn
+    editBtn.onclick = function(ev:MouseEvent) {
+        machineService.send("enableEditMode")
+    }
 
     const previewBtn = document.getElementById("btn-preview") as HTMLButtonElement
-    previewBtn.onclick = onClickPreviewBtn
+    previewBtn.onclick = function(ev:MouseEvent) {
+        machineService.send("togglePreview")
+    }
 
     const saveBtn = document.getElementById("btn-save") as HTMLButtonElement
-    saveBtn.onclick = onClickSaveBtn
+    saveBtn.onclick = function(ev:MouseEvent) {
+        machineService.send("save")
+    }
 
     const closeBtn = document.getElementById("btn-close") as HTMLButtonElement
-    closeBtn.onclick = onClickCloseBtn
+    closeBtn.onclick = function(ev:MouseEvent) {
+        machineService.send("closeEditor")
+    }
+
+    const editorTextArea = document.getElementById("editor").getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
+    editorTextArea.onchange = function(ev:Event) {
+        machineService.send("contentChanged")
+    }
+    editorTextArea.oninput = function(ev:Event) {
+        machineService.send("contentChanged")
+    }
 })() 
