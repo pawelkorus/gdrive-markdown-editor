@@ -1,12 +1,16 @@
 import './main.scss';
 import { default as showdown } from 'showdown'
-import { assign, createMachine, interpret } from "xstate";
-import { sendTo } from 'xstate/lib/actions';
+import { assign, createMachine, interpret, send } from "xstate";
 
 interface StateFromGoogle {
     action: StateFromGoogleAction
     fileId: string
     userId: string
+}
+
+interface Notification {
+    message: string,
+    type: "info" | "error"
 }
 
 enum StateFromGoogleAction {
@@ -162,6 +166,9 @@ enum StateFromGoogleAction {
     }
 
     function enterViewerView(content:string) {
+        const rootEle = document.getElementById("main") as HTMLDivElement
+        rootEle.classList.remove("d-none")
+
         const viewer = document.getElementById("viewer") as HTMLDivElement
         viewer.classList.remove("d-none")
         
@@ -172,6 +179,9 @@ enum StateFromGoogleAction {
     }
 
     function exitViewerView() {
+        const rootEle = document.getElementById("main") as HTMLDivElement
+        rootEle.classList.remove("d-none")
+
         const viewer = document.getElementById("viewer") as HTMLDivElement
         viewer.classList.add("d-none")
 
@@ -180,6 +190,9 @@ enum StateFromGoogleAction {
     }
 
     function enterEditorView(content:string) {
+        const rootEle = document.getElementById("main") as HTMLDivElement
+        rootEle.classList.remove("d-none")
+
         const editorEle = document.getElementById("editor") as HTMLDivElement
         editorEle.classList.remove("d-none")
         const textArea = editorEle.getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
@@ -201,6 +214,9 @@ enum StateFromGoogleAction {
     }
 
     function exitEditorView() {
+        const rootEle = document.getElementById("main") as HTMLDivElement
+        rootEle.classList.remove("d-none")
+
         const editorEle = document.getElementById("editor") as HTMLDivElement
         editorEle.classList.add("d-none")
 
@@ -221,6 +237,13 @@ enum StateFromGoogleAction {
         const editorEle = document.getElementById("editor") as HTMLDivElement
         const textArea = editorEle.getElementsByTagName("textarea").item(0) as HTMLTextAreaElement
         return textArea.value
+    }
+
+    function enterInfoView(message: string) {
+        const rootEle = document.getElementById("info") as HTMLDivElement
+        rootEle.classList.remove("d-none")
+
+        rootEle.getElementsByClassName("content").item(0).innerHTML = message
     }
 
     const handleFile = createMachine({
@@ -355,6 +378,11 @@ enum StateFromGoogleAction {
         },
         "states": {
             "Initialize": {
+                on: {
+                    "notify": {
+                        target: "Notification"
+                    }
+                },
                 "invoke": {
                     src: (context, event) => Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient).then(parseGoogleState),
                     onDone: {
@@ -367,7 +395,12 @@ enum StateFromGoogleAction {
                             }
                         })
                     },
-                    onError: "Error view"
+                    onError: {
+                        actions: send({type: "notify", notification: {
+                            type: "error",
+                            message: "Failed to initialize application"
+                        }})
+                    }
                 }
             },
             "Routing": {
@@ -384,15 +417,30 @@ enum StateFromGoogleAction {
                         target: "Installing",
                         cond: "isInstallAction"
                     },
-                    { target: "App info" }
+                    { target: "Notification" }
                 ]
             },
             "Installing": {
+                on: {
+                    "notify": {
+                        target: "Notification"
+                    }
+                }, 
                 invoke: {
-                    src: (context, event) => authorizeInstall,
-                    onDone: "App info",
-                    onError: "Error view"
-                }
+                    // src: () => authorizeInstall,
+                    src: () => Promise.resolve(true),
+                    onDone: {
+                        actions: [
+                            send((context, event) => { 
+                                return {type: "notify", notification: { 
+                                    type: "info",
+                                    message: "Installed successfuly"
+                                }} 
+                            })
+                        ]
+                    },
+                    onError: "Notification"
+                },
             },
             "Handling file": {
                 invoke: {
@@ -406,11 +454,17 @@ enum StateFromGoogleAction {
                     }
                 }
             },
-            "App info": {
-
-            },
-            "Error view": {
-                "type": "final"
+            "Notification": {
+                "type": "final",
+                entry: [
+                    (context, event) => {
+                        switch(event.type) {
+                            case "installed": enterInfoView("Installed success"); break;
+                            case "notify": enterInfoView(event.notification.message); break;
+                            default: enterInfoView("Welcome to Gdrive Markdown Editor"); break;
+                        }
+                    }
+                ]
             }
         },
         "schema": {
@@ -426,7 +480,9 @@ enum StateFromGoogleAction {
             | {type: "google state invalid"}
             | {type: "file loaded"}
             | {type: "process google state"}
-            | {type: "on error"}
+            | {type: "on error", value: string}
+            | {type: "installed", message: string}
+            | {type: "notify", notification: Notification}
             | {type: "editButtonClicked"}
             | {type: "previewButtonClicked"}
             | {type: "saveButtonClicked"}
@@ -438,7 +494,8 @@ enum StateFromGoogleAction {
             context: {} as {
                 action: StateFromGoogleAction,
                 fileId: string,
-                userId: string
+                userId: string,
+                notification?: Notification
             }
         },
       },
