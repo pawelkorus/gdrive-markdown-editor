@@ -16,33 +16,6 @@ enum StateFromGoogleAction {
     Unsupported
 }
 
-interface Context {
-    action: StateFromGoogleAction,
-    fileId: string,
-    userId: string
-}
-
-type Events = {type: "edit"}   
-| {type: "saved"}
-| {type: "save"} 
-| {type: "close"} 
-| {type: "toggle preview"}
-| {type: "scripts loaded"} 
-| {type: "google state processed"}
-| {type: "google state processing" }
-| {type: "google state invalid"}
-| {type: "file loaded"}
-| {type: "process google state"}
-| {type: "on error"}
-| {type: "editButtonClicked"}
-| {type: "previewButtonClicked"}
-| {type: "saveButtonClicked"}
-| {type: "closeButtonClicked"}
-| {type: "contentChanged"}
-| {type: "enableEditMode"}
-| {type: "togglePreview"}
-| {type: "closeEditor"}
-
 (function() {
 
     const converter: showdown.Converter = new showdown.Converter();
@@ -251,6 +224,7 @@ type Events = {type: "edit"}
     }
 
     const handleFile = createMachine({
+        "tsTypes": {} as import("./index.typegen").Typegen0,
         "predictableActionArguments": true,
         "id": "handleFile",
         "initial": "Loading file",
@@ -440,8 +414,32 @@ type Events = {type: "edit"}
             }
         },
         "schema": {
-            events: {} as Events,
-            context: {} as Context
+            events: {} as
+            | {type: "edit"}   
+            | {type: "saved"}
+            | {type: "save"} 
+            | {type: "close"} 
+            | {type: "toggle preview"}
+            | {type: "scripts loaded"} 
+            | {type: "google state processed"}
+            | {type: "google state processing" }
+            | {type: "google state invalid"}
+            | {type: "file loaded"}
+            | {type: "process google state"}
+            | {type: "on error"}
+            | {type: "editButtonClicked"}
+            | {type: "previewButtonClicked"}
+            | {type: "saveButtonClicked"}
+            | {type: "closeButtonClicked"}
+            | {type: "contentChanged"}
+            | {type: "enableEditMode"}
+            | {type: "togglePreview"}
+            | {type: "closeEditor"},
+            context: {} as {
+                action: StateFromGoogleAction,
+                fileId: string,
+                userId: string
+            }
         },
       },
       {
