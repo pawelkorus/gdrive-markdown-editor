@@ -1,6 +1,7 @@
 import './main.scss';
 import { default as showdown } from 'showdown'
 import { assign, createMachine, interpret, send } from "xstate";
+import { error } from 'xstate/lib/actions';
 
 interface StateFromGoogle {
     action: StateFromGoogleAction
@@ -10,7 +11,8 @@ interface StateFromGoogle {
 
 interface Notification {
     message: string,
-    type: "info" | "error"
+    type: "info" | "error",
+    errorDetails?: Error
 }
 
 enum StateFromGoogleAction {
@@ -120,7 +122,7 @@ enum StateFromGoogleAction {
                     resolve(true)
                 }
             })
-                
+
             tokenClient.requestAccessToken({
                 prompt: '',
                 hint: userId
@@ -239,11 +241,24 @@ enum StateFromGoogleAction {
         return textArea.value
     }
 
-    function enterInfoView(message: string) {
+    function enterInfoView() {
         const rootEle = document.getElementById("info") as HTMLDivElement
         rootEle.classList.remove("d-none")
+    }
 
-        rootEle.getElementsByClassName("content").item(0).innerHTML = message
+    function displayNotification(notification:Notification) {
+        const rootEle = document.getElementById("info") as HTMLDivElement
+        const rootContentEle = rootEle.getElementsByClassName("content").item(0)
+        
+        const messageEle = document.createElement("p")
+        messageEle.innerHTML = notification.message
+        rootContentEle.append(messageEle)
+
+        if(notification.errorDetails) {
+            const errorDetails = document.createElement("p")
+            errorDetails.innerHTML = notification.errorDetails.stack
+            rootContentEle.append(errorDetails)
+        }
     }
 
     const handleFile = createMachine({
@@ -260,11 +275,10 @@ enum StateFromGoogleAction {
         "states": {
             "Loading file": {
                 invoke: {
-                    src: (context, event) => 
-                        Promise.resolve("# Hello world")
-                        // authorizeFileAccess(context.userId)
-                        //     .then(() => loadFile(context.fileId))
-                        ,
+                    src: (context, event) =>
+                        // loadFile(context.fileId), 
+                        authorizeFileAccess(context.userId)
+                            .then(() => loadFile(context.fileId)),
                     onDone: {
                         target: "Loaded",
                         actions: [
@@ -368,6 +382,7 @@ enum StateFromGoogleAction {
     })
 
     const machine = createMachine({
+        "tsTypes": {} as import("./index.typegen").Typegen1,
         "predictableActionArguments": true,
         "id": "Gdrive editor",
         "initial": "Initialize",
@@ -378,13 +393,8 @@ enum StateFromGoogleAction {
         },
         "states": {
             "Initialize": {
-                on: {
-                    "notify": {
-                        target: "Notification"
-                    }
-                },
                 "invoke": {
-                    src: (context, event) => Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient).then(parseGoogleState),
+                    src: () => Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient).then(parseGoogleState),
                     onDone: {
                         target: "Routing",
                         actions: assign((context, event) => {
@@ -396,10 +406,13 @@ enum StateFromGoogleAction {
                         })
                     },
                     onError: {
-                        actions: send({type: "notify", notification: {
-                            type: "error",
-                            message: "Failed to initialize application"
-                        }})
+                        target: "Notification",
+                        actions: assign({
+                            notification: {
+                                type: "error",
+                                message: "Failed to initialize application"
+                            }
+                        })
                     }
                 }
             },
@@ -417,29 +430,38 @@ enum StateFromGoogleAction {
                         target: "Installing",
                         cond: "isInstallAction"
                     },
-                    { target: "Notification" }
+                    { 
+                        target: "Notification",
+                        actions: assign({ notification: { type: "error", message: "Can't handle input" } }) 
+                    }
                 ]
             },
             "Installing": {
-                on: {
-                    "notify": {
-                        target: "Notification"
-                    }
-                }, 
                 invoke: {
-                    // src: () => authorizeInstall,
-                    src: () => Promise.resolve(true),
+                    src: () => authorizeInstall,
+                    // src: () => Promise.resolve(true),
+                    // src: () => Promise.reject(new Error("dupaduap")),
                     onDone: {
+                        target: "Notification",
                         actions: [
-                            send((context, event) => { 
-                                return {type: "notify", notification: { 
+                            assign({
+                                notification: {
                                     type: "info",
                                     message: "Installed successfuly"
-                                }} 
+                                }
                             })
                         ]
                     },
-                    onError: "Notification"
+                    onError: {
+                        target: "Notification",
+                        actions: assign({
+                            notification: (context, event):Notification => ({
+                                type: "error",
+                                message: "Failed to install application in Gdrive",
+                                errorDetails: event.data
+                            })
+                        })
+                    }
                 },
             },
             "Handling file": {
@@ -455,38 +477,16 @@ enum StateFromGoogleAction {
                 }
             },
             "Notification": {
-                "type": "final",
+                type: "final",
                 entry: [
-                    (context, event) => {
-                        switch(event.type) {
-                            case "installed": enterInfoView("Installed success"); break;
-                            case "notify": enterInfoView(event.notification.message); break;
-                            default: enterInfoView("Welcome to Gdrive Markdown Editor"); break;
-                        }
-                    }
+                    () => enterInfoView(),
+                    (context) => displayNotification(context.notification || { type: "info", message: "Welcome to Gdrive markdown editor" })
                 ]
             }
         },
         "schema": {
             events: {} as
-            | {type: "edit"}   
-            | {type: "saved"}
             | {type: "save"} 
-            | {type: "close"} 
-            | {type: "toggle preview"}
-            | {type: "scripts loaded"} 
-            | {type: "google state processed"}
-            | {type: "google state processing" }
-            | {type: "google state invalid"}
-            | {type: "file loaded"}
-            | {type: "process google state"}
-            | {type: "on error", value: string}
-            | {type: "installed", message: string}
-            | {type: "notify", notification: Notification}
-            | {type: "editButtonClicked"}
-            | {type: "previewButtonClicked"}
-            | {type: "saveButtonClicked"}
-            | {type: "closeButtonClicked"}
             | {type: "contentChanged"}
             | {type: "enableEditMode"}
             | {type: "togglePreview"}
