@@ -9,6 +9,7 @@
     "@types/showdown": "2.0.0",
     "@typescript-eslint/eslint-plugin": "5.58.0",
     "@typescript-eslint/parser": "5.58.0",
+    "@xstate/cli": "0.5.1",
     "clean-webpack-plugin": "4.0.0",
     "css-loader": "6.7.3",
     "eslint": "8.38.0",
@@ -30,16 +31,18 @@
     "node": ">18.0.0"
   },
   "scripts": {
-    "build-prod": "webpack --mode production --config webpack.js",
-    "build-debug": "webpack --mode development --config webpack.js",
+    "build-prod": "npm run xstate-typegen && webpack --mode production --config webpack.js",
+    "build-debug": "npm run xstate-typegen && webpack --mode development --config webpack.js",
     "develop-prod": "webpack serve --mode production --config webpack.js",
     "develop-debug": "webpack serve --mode development --config webpack.js",
     "develop-local": "webpack serve --mode development --env local --config webpack.js",
     "lint": "eslint . --ext .ts",
-    "lint-and-fix": "eslint . --ext .ts --fix"
+    "lint-and-fix": "eslint . --ext .ts --fix",
+    "xstate-typegen": "xstate typegen \"src/**/*.tsx?\""
   },
   "dependencies": {
+    "bootstrap": "5.2.3",
     "showdown": "2.1.0",
-    "bootstrap": "5.2.3"
+    "xstate": "4.37.2"
   }
 }
