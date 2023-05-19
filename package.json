@@ -1,6 +1,6 @@
 {
-  "name": "pass-man",
-  "version": "1.0.0",
+  "name": "gdrive-markdown-editor",
+  "version": "0.0.1",
   "devDependencies": {
     "@types/gapi": "0.0.44",
     "@types/gapi.client.drive-v3": "0.0.1",
