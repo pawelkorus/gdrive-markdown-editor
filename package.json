@@ -38,7 +38,7 @@
     "develop-local": "webpack serve --mode development --env local --config webpack.js",
     "lint": "eslint . --ext .ts",
     "lint-and-fix": "eslint . --ext .ts --fix",
-    "xstate-typegen": "xstate typegen \"src/**/*.tsx?\""
+    "xstate-typegen": "xstate typegen \"src/**/*.ts\""
   },
   "dependencies": {
     "bootstrap": "5.2.3",
