@@ -1,12 +1,15 @@
 import './main.scss';
 import { default as showdown } from 'showdown'
-import { assign, createMachine, interpret, send } from "xstate";
+import { assign, createMachine, interpret, send } from 'xstate';
 import { error } from 'xstate/lib/actions';
+import { loadFile, loadGapi, loadGis, authorizeFileAccess, authorizeInstall, initializeGapiClient, save, createFile} from './google'
 
 interface StateFromGoogle {
     action: StateFromGoogleAction
     fileId: string
     userId: string
+    folderId: string|undefined,
+    folderResourceKey: string|undefined
 }
 
 interface Notification {
@@ -25,40 +28,6 @@ enum StateFromGoogleAction {
 (function() {
 
     const converter: showdown.Converter = new showdown.Converter();
-    const CLIENT_ID = "413355556847-pd76u4ckm8d8jisjg2fmlamgisejh4nn.apps.googleusercontent.com";
-    const API_KEY = "AIzaSyCQLy4XRrT2HWbALEcxhSf2rWNoeQvT6bA";
-    const DISCOVERY_DOC = "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest";
-    const SCOPE_FILE_ACCESS = "https://www.googleapis.com/auth/drive.file"
-    const SCOPE_INSTALL = "https://www.googleapis.com/auth/drive.install"
-
-    async function initializeGapiClient() {
-      await gapi.client.init({
-          apiKey: API_KEY,
-          discoveryDocs: [DISCOVERY_DOC],
-        })
-    }
-
-    function loadGapi() {
-      return new Promise((resolve, reject) => {
-          const apiEle = document.createElement('script') as HTMLScriptElement
-          apiEle.defer = true
-          apiEle.src = "https://apis.google.com/js/api.js"
-          apiEle.addEventListener("load", () => {
-            gapi.load('client', () => resolve(true))
-          })
-          document.body.appendChild(apiEle)
-      })
-    }
-
-    function loadGis() {
-        return new Promise((resolve, reject) => {
-            const gisEle = document.createElement('script') as HTMLScriptElement
-            gisEle.defer = true
-            gisEle.src = "https://accounts.google.com/gsi/client"
-            gisEle.addEventListener("load", () => { resolve(true) })
-            document.body.appendChild(gisEle)
-        })
-    }
 
     async function parseGoogleState():Promise<StateFromGoogle> {
         const searchParams = new URLSearchParams(window.location.search)
@@ -69,87 +38,57 @@ enum StateFromGoogleAction {
             return {
                 action: StateFromGoogleAction.Install,
                 fileId: "",
-                userId: ""
+                userId: "",
+                folderId: undefined,
+                folderResourceKey: undefined
             }
         }
 
-        const fileIds = state["ids"] as Array<string>;
-        if(fileIds.length != 1) throw Error("Invalid state parameter: to many file ids");
-
+    
         let action = StateFromGoogleAction.Unsupported
         if(state["action"] == "open") action = StateFromGoogleAction.Open
         if(state["action"] == "new") action = StateFromGoogleAction.New
+        if(state["action"] == "create") action = StateFromGoogleAction.New
 
         const userId = state["userId"]
 
-        return {
-            action: action,
-            fileId: fileIds[0],
-            userId: userId
+        switch(action) {
+            case StateFromGoogleAction.Open: {
+                const fileIds = state["ids"] as Array<string>;
+                if(action == StateFromGoogleAction.Open && fileIds.length != 1) throw Error("Invalid state parameter: to many file ids");
+                
+                return {
+                    action: action,
+                    fileId: fileIds? fileIds[0] : undefined,
+                    userId: userId,
+                    folderId: undefined,
+                    folderResourceKey: undefined
+                }
+            }
+            case StateFromGoogleAction.New: {
+                const folderId = state["folderId"] as string
+                if(!folderId) throw Error("Can't create new file. Destination folder not specified")
+                
+                const folderResourceKey = state["folderResourceKey"] as string
+
+                return {
+                    action: action,
+                    fileId: undefined,
+                    userId: userId,
+                    folderId: folderId,
+                    folderResourceKey: folderResourceKey
+                }
+            }
+            default: {
+                return {
+                    action: action,
+                    fileId: undefined,
+                    userId: userId,
+                    folderId: undefined,
+                    folderResourceKey: undefined
+                }
+            }
         }
-    }
-
-    async function authorizeInstall() {
-        return new Promise((resolve, reject) => {
-            const tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPE_INSTALL,
-                callback: async (tokenResponse:google.accounts.oauth2.TokenResponse) => {
-                    if (tokenResponse.error !== undefined) {
-                        throw (tokenResponse);
-                    }
-
-                    resolve(true)
-                }
-            });
-
-            tokenClient.requestAccessToken({
-                prompt: 'consent',
-            });
-        })
-    }
-
-    async function authorizeFileAccess(userId: string) {
-        return new Promise((resolve, reject) => {
-            const tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPE_FILE_ACCESS,
-                callback: async (tokenResponse:google.accounts.oauth2.TokenResponse) => {
-                    if (tokenResponse.error !== undefined) {
-                        throw (tokenResponse);
-                    }
-
-                    resolve(true)
-                }
-            })
-
-            tokenClient.requestAccessToken({
-                prompt: '',
-                hint: userId
-            });
-        })
-    }
-
-    async function loadFile(fileId:string) {
-        // https://developers.google.com/drive/api/v3/reference/files
-        const response = await gapi.client.drive.files.get({
-            fileId: fileId,
-            alt: "media"
-        })
-        return response.body
-    }
-
-    async function save(fileId:string, content:string) {
-        // according to https://stackoverflow.com/questions/40600725/google-drive-api-v3-javascript-update-file-contents
-        // google drive javascript library doesn't support body upload
-        await gapi.client.request({
-            path: "/upload/drive/v3/files/" + fileId,
-            method: "PATCH",
-            params: {
-                uploadType: "media"
-            },
-            body: content
-        })
     }
 
     function logInvokeFail(context:any, event:any) {
@@ -265,14 +204,48 @@ enum StateFromGoogleAction {
         "tsTypes": {} as import("./index.typegen").Typegen0,
         "predictableActionArguments": true,
         "id": "handleFile",
-        "initial": "Loading file",
+        "initial": "Init",
         "context": {
             action: StateFromGoogleAction.New,
-            fileId: "",
-            userId: "",
-            content: ""
+            fileId: null,
+            userId: null,
+            content: "",
+            folderId: null,
+            folderResourceKey: null
         },
         "states": {
+            "Init": {
+                always: [
+                    {
+                        target: "Loading file",
+                        cond: (context, event) => context.action == StateFromGoogleAction.Open
+                    },
+                    {
+                        target: "New file",
+                        cond: (context, event) => context.action == StateFromGoogleAction.New
+                    },
+                    {
+                        target: "Error"
+                    }
+                ]
+            },
+            "New file": {
+                invoke: {
+                    src: (context, event) => authorizeFileAccess(context.userId)
+                        .then(() => createFile("New file", context.content, context.folderId)),
+                    onDone: {
+                        target: "Loaded",
+                        actions: [
+                            assign({fileId: (context, event) => event.data}),
+                            assign({content: (context, event) => "This is new file"})
+                        ],
+                    },
+                    onError: {
+                        target: "Error",
+                        actions: logInvokeFail
+                    }
+                }
+            },
             "Loading file": {
                 invoke: {
                     src: (context, event) =>
@@ -376,7 +349,9 @@ enum StateFromGoogleAction {
                 action: StateFromGoogleAction,
                 fileId: string,
                 userId: string,
-                content: string
+                content: string,
+                folderId: string,
+                folderResourceKey: string
             }
         }
     })
@@ -388,8 +363,9 @@ enum StateFromGoogleAction {
         "initial": "Initialize",
         "context": {
           action: StateFromGoogleAction.Unsupported,
-          fileId: "",
-          userId: ""
+          fileId: null,
+          userId: null,
+          folderId: null
         },
         "states": {
             "Initialize": {
@@ -401,7 +377,8 @@ enum StateFromGoogleAction {
                             return {
                                 action: event.data.action,
                                 fileId: event.data.fileId,
-                                userId: event.data.userId
+                                userId: event.data.userId,
+                                folderId: event.data.folderId
                             }
                         })
                     },
@@ -472,7 +449,8 @@ enum StateFromGoogleAction {
                     data: {
                         action: (context:any) => context.action,
                         fileId: (context:any) => context.fileId,
-                        userId: (context:any) => context.userId
+                        userId: (context:any) => context.userId,
+                        folderId: (context:any) => context.folderId
                     }
                 }
             },
@@ -495,6 +473,7 @@ enum StateFromGoogleAction {
                 action: StateFromGoogleAction,
                 fileId: string,
                 userId: string,
+                folderId: string,
                 notification?: Notification
             }
         },

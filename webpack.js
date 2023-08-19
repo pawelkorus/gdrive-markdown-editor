@@ -13,9 +13,10 @@ module.exports = (env, argv) => {
         },
         devtool: 'source-map',
         devServer: {
-            host: 'editor-2askjkd902nd.com',
+            host: env.APP_HOST || 'editor-2askjkd902nd.com',
             server: 'https',
-            static: [path.resolve(__dirname, 'target'), path.resolve(__dirname, configDir)]
+            static: [path.resolve(__dirname, 'target'), path.resolve(__dirname, configDir)],
+            port: 443
         },
         optimization: { 
             splitChunks: {
