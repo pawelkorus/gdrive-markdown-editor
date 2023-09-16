@@ -1,1 +1,25 @@
 @import "~bootstrap/scss/bootstrap";
+
+// temporary fix for incorrect close button display
+// see https://stackoverflow.com/a/67875597
+.close ::before{
+    content: 'X';
+    visibility: visible;
+    color: "black";
+    margin: -4px;
+}
+
+.sr-only::before{
+    visibility: hidden;
+}
+
+.close{
+    /*background-color: red; */
+    visibility: hidden;
+    position: absolute;
+    right: 32px;
+    top: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(247, 12, 12, 0.5);
+}

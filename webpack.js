@@ -5,7 +5,7 @@ const path = require('path');
 
 module.exports = (env, argv) => {
     const configDir = env.local? '.config-local' : '.config-dev'
-    const entryFile = './src/index.ts'
+    const entryFile = './src/index.tsx'
     
     return {
         entry: {
@@ -16,7 +16,7 @@ module.exports = (env, argv) => {
             host: env.APP_HOST || 'editor-2askjkd902nd.com',
             server: 'https',
             static: [path.resolve(__dirname, 'target'), path.resolve(__dirname, configDir)],
-            port: 443
+            port: 8080
         },
         optimization: { 
             splitChunks: {
