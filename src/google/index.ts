@@ -4,15 +4,15 @@ const DISCOVERY_DOC = "https://www.googleapis.com/discovery/v1/apis/drive/v3/res
 const SCOPE_FILE_ACCESS = "https://www.googleapis.com/auth/drive.file";
 const SCOPE_INSTALL = "https://www.googleapis.com/auth/drive.install";
 
-type TokenRequestResult = (tokenReponse:google.accounts.oauth2.TokenResponse) => void
-type TokenRequestReject = (error:unknown) => void
+type RequestTokenSuccess = (tokenReponse:google.accounts.oauth2.TokenResponse) => void
+type RequestTokenReject = (error:unknown) => void
 
 class TokenCallbackResult {
 
-    private r:TokenRequestResult
-    private e:TokenRequestReject
+    private r:RequestTokenSuccess
+    private e:RequestTokenReject
     
-    constructor(r:TokenRequestResult, e:TokenRequestReject) {
+    constructor(r:RequestTokenSuccess, e:RequestTokenReject) {
         this.r = r;
         this.e = e;
     }
