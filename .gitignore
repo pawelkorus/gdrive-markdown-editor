@@ -2,3 +2,4 @@ node_modules
 target
 index.typegen.ts
 .run-develop-local.sh
+.hidden
