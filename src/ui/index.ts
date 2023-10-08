@@ -1,5 +1,5 @@
 export { default as Editor } from "./Editor"
 export { default as Viewer } from "./Viewer"
 export { default as NotificationView } from "./NotificationView"
-export { default as MarkdownContent } from "./MarkdownContent"
+export { default as MarkdownContent } from "../markdown/MarkdownContent"
 export { SaveEvent } from "./Editor"

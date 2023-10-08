@@ -10,10 +10,11 @@
         "module": "es2020",
         "importHelpers": true,
         "downlevelIteration": true,
-        "types": [ 
-            "gapi", 
+        "types": [
+            "gapi",
             "gapi.client.drive-v3",
-            "google.accounts" 
+            "google.accounts",
+            "google.picker"
         ],
         "lib": [
             "es2015",

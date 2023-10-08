@@ -26,14 +26,17 @@ class TokenCallbackResult {
     }
 }
 
-let waitForTokenResult:TokenCallbackResult
-let tokenClientPromise:any = null
+let waitForTokenResult:TokenCallbackResult;
+let latestTokenResponse:google.accounts.oauth2.TokenResponse = null;
+let tokenClient:google.accounts.oauth2.TokenClient = null;
 
-function initializeTokenClient():Promise<google.accounts.oauth2.TokenClient> {
-    tokenClientPromise = Promise.resolve(google.accounts.oauth2.initTokenClient({
+function initializeTokenClient() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPE_INSTALL,
         callback: async (tokenResponse:google.accounts.oauth2.TokenResponse) => {
+            latestTokenResponse = tokenResponse
+            
             if(!waitForTokenResult) return
             
             if (tokenResponse.error !== undefined) {
@@ -42,9 +45,7 @@ function initializeTokenClient():Promise<google.accounts.oauth2.TokenClient> {
 
             waitForTokenResult.resolve(tokenResponse)
         }
-    }))
-
-    return tokenClientPromise;
+    });
 }
 
 export async function initializeGapiClient() {
@@ -60,10 +61,56 @@ export function loadGapi() {
         apiEle.defer = true
         apiEle.src = "https://apis.google.com/js/api.js"
         apiEle.addEventListener("load", () => {
-            gapi.load('client', () => resolve(true))
+            Promise.all(
+                [loadGapiClient(), loadPicker()]
+            )
+            .then(() => resolve(true))
         })
         document.body.appendChild(apiEle)
     })
+}
+
+function loadGapiClient():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+        gapi.load('client', {
+            callback: () => resolve(true),
+            onerror: (err:any) => reject("Failed to load gapi client. " + err),
+            timeout: 15000,
+            ontimeout: () => reject("Timeout when loading gapi client")
+        })
+    })
+}
+
+function loadPicker():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+        gapi.load('picker', {
+            callback: () => resolve(true),
+            onerror: (err:any) => reject("Failed to load picker. " + err),
+            timeout: 15000,
+            ontimeout: () => reject("Timeout when loading picker")
+        });
+    });
+}
+
+export function showPicker():Promise<string> {
+    return new Promise((resolve, reject) => {
+        const picker = new google.picker.PickerBuilder()
+            .addView(new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true))
+            .setOAuthToken(latestTokenResponse.access_token)
+            .setDeveloperKey(API_KEY)
+            .setCallback((res:google.picker.ResponseObject) => {
+                if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+                    let doc = res[google.picker.Response.DOCUMENTS][0];
+                    let url = doc[google.picker.Document.URL];
+                    let fileId = doc[google.picker.Document.ID]
+                    resolve(fileId)
+                } else if(res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
+                    reject("no pick")
+                }
+            })
+            .build();
+        picker.setVisible(true);
+    });
 }
 
 export function loadGis() {
@@ -72,7 +119,8 @@ export function loadGis() {
         gisEle.defer = true
         gisEle.src = "https://accounts.google.com/gsi/client"
         gisEle.addEventListener("load", () => { 
-            initializeTokenClient().then(() => resolve(true)) 
+            initializeTokenClient()
+            resolve(true)
         })
         document.body.appendChild(gisEle)
     })
@@ -82,9 +130,8 @@ export async function authorizeFileAccess(userId: string) {
     return new Promise(async (resolve, reject) => {
         waitForTokenResult = new TokenCallbackResult(resolve, reject);
 
-        let tokenClient = await tokenClientPromise;
         tokenClient.requestAccessToken({
-            scope: SCOPE_FILE_ACCESS,
+            scope: SCOPE_FILE_ACCESS + " https://www.googleapis.com/auth/drive.readonly",
             hint: userId
         });
     })
@@ -94,7 +141,6 @@ export async function authorizeInstall() {
     return new Promise(async (resolve, reject) => {
         waitForTokenResult = new TokenCallbackResult(resolve, reject);
 
-        let tokenClient = await tokenClientPromise;
         tokenClient.requestAccessToken({
             scope: SCOPE_INSTALL
         });
@@ -109,6 +155,15 @@ export async function loadFile(fileId:string):Promise<string> {
         alt: "media"
     })
     return response.body
+}
+
+export async function loadBinaryFile(fileId:string):Promise<string> {
+    // https://developers.google.com/drive/api/v3/reference/files
+    const response = await gapi.client.drive.files.get({
+        fileId: fileId,
+        alt: "media"
+    })
+    return btoa(response.body) 
 }
 
 export async function createFile(filename: string, content:string, parent:string):Promise<string> {

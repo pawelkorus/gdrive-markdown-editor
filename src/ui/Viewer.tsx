@@ -1,5 +1,5 @@
 import React from "react"
-import MarkdownContent from "./MarkdownContent"
+import { MarkdownContent } from "../markdown"
 
 type Props = {
     content: string
