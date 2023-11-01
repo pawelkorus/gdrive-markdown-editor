@@ -8,18 +8,21 @@ class GoolgeFile {
 
 var googleFile:GoolgeFile | null = null;
 
-export async function loadFile(fileId:string, userId:string) {
+export type FileDetails = Omit<googleApi.FileDetails, "id">
+
+export async function loadFile(fileId:string, userId:string):Promise<FileDetails> {
     await googleApi.authorizeFileAccess(userId)
-    var content = await googleApi.loadFile(fileId);
+    const result = await googleApi.loadFile(fileId);
     googleFile = new GoolgeFile(fileId)
-    return content;
+    console.log("Loaded file", result)
+    return result;
 }
 
-export async function createFile(userId:string, parent:string) {
+export async function createFile(userId:string, parent:string):Promise<FileDetails> {
     await googleApi.authorizeFileAccess(userId)
-    const fileId = await googleApi.createFile("Newfile.md", "", parent)
-    googleFile = new GoolgeFile(fileId);
-    return "This is new file"
+    const result = await googleApi.createFile("Newfile.md", "", parent)
+    googleFile = new GoolgeFile(result.id);
+    return result
 }
 
 export async function save(newContent:string) {
@@ -27,6 +30,14 @@ export async function save(newContent:string) {
         throw new Error("Google file not loaded");
     } else {
         googleApi.save(googleFile.fileId, newContent)
+    }
+}
+
+export async function updateFileName(newName:string) {
+    if(googleFile == null) {
+        throw new Error("Google file not loaded");
+    } else {
+        googleApi.updateFileName(googleFile.fileId, newName)
     }
 }
 

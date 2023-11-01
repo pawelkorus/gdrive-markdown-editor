@@ -22,10 +22,12 @@ afterEach(() => {
 
 test('renders without crashing', () => {
     const props:Props = {
+        fileName: 'test.md',
         content: '',
         onSaveClicked: () => {},
         onCloseClicked: () => {},
-        onTogglePreviewClicked: () => {}
+        onTogglePreviewClicked: () => {},
+        onFileNameChanged: () => {}
     };
     component = renderer.create(<Editor {...props} />);
     const tree = component.toJSON();
@@ -34,10 +36,12 @@ test('renders without crashing', () => {
 
 test('renders with content', () => {
     const props:Props = {
+        fileName: 'test.md',
         content: 'Hello, world!',
         onSaveClicked: () => {},
         onCloseClicked: () => {},
-        onTogglePreviewClicked: () => {}
+        onTogglePreviewClicked: () => {},
+        onFileNameChanged: () => {}
     };
     component = renderer.create(<Editor {...props} />);
     const tree = component.toJSON();
@@ -47,10 +51,12 @@ test('renders with content', () => {
 test('renders with preview enabled', () => {
     const mockOnTogglePreviewClicked = jest.fn();
     const props:Props = {
+        fileName: 'test.md',
         content: 'Hello, world!',
         onSaveClicked: () => {},
         onCloseClicked: () => {},
-        onTogglePreviewClicked: mockOnTogglePreviewClicked
+        onTogglePreviewClicked: mockOnTogglePreviewClicked,
+        onFileNameChanged: () => {}
     };
     component = renderer.create(<Editor {...props} />);
     act(() => {
@@ -63,10 +69,12 @@ test('renders with preview enabled', () => {
 
 test('save button click', () => {
     const props:Props = {
+        fileName: 'test.md',
         content: 'Hello, world!',
         onSaveClicked: () => {},
         onCloseClicked: () => {},
-        onTogglePreviewClicked: () => {}
+        onTogglePreviewClicked: () => {},
+        onFileNameChanged: () => {}
     };
     component = renderer.create(<Editor {...props} />);
     act(() => {
@@ -82,10 +90,12 @@ test('save button click', () => {
 test('close button click', () => {
     const mockOnCloseClicked = jest.fn();
     const props:Props = {
+        fileName: 'test.md',
         content: 'Hello, world!',
         onSaveClicked: () => {},
         onCloseClicked: mockOnCloseClicked,
-        onTogglePreviewClicked: () => {}
+        onTogglePreviewClicked: () => {},
+        onFileNameChanged: () => {}
     };
     component = renderer.create(<Editor {...props} />);
     act(() => {
@@ -98,10 +108,12 @@ test('close button click', () => {
 test('preview button click', () => {
     const mockOnTogglePreviewClicked = jest.fn();
     const props:Props = {
+        fileName: 'test.md',
         content: 'Hello, world!',
         onSaveClicked: () => {},
         onCloseClicked: () => {},
-        onTogglePreviewClicked: mockOnTogglePreviewClicked
+        onTogglePreviewClicked: mockOnTogglePreviewClicked,
+        onFileNameChanged: () => {}
     };
     component = renderer.create(<Editor {...props} />);
     act(() => {
@@ -109,6 +121,45 @@ test('preview button click', () => {
     });
 
     expect(mockOnTogglePreviewClicked).toHaveBeenCalled();
+});
+
+test('should enter file name edit mode', () => {
+    const props:Props = {
+        fileName: 'test.md',
+        content: 'Hello, world!',
+        onSaveClicked: () => {},
+        onCloseClicked: () => {},
+        onTogglePreviewClicked: () => {},
+        onFileNameChanged: () => {}
+    };
+    component = renderer.create(<Editor {...props} />);
+    act(() => {
+        component.root.findByType('h5').props.onClick();
+    });
+
+    const tree = component.toJSON();
+    expect(tree).toMatchSnapshot();
+});
+
+test('should trigger onFileNameChanged when file name changed', () => {
+    const mockOnFileNameChanged = jest.fn();
+    const props:Props = {
+        fileName: 'test.md',
+        content: 'Hello, world!',
+        onSaveClicked: () => {},
+        onCloseClicked: () => {},
+        onTogglePreviewClicked: () => {},
+        onFileNameChanged: mockOnFileNameChanged
+    };
+    component = renderer.create(<Editor {...props} />);
+    act(() => {
+        component.root.findByType('h5').props.onClick();
+    });
+    act(() => {
+        component.root.findByType('input').props.onBlur();
+    });
+
+    expect(mockOnFileNameChanged).toHaveBeenCalled();
 });
 
 

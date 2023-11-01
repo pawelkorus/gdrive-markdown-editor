@@ -48,6 +48,12 @@ function initializeTokenClient() {
     });
 }
 
+export type FileDetails = {
+    id: string,
+    name: string,
+    content: string
+}
+
 export async function initializeGapiClient() {
     await gapi.client.init({
         apiKey: API_KEY,
@@ -147,14 +153,27 @@ export async function authorizeInstall() {
     })
 }
 
-
-export async function loadFile(fileId:string):Promise<string> {
+export async function loadFile(fileId:string):Promise<FileDetails> {
     // https://developers.google.com/drive/api/v3/reference/files
-    const response = await gapi.client.drive.files.get({
-        fileId: fileId,
-        alt: "media"
-    })
-    return response.body
+    var results = await Promise.all([
+        gapi.client.drive.files.get({
+            fileId: fileId,
+            fields: "id,name"
+        }),
+        gapi.client.drive.files.get({
+            fileId: fileId,
+            alt: "media"
+        })
+    ]);
+
+    const metadataResponse = results[0] 
+    const response = results[1]
+    
+    return {
+        id: fileId,
+        name: metadataResponse.result.name,
+        content: response.body
+    }
 }
 
 export async function loadBinaryFile(fileId:string):Promise<string> {
@@ -166,7 +185,7 @@ export async function loadBinaryFile(fileId:string):Promise<string> {
     return btoa(response.body) 
 }
 
-export async function createFile(filename: string, content:string, parent:string):Promise<string> {
+export async function createFile(filename: string, content:string, parent:string):Promise<FileDetails> {
     const response = await gapi.client.drive.files.create({
         uploadType: "media"
     }, {
@@ -177,7 +196,11 @@ export async function createFile(filename: string, content:string, parent:string
         ],
     })
 
-    return response.result.id
+    return {
+        id: response.result.id,
+        name: response.result.name,
+        content: content
+    }
 }
 
 export async function save(fileId:string, content:string) {
@@ -190,6 +213,17 @@ export async function save(fileId:string, content:string) {
             uploadType: "media"
         },
         body: content
+    })
+}
+
+// generate method that will update gdrive file name
+export async function updateFileName(fileId:string, filename:string) {
+    await gapi.client.request({
+        path: "/drive/v3/files/" + fileId,
+        method: "PATCH",
+        body: {
+            name: filename
+        }
     })
 }
 

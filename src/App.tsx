@@ -17,9 +17,11 @@ import {
 import {
     loadFile,
     save,
-    createFile
+    createFile,
+    updateFileName
 } from "./service"
 import { Spinner } from "react-bootstrap"
+import { FileNameChangeEvent } from "./ui/Editor"
 
 type Props = {
 
@@ -27,6 +29,7 @@ type Props = {
 
 export default ({}:Props):React.ReactElement => {
     const [loading, setLoading] = useState(true)
+    const [fileName, setFileName] = useState("RandomFilename.md")
     const [content, setContent] = useState("Initializing"); 
     const [editMode, setEditMode] = useState(false)
     const [message, setMessage] = useState(null)
@@ -37,7 +40,8 @@ export default ({}:Props):React.ReactElement => {
         
             if(StateFromGoogleAction.Open == googleState.action) {
                 try {
-                    const content = await loadFile(googleState.fileId, googleState.userId);
+                    const { name, content } = await loadFile(googleState.fileId, googleState.userId);
+                    setFileName(name)
                     setContent(content)
                     setEditMode(false)
                 } catch(e : unknown) {
@@ -46,7 +50,8 @@ export default ({}:Props):React.ReactElement => {
                 }
             } else if(StateFromGoogleAction.New == googleState.action) {
                 try {
-                    const content = await createFile("Newfile.md", googleState.folderId);
+                    const { name, content } = await createFile("Newfile.md", googleState.folderId);
+                    setFileName(name);
                     setContent(content);
                     setEditMode(true);
                 } catch(e: unknown) {
@@ -84,6 +89,10 @@ export default ({}:Props):React.ReactElement => {
         setContent(e.content)
     }
 
+    async function handleFileNameChange(e:FileNameChangeEvent) {
+        await updateFileName(e.fileName)
+    }
+
     return loading? 
     <div className="container-fluid h-100 d-flex">
         <div className="mx-auto my-auto">
@@ -94,7 +103,13 @@ export default ({}:Props):React.ReactElement => {
     </div>
     : 
     <NotificationView message={message}>
-        {editMode && <Editor content={content} onCloseClicked={closeEditMode} onSaveClicked={saveContent}/>}
+        {editMode && <Editor 
+                fileName={fileName}
+                content={content} 
+                onCloseClicked={closeEditMode} 
+                onSaveClicked={saveContent}
+                onFileNameChanged={handleFileNameChange}
+            />}
 
         {!editMode && <Viewer content={content} onEditClicked={enableEditMode}/>}
     </NotificationView>
