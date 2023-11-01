@@ -24,7 +24,7 @@ export default function(props:Props):React.ReactElement {
     useEffect(() => {
         const interval = setInterval(() => {
             if(isDirty) save(updatedContent)
-        }, 10000);
+        }, 5000);
         return () => {
             clearInterval(interval);
         }
