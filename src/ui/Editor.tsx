@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { MarkdownContent } from "../markdown"
 import { showPicker } from '../google'
 
-type Props = {
+export type Props = {
     content: string,
     onSaveClicked?: (event:SaveEvent) => void
     onCloseClicked?: () => void
