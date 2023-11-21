@@ -6,7 +6,7 @@ class GoolgeFile {
     ) {}
 }
 
-var googleFile:GoolgeFile | null = null;
+let googleFile:GoolgeFile | null = null;
 
 export type FileDetails = Omit<googleApi.FileDetails, "id">
 

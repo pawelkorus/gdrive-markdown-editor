@@ -112,9 +112,9 @@ export function showPicker():Promise<string> {
             .setDeveloperKey(API_KEY)
             .setCallback((res:google.picker.ResponseObject) => {
                 if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-                    let doc = res[google.picker.Response.DOCUMENTS][0];
-                    let url = doc[google.picker.Document.URL];
-                    let fileId = doc[google.picker.Document.ID]
+                    const doc = res[google.picker.Response.DOCUMENTS][0];
+                    const url = doc[google.picker.Document.URL];
+                    const fileId = doc[google.picker.Document.ID]
                     resolve(fileId)
                 } else if(res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
                     reject("no pick")
@@ -161,7 +161,7 @@ export async function authorizeInstall() {
 
 export async function loadFile(fileId:string):Promise<FileDetails> {
     // https://developers.google.com/drive/api/v3/reference/files
-    var results = await Promise.all([
+    const results = await Promise.all([
         gapi.client.drive.files.get({
             fileId: fileId,
             fields: "id,name"
