@@ -100,8 +100,14 @@ function loadPicker():Promise<boolean> {
 
 export function showPicker():Promise<string> {
     return new Promise((resolve, reject) => {
+        const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true);
+        const uploadView = new google.picker.DocsUploadView().setIncludeFolders(true);
+
         const picker = new google.picker.PickerBuilder()
-            .addView(new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true))
+            .enableFeature(google.picker.Feature.SIMPLE_UPLOAD_ENABLED)
+            .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+            .addView(view)
+            .addView(uploadView)
             .setOAuthToken(latestTokenResponse.access_token)
             .setDeveloperKey(API_KEY)
             .setCallback((res:google.picker.ResponseObject) => {
