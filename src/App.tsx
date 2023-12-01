@@ -22,6 +22,7 @@ import {
     updateFileName
 } from "./service"
 import { Spinner } from "react-bootstrap"
+import EditorViewProseMirror from "./ui/EditorViewProseMirror"
 
 type Props = {
 
@@ -103,7 +104,7 @@ export default ({}:Props):React.ReactElement => {
     </div>
     : 
     <NotificationView message={message}>
-        {editMode && <EditorView 
+        {editMode && <EditorViewProseMirror 
                 fileName={fileName}
                 content={content} 
                 onCloseClicked={closeEditMode} 
