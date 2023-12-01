@@ -1,6 +1,6 @@
 import React from 'react';
 import renderer, { act } from 'react-test-renderer';
-import Editor, { Props } from '../../src/ui/Editor';
+import Editor, { Props } from '../../src/ui/EditorView';
 import { test, expect, jest, afterEach } from '@jest/globals';
 
 

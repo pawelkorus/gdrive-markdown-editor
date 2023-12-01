@@ -1,9 +1,10 @@
 import React from "react"
 import {
-    Editor,
-    Viewer,
+    EditorView,
+    ViewerView,
     NotificationView,
-    SaveEvent
+    SaveEvent,
+    FileNameChangeEvent
 } from "./ui"
 import { useEffect, useState } from 'react'
 import { 
@@ -21,7 +22,6 @@ import {
     updateFileName
 } from "./service"
 import { Spinner } from "react-bootstrap"
-import { FileNameChangeEvent } from "./ui/Editor"
 
 type Props = {
 
@@ -103,7 +103,7 @@ export default ({}:Props):React.ReactElement => {
     </div>
     : 
     <NotificationView message={message}>
-        {editMode && <Editor 
+        {editMode && <EditorView 
                 fileName={fileName}
                 content={content} 
                 onCloseClicked={closeEditMode} 
@@ -111,6 +111,6 @@ export default ({}:Props):React.ReactElement => {
                 onFileNameChanged={handleFileNameChange}
             />}
 
-        {!editMode && <Viewer content={content} onEditClicked={enableEditMode}/>}
+        {!editMode && <ViewerView content={content} onEditClicked={enableEditMode}/>}
     </NotificationView>
 }
