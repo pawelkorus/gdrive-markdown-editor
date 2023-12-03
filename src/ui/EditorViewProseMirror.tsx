@@ -1,10 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { showPicker } from '../google';
-import { ProseMirror } from '@nytimes/react-prosemirror';
-import { EditorState } from 'prosemirror-state';
-import { schema, defaultMarkdownParser } from 'prosemirror-markdown';
-import { exampleSetup } from 'prosemirror-example-setup';
-import { gapCursor } from 'prosemirror-gapcursor';
+import ProseMirrorVisualEditor from './ProseMirrorVisualEditor';
 
 export type Props = {
     fileName: string,
@@ -34,16 +30,7 @@ export default function(props:Props):React.ReactElement {
     const [isDirty, setIsDirty] = useState(false)
     const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
     const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
-    const [editorState, setEditorState] = useState(() => {
-        return EditorState.create({
-            doc: defaultMarkdownParser.parse(props.content),
-            plugins: [
-                gapCursor(),
-                ...exampleSetup({schema})
-            ]
-        })
-    });
-    const [mount, setMount] = useState<HTMLDivElement | null>(null);
+    
     
     useEffect(() => {
         if(isDirty) {
@@ -101,11 +88,7 @@ export default function(props:Props):React.ReactElement {
     </div>
     <div className="d-flex flex-row flex-fill mt-4">
         <div className="position-relative" style={{flex: 1}}>
-            <div className="editor">
-                <ProseMirror mount={mount} state={editorState} dispatchTransaction={(tr) => { setEditorState((s) => s.apply(tr)); }}>
-                    <div ref={setMount} />
-                </ProseMirror>
-            </div>
+            <ProseMirrorVisualEditor content={updatedContent} />
         </div>
     </div>
 </div>
