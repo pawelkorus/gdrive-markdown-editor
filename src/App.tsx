@@ -22,7 +22,6 @@ import {
     updateFileName
 } from "./service"
 import { Spinner } from "react-bootstrap"
-import EditorViewProseMirror from "./ui/EditorViewProseMirror"
 
 type Props = {
 
@@ -104,13 +103,13 @@ export default ({}:Props):React.ReactElement => {
     </div>
     : 
     <NotificationView message={message}>
-        {editMode && <EditorViewProseMirror 
+        {/* {editMode && <EditorViewProseMirror 
                 fileName={fileName}
                 content={content} 
                 onCloseClicked={closeEditMode} 
                 onSaveClicked={saveContent}
                 onFileNameChanged={handleFileNameChange}
-            />}
+            />} */}
 
         {!editMode && <ViewerView content={content} onEditClicked={enableEditMode}/>}
     </NotificationView>
