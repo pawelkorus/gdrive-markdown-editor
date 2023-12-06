@@ -39,20 +39,25 @@ module.exports = (env, argv) => {
                 {
                     test: /\.(css)/,
                     use: [ 
-                      MiniCssExtractPlugin.loader, // instead of style-loader
-                      {
-                        loader: 'css-loader', // translates CSS into CommonJS modules
-                      }]
+                        MiniCssExtractPlugin.loader, // instead of style-loader
+                        {
+                            loader: 'css-loader', // translates CSS into CommonJS modules
+                        }, {
+                            loader: 'postcss-loader'
+                        }
+                    ]
                 },
                 {
                     test: /\.(scss)/,
                     use: [
-                      MiniCssExtractPlugin.loader, 
-                      {
-                        loader: 'css-loader', // translates CSS into CommonJS modules
-                      }, {
-                        loader: 'sass-loader' // compiles Sass to CSS
-                      }
+                        MiniCssExtractPlugin.loader, 
+                        {
+                            loader: 'css-loader', // translates CSS into CommonJS modules
+                        }, {
+                            loader: 'postcss-loader'                        
+                        },{
+                            loader: 'sass-loader' // compiles Sass to CSS
+                        }
                     ]
                 },
                 {
