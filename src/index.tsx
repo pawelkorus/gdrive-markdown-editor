@@ -18,6 +18,13 @@ lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor inc
 ## World
 
 **lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua**
+
+https://talk.commonmark.org/t/generic-directives-plugins-syntax/444/106
+
+::gdrive{src="aaaa"}
 `
 import EditorViewMilkdown from './ui/EditorViewMilkdown';
-root.render(<EditorViewMilkdown fileName='alamakota.md' content={content}/>)
+import DebugMilkdownEditor from './ui/DebugMilkdownEditor';
+import { ProseStateProvider } from './ui/ProseStateProvider';
+// root.render(<EditorViewMilkdown fileName='alamakota.md' content={content}/>)
+root.render(<ProseStateProvider><DebugMilkdownEditor content={content}/></ProseStateProvider>)
