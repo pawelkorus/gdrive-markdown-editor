@@ -7,6 +7,7 @@ import {
   insertHrCommand,
   wrapInHeadingCommand,
 } from "@milkdown/preset-commonmark";
+import { gdriveCommand } from "../gdrive-plugin";
 import { ReactNode } from "react";
 
 type ConfigItem = {
@@ -67,6 +68,10 @@ export const config: Array<ConfigItem> = [
     onSelect: (ctx: Ctx) => ctx.get(commandsCtx).call(insertHrCommand.key),
     renderer: <>Horizontal divider</>
   },
+  {
+    onSelect: (ctx: Ctx) => ctx.get(commandsCtx).call(gdriveCommand.key),
+    renderer: <>Insert image from google drive</>
+  }
 ].map((item) => ({
   ...item,
   onSelect: (ctx: Ctx) => {

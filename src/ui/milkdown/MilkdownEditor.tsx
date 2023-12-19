@@ -3,12 +3,13 @@ import { Editor, rootCtx, defaultValueCtx } from '@milkdown/core';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import { commonmark } from '@milkdown/preset-commonmark';
 import { history } from '@milkdown/plugin-history';
-import { usePluginViewFactory, ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
+import { ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
 import { useSlash } from './slash'
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { useSetProseState } from '../ProseStateProvider';
 import { debounce } from 'lodash';
-import { gdrive } from './gdrive-plugin';
+import { useGdriveEmbed } from './gdrive-plugin';
+import { remarkPlugins } from './remark-plugin';
 
 type MilkdownEditorProps = {
     content: string
@@ -16,9 +17,9 @@ type MilkdownEditorProps = {
 
 function MilkdownEditor(props:MilkdownEditorProps) {
     const slash = useSlash();
+    const gdriveEmbed = useGdriveEmbed();
     const setProseState = useSetProseState();
-    const pluginViewFactory = usePluginViewFactory();
-
+    
     const { get } = useEditor((root) =>
       Editor.make()
         .config((ctx) => {
@@ -39,7 +40,8 @@ function MilkdownEditor(props:MilkdownEditorProps) {
         .use(commonmark)
         .use(listener)
         .use(history)
-        .use(gdrive)
+        .use(remarkPlugins)
+        .use(gdriveEmbed.plugins)
         .use(slash.plugins)
   );
 

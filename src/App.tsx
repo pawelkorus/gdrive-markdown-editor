@@ -22,10 +22,30 @@ import {
     updateFileName
 } from "./service"
 import { Spinner } from "react-bootstrap"
+import { ProseStateProvider } from "./ui/ProseStateProvider"
+import DebugMilkdownEditor from "./ui/DebugMilkdownEditor"
 
 type Props = {
 
 }
+
+let content2 = `
+# Hello world
+
+> lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
+
+## Hello
+
+lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua
+
+## World
+
+**lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua**
+
+https://talk.commonmark.org/t/generic-directives-plugins-syntax/444/106
+
+::gdrive{src="1fZywQ0vXBX33fZlrqKl1ubHlmeGg-O9l"}
+`
 
 export default ({}:Props):React.ReactElement => {
     const [loading, setLoading] = useState(true)
@@ -102,15 +122,16 @@ export default ({}:Props):React.ReactElement => {
         </div>
     </div>
     : 
-    <NotificationView message={message}>
-        {/* {editMode && <EditorViewProseMirror 
-                fileName={fileName}
-                content={content} 
-                onCloseClicked={closeEditMode} 
-                onSaveClicked={saveContent}
-                onFileNameChanged={handleFileNameChange}
-            />} */}
+    // <NotificationView message={message}>
+    //     {/* {editMode && <EditorViewProseMirror 
+    //             fileName={fileName}
+    //             content={content} 
+    //             onCloseClicked={closeEditMode} 
+    //             onSaveClicked={saveContent}
+    //             onFileNameChanged={handleFileNameChange}
+    //         />} */}
 
-        {!editMode && <ViewerView content={content} onEditClicked={enableEditMode}/>}
-    </NotificationView>
+    //     {!editMode && <ViewerView content={content} onEditClicked={enableEditMode}/>}
+    // </NotificationView>
+    <ProseStateProvider><DebugMilkdownEditor content={content2}/></ProseStateProvider>
 }
