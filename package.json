@@ -53,6 +53,7 @@
   "dependencies": {
     "@milkdown/core": "^7.3.2",
     "@milkdown/ctx": "^7.3.2",
+    "@milkdown/plugin-cursor": "7.3.2",
     "@milkdown/plugin-history": "^7.3.2",
     "@milkdown/plugin-slash": "7.3.2",
     "@milkdown/preset-commonmark": "^7.3.2",
