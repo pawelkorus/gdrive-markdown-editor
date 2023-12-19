@@ -7,7 +7,7 @@ import { ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
 import { useSlash } from './slash'
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { cursor } from '@milkdown/plugin-cursor';
-import { useSetProseState } from '../ProseStateProvider';
+import { useSetProseState } from './dev-plugin/ProseStateProvider';
 import { debounce } from 'lodash';
 import { useGdriveEmbed } from './gdrive-plugin';
 import { remarkPlugins } from './remark-plugin';
