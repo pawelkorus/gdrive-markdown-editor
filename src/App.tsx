@@ -22,8 +22,8 @@ import {
     updateFileName
 } from "./service"
 import { Spinner } from "react-bootstrap"
-import { ProseStateProvider } from "./ui/ProseStateProvider"
-import DebugMilkdownEditor from "./ui/DebugMilkdownEditor"
+import { ProseStateProvider } from "./ui/milkdown/dev-plugin/ProseStateProvider"
+import DebugMilkdownEditor from "./ui/milkdown/dev-plugin/DebugMilkdownEditor"
 
 type Props = {
 

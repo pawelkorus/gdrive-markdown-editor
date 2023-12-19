@@ -1,6 +1,6 @@
 import React from "react";
 import { useProseState } from "./ProseStateProvider";
-import { MilkdownEditor } from "./milkdown";
+import { MilkdownEditor } from "..";
 import { JSONTree } from 'react-json-tree'
 
 type Props = {
