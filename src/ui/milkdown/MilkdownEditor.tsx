@@ -1,5 +1,5 @@
 import React from 'react';
-import { Editor, rootCtx, defaultValueCtx } from '@milkdown/core';
+import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx } from '@milkdown/core';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import { commonmark } from '@milkdown/preset-commonmark';
 import { history } from '@milkdown/plugin-history';
@@ -13,7 +13,9 @@ import { useGdriveEmbed } from './gdrive-plugin';
 import { remarkPlugins } from './remark-plugin';
 
 type MilkdownEditorProps = {
-    content: string
+    content: string,
+    readonly?: boolean,
+    onContentUpdated?: (markdown:string) => void
 }
 
 function MilkdownEditor(props:MilkdownEditorProps) {
@@ -22,21 +24,28 @@ function MilkdownEditor(props:MilkdownEditorProps) {
     const setProseState = useSetProseState();
     
     const { get } = useEditor((root) =>
-      Editor.make()
+    Editor.make()
         .config((ctx) => {
-          ctx.set(rootCtx, root);
-          ctx.set(defaultValueCtx, props.content)
+            ctx.set(rootCtx, root);
+            ctx.set(defaultValueCtx, props.content)
 
-          ctx.get(listenerCtx)
-          .updated((_, doc) => {
-            console.log('updated' + doc.toJSON());
-            const state = doc.toJSON();
-            setProseState(state);
-            debounce(setProseState, 100)(state);
-          })
-          .focus((_) => { console.log('focus') });
+            ctx.update(editorViewOptionsCtx, (prev) => ({
+                ...prev,
+                editable: () => !props.readonly
+            }))
 
-          slash.config(ctx);
+            ctx.get(listenerCtx)
+            .markdownUpdated((_, doc) => {
+                props.onContentUpdated && props.onContentUpdated(doc);
+            })
+            .updated((_, doc) => {
+                const state = doc.toJSON();
+                setProseState(state);
+                debounce(setProseState, 100)(state);
+            })
+            .focus((_) => { console.log('focus') });
+
+            slash.config(ctx);
         })
         .use(commonmark)
         .use(listener)
@@ -45,7 +54,7 @@ function MilkdownEditor(props:MilkdownEditorProps) {
         .use(remarkPlugins)
         .use(gdriveEmbed.plugins)
         .use(slash.plugins)
-  );
+);
 
   return <Milkdown />;
 };
@@ -54,7 +63,7 @@ export default function(props:MilkdownEditorProps) {
   return (
 <MilkdownProvider>
     <ProsemirrorAdapterProvider>
-        <MilkdownEditor content={props.content}/>
+        <MilkdownEditor content={props.content} onContentUpdated={props.onContentUpdated} readonly={props.readonly}/>
     </ProsemirrorAdapterProvider>
 </MilkdownProvider>
     );

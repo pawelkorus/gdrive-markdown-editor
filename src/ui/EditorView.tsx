@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { MarkdownContent } from "../markdown"
-import { showPicker } from '../google'
+import React, { useEffect, useState, useRef } from 'react';
+import { showPicker } from '../google';
+import { MilkdownEditor } from './milkdown';
 
 export type Props = {
     fileName: string,
@@ -24,13 +24,12 @@ export class FileNameChangeEvent {
 }
 
 export default function(props:Props):React.ReactElement {
-    const [previewEnabled, setPreviewEnabled] = useState(false)
     const [fileName, setFileName] = useState(props.fileName)
     const [updatedContent, setUpdatedContent] = useState(props.content)
     const [isDirty, setIsDirty] = useState(false)
     const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
     const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
-    
+
     useEffect(() => {
         if(isDirty) {
             const interval = setInterval(() => {
@@ -46,15 +45,6 @@ export default function(props:Props):React.ReactElement {
         setIsDirty(true);
     }, [updatedContent]);
 
-    function togglePreview() {
-        setPreviewEnabled(!previewEnabled);
-        props.onTogglePreviewClicked && props.onTogglePreviewClicked();
-    }
-
-    function browseGdrive() {
-        showPicker().then(res => setUpdatedContent(updatedContent + res))
-    }
-
     function save(newContent:string) {
         props.onSaveClicked && props.onSaveClicked(new SaveEvent(newContent))
         setLastSavedTimestamp(new Date())
@@ -64,6 +54,11 @@ export default function(props:Props):React.ReactElement {
     function handleFileNameChange() {
         props.onFileNameChanged && props.onFileNameChanged(new FileNameChangeEvent(fileName))
         setEditFileNameEnabled(false)
+    }
+
+    function updateContent(markdown:string) {
+        console.log('updateContent')
+        setUpdatedContent(markdown)
     }
 
     return (
@@ -81,17 +76,12 @@ export default function(props:Props):React.ReactElement {
         ) : ( <h5 className='me-auto mb-0' onClick={() => setEditFileNameEnabled(true)}>{fileName}</h5> )}
         {lastSavedTimestamp != null && <span className="ms-1"><small className="text-success">Last saved at {lastSavedTimestamp.toLocaleString()}</small></span>}
         <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={e => save(updatedContent)}>Save</button>
-        <button className="btn btn-primary ms-1" id="btn-browse" type="button" onClick={browseGdrive}>Browse</button>
-        <button className="btn btn-primary ms-1" id="btn-preview" type="button" onClick={togglePreview}>Preview</button>
         <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={props.onCloseClicked}>Close</button>
     </div>
     <div className="d-flex flex-row flex-fill mt-4">
         <div className="position-relative" style={{flex: 1}}>
-            <textarea className="form-control position-absolute" style={{minHeight: "100%"}}
-                value={updatedContent} 
-                onChange={e => { setUpdatedContent(e.target.value) }}></textarea>
+            <MilkdownEditor content={updatedContent} onContentUpdated={updateContent}/>
         </div>
-        {previewEnabled && <div style={{flex: 1}} className="p-2"><MarkdownContent content={updatedContent}/></div>}  
     </div>
 </div>
 )}
