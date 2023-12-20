@@ -1,5 +1,5 @@
 import React from "react"
-import { MarkdownContent } from "../markdown"
+import { MilkdownEditor } from "./milkdown"
 
 type Props = {
     content: string
@@ -18,7 +18,7 @@ export default function(props:Props):React.ReactElement {
 
     <div className="container-lg mt-4">
         <div className="row">
-            <MarkdownContent content={props.content}/>
+            <MilkdownEditor content={props.content} readonly={true}/>
         </div>
     </div>
 </div>

@@ -1,20 +1,14 @@
 import { Cmd } from '@milkdown/core'; 
-import { Ctx, MilkdownPlugin } from '@milkdown/ctx';
+import { Ctx } from '@milkdown/ctx';
 import { $node, $nodeAttr, $inputRule, $command } from '@milkdown/utils';
 import { expectDomTypeError } from '@milkdown/exception'
-import { setBlockType } from '@milkdown/prose/commands'
 import { EditorState, Transaction } from '@milkdown/prose/state'
 import { EditorView } from '@milkdown/prose/view';
 import { withMeta } from './with-meta'
 import { InputRule } from '@milkdown/prose/inputrules'
 
-// import { gdriveBlockView } from './view'
-import { $view } from '@milkdown/utils';
-import type { NodeViewConstructor } from '@milkdown/prose/view'
-import { loadBinaryFile, showPicker } from '../../../google';
-import GoogleDriveEmbed from './GoogleDriveEmbed';
+import { showPicker } from '../../../google';
 import { useNodeViewFactory } from '@prosemirror-adapter/react';
-import { useState } from 'react';
 import { node } from 'webpack';
 import { gdriveNodeView } from './view';
 
