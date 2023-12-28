@@ -13,10 +13,10 @@ module.exports = (env, argv) => {
         },
         devtool: 'source-map',
         devServer: {
-            host: env.APP_HOST || 'editor-2askjkd902nd.com',
             server: 'https',
             static: [path.resolve(__dirname, 'target'), path.resolve(__dirname, configDir)],
-            port: 8080
+            port: 8080,
+            allowedHosts: 'all',
         },
         optimization: { 
             splitChunks: {
