@@ -4,3 +4,4 @@ target
 .config*
 _snapshots_
 *.typegen.ts
+webpack.js
