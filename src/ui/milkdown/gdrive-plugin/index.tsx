@@ -1,15 +1,12 @@
 import { Cmd } from '@milkdown/core'; 
 import { Ctx } from '@milkdown/ctx';
 import { $node, $nodeAttr, $inputRule, $command } from '@milkdown/utils';
-import { expectDomTypeError } from '@milkdown/exception'
-import { EditorState, Transaction } from '@milkdown/prose/state'
-import { EditorView } from '@milkdown/prose/view';
-import { withMeta } from './with-meta'
-import { InputRule } from '@milkdown/prose/inputrules'
-
+import { expectDomTypeError } from '@milkdown/exception';
+import { EditorState, Transaction } from '@milkdown/prose/state';
+import { withMeta } from './with-meta';
+import { InputRule } from '@milkdown/prose/inputrules';
 import { showPicker } from '../../../google';
 import { useNodeViewFactory } from '@prosemirror-adapter/react';
-import { node } from 'webpack';
 import { gdriveNodeView } from './view';
 
 // https://prosemirror.net/docs/ref/#model.NodeType
@@ -22,7 +19,7 @@ withMeta(gdriveAttr, {
     group: 'Gdrive',
 })
 
-export const gdriveNode = $node('gdrive', ctx => ({
+export const gdriveNode = $node('gdrive', () => ({
     inline: false,
     group: 'block',
     selectable: false,
@@ -67,7 +64,7 @@ withMeta(gdriveNode, {
     group: 'Gdrive',
 })
 
-export const griveInputRule = $inputRule((ctx) => new InputRule(/::gdrive\{src\="(?<src>[^"]+)?"?\}/, (state, match, start, end) => {
+export const griveInputRule = $inputRule((ctx) => new InputRule(/::gdrive\{src="(?<src>[^"]+)?"?\}/, (state, match, start, end) => {
     const [okay, src = ''] = match;
     const { tr } = state;
   
@@ -85,7 +82,7 @@ withMeta(griveInputRule, {
 
 function executeGdriveCommand(ctx: Ctx):Cmd<unknown> {
     return () => {
-        return (state: EditorState, dispatch?: (tr: Transaction) => void, view?: EditorView):boolean => {
+        return (state: EditorState, dispatch?: (tr: Transaction) => void):boolean => {
             if(dispatch) {
                 showPicker().then(fileId => {
                     dispatch(state.tr.replaceSelectionWith(gdriveNode.type(ctx).create({ src: fileId })));

@@ -23,11 +23,8 @@ import {
 } from "./service"
 import { Spinner } from "react-bootstrap"
 
-type Props = {
 
-}
-
-export default ({}:Props):React.ReactElement => {
+export default ():React.ReactElement => {
     const [loading, setLoading] = useState(true)
     const [fileName, setFileName] = useState("RandomFilename.md")
     const [content, setContent] = useState("Initializing"); 

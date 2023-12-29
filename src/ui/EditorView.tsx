@@ -1,5 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { showPicker } from '../google';
+import React, { useEffect, useState } from 'react';
 import { MilkdownEditor } from './milkdown';
 
 export type Props = {
@@ -75,7 +74,7 @@ export default function(props:Props):React.ReactElement {
             />
         ) : ( <h5 className='me-auto mb-0' onClick={() => setEditFileNameEnabled(true)}>{fileName}</h5> )}
         {lastSavedTimestamp != null && <span className="ms-1"><small className="text-success">Last saved at {lastSavedTimestamp.toLocaleString()}</small></span>}
-        <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={e => save(updatedContent)}>Save</button>
+        <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={() => save(updatedContent)}>Save</button>
         <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={props.onCloseClicked}>Close</button>
     </div>
     <div className="d-flex flex-row flex-fill mt-4">

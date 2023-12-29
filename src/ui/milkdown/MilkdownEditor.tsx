@@ -23,7 +23,7 @@ function MilkdownEditor(props:MilkdownEditorProps) {
     const gdriveEmbed = useGdriveEmbed();
     const setProseState = useSetProseState();
     
-    const { get } = useEditor((root) =>
+    useEditor((root) =>
     Editor.make()
         .config((ctx) => {
             ctx.set(rootCtx, root);
@@ -42,8 +42,7 @@ function MilkdownEditor(props:MilkdownEditorProps) {
                 const state = doc.toJSON();
                 setProseState(state);
                 debounce(setProseState, 100)(state);
-            })
-            .focus((_) => { console.log('focus') });
+            });
 
             slash.config(ctx);
         })
@@ -57,7 +56,7 @@ function MilkdownEditor(props:MilkdownEditorProps) {
 );
 
   return <Milkdown />;
-};
+}
 
 export default function(props:MilkdownEditorProps) {
   return (
@@ -67,4 +66,4 @@ export default function(props:MilkdownEditorProps) {
     </ProsemirrorAdapterProvider>
 </MilkdownProvider>
     );
-};
+}

@@ -1,7 +1,7 @@
 node_modules
 target
 .idea
-.config*
+.configit 
 _snapshots_
 *.typegen.ts
 webpack.js
