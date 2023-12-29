@@ -11,6 +11,7 @@ import { useSetProseState } from './dev-plugin/ProseStateProvider';
 import { debounce } from 'lodash';
 import { useGdriveEmbed } from './gdrive-plugin';
 import { remarkPlugins } from './remark-plugin';
+import { useSlash as useSlash2 } from './slash-plugin';
 
 type MilkdownEditorProps = {
     content: string,
@@ -20,6 +21,7 @@ type MilkdownEditorProps = {
 
 function MilkdownEditor(props:MilkdownEditorProps) {
     const slash = useSlash();
+    const slash2 = useSlash2();
     const gdriveEmbed = useGdriveEmbed();
     const setProseState = useSetProseState();
     
@@ -53,6 +55,7 @@ function MilkdownEditor(props:MilkdownEditorProps) {
         .use(remarkPlugins)
         .use(gdriveEmbed.plugins)
         .use(slash.plugins)
+        .use(slash2.plugins)
 );
 
   return <Milkdown />;
