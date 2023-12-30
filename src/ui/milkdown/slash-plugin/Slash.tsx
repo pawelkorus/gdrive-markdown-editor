@@ -5,11 +5,12 @@ import type { Node } from '@milkdown/prose/model';
 import { findParentNode } from '@milkdown/prose';
 import { TextSelection } from '@milkdown/prose/state';
 import { Modal } from 'react-bootstrap';
+import { pluginKey } from '.';
 
 export default function():React.ReactElement {
     const { view, prevState } = usePluginViewContext();
     const [visible, setVisible] = React.useState(false);
-    const ref = useRef<any>(null);
+    // const ref = useRef<any>(null);
     const trigger = '/';
 
     useEffect(() => {
@@ -28,6 +29,8 @@ export default function():React.ReactElement {
         } else {
             console.log("hide")
         }
+
+        console.log(pluginKey.getState(view.state).visible)
     });
 
     function _shouldShow(view: EditorView): boolean {
@@ -66,7 +69,7 @@ export default function():React.ReactElement {
       }
 
     return (
-<Modal show={visible} ref={ref}>
+<Modal show={visible}>
     <Modal.Body>
         <div className="list-group">
             <a href="#" className="list-group-item list-group-item-action active" aria-current="true">Item 1</a>
