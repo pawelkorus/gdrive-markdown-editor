@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MilkdownEditor } from './milkdown';
+import CommandPalette from './CommandPalette';
+import useMilkdownCommands from './milkdown/useMilkdownCommands';
 
 export type Props = {
     fileName: string,
@@ -28,6 +30,8 @@ export default function(props:Props):React.ReactElement {
     const [isDirty, setIsDirty] = useState(false)
     const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
     const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
+    const [commandPaletteVisible, setCommandPaletteVisible] = useState(false);
+    const [commands] = useMilkdownCommands();
 
     useEffect(() => {
         if(isDirty) {
@@ -60,8 +64,25 @@ export default function(props:Props):React.ReactElement {
         setUpdatedContent(markdown)
     }
 
+    function keyDown(event:React.KeyboardEvent) {
+        if(event.key === '/' && !commandPaletteVisible) {
+            event.preventDefault();
+            setCommandPaletteVisible(true);
+        }
+
+        if(event.key === 'Escape' && commandPaletteVisible) {
+            event.preventDefault();
+            setCommandPaletteVisible(false);
+        }
+    }
+
+    function executeCommand(id:string) {
+        commands.filter(c => c.id === id).forEach(c => c.execute());
+        setCommandPaletteVisible(false);
+    }
+
     return (
-<div className="container-fluid p-2 d-flex flex-column min-vh-100">
+<div className="container-fluid p-2 d-flex flex-column min-vh-100" onKeyDown={keyDown}>
     <div className="d-flex flex-row align-items-center justify-content-end">
         {editFileNameEnabled ? (
             <input
@@ -82,5 +103,6 @@ export default function(props:Props):React.ReactElement {
             <MilkdownEditor content={updatedContent} onContentUpdated={updateContent}/>
         </div>
     </div>
+    <CommandPalette show={commandPaletteVisible} commands={commands} onItemSelected={item => executeCommand(item.id)}></CommandPalette>
 </div>
 )}

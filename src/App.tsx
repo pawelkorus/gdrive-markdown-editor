@@ -22,6 +22,8 @@ import {
     updateFileName
 } from "./service"
 import { Spinner } from "react-bootstrap"
+import { MilkdownProvider } from "@milkdown/react"
+import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/react"
 
 
 export default ():React.ReactElement => {
@@ -99,15 +101,25 @@ export default ():React.ReactElement => {
         </div>
     </div>
     : 
-    <NotificationView message={message}>
-        {editMode && <EditorView 
-                fileName={fileName}
-                content={content} 
-                onCloseClicked={closeEditMode} 
-                onSaveClicked={saveContent}
-                onFileNameChanged={handleFileNameChange}
-            />}
+            <NotificationView message={message}>
+                {editMode && <MilkdownProvider>
+                    <ProsemirrorAdapterProvider>
+                        <EditorView 
+                                fileName={fileName}
+                                content={content} 
+                                onCloseClicked={closeEditMode} 
+                                onSaveClicked={saveContent}
+                                onFileNameChanged={handleFileNameChange}
+                            />
+                    </ProsemirrorAdapterProvider>
+                </MilkdownProvider>
+                }
 
-        {!editMode && <ViewerView content={content} onEditClicked={enableEditMode}/>}
-    </NotificationView>
+                {!editMode && <MilkdownProvider>
+                    <ProsemirrorAdapterProvider>
+                        <ViewerView content={content} onEditClicked={enableEditMode}/>
+                    </ProsemirrorAdapterProvider>
+                </MilkdownProvider>
+                }
+            </NotificationView>
 }
