@@ -2,6 +2,7 @@ import { useInstance } from "@milkdown/react";
 import Command from "../Command";
 import {
     wrapInHeadingCommand,
+    turnIntoTextCommand,
     createCodeBlockCommand,
     insertHrCommand,
   } from "@milkdown/preset-commonmark";
@@ -40,6 +41,11 @@ export default function useMilkdownCommands() {
             id: "heading6",
             execute: () => getInstance().ctx.get(commandsCtx).call(wrapInHeadingCommand.key, 6),
             name: "Heading 6"
+        },
+        {
+            id: "turnIntoText",
+            execute: () => getInstance().ctx.get(commandsCtx).call(turnIntoTextCommand.key),
+            name: "Turn into text"
         },
         {
             id: "codeblock",
