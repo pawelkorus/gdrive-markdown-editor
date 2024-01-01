@@ -1,17 +1,14 @@
 import React from 'react';
 import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx } from '@milkdown/core';
-import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
+import { Milkdown, useEditor } from '@milkdown/react';
 import { commonmark } from '@milkdown/preset-commonmark';
 import { history } from '@milkdown/plugin-history';
-import { ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
-import { useSlash } from './slash'
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { cursor } from '@milkdown/plugin-cursor';
 import { useSetProseState } from './dev-plugin/ProseStateProvider';
 import { debounce } from 'lodash';
 import { useGdriveEmbed } from './gdrive-plugin';
 import { remarkPlugins } from './remark-plugin';
-import { useSlash as useSlash2 } from './slash-plugin';
 
 type MilkdownEditorProps = {
     content: string,
@@ -19,9 +16,7 @@ type MilkdownEditorProps = {
     onContentUpdated?: (markdown:string) => void
 }
 
-function MilkdownEditor(props:MilkdownEditorProps) {
-    const slash = useSlash();
-    const slash2 = useSlash2();
+export default function MilkdownEditor(props:MilkdownEditorProps) {
     const gdriveEmbed = useGdriveEmbed();
     const setProseState = useSetProseState();
     
@@ -45,8 +40,6 @@ function MilkdownEditor(props:MilkdownEditorProps) {
                 setProseState(state);
                 debounce(setProseState, 100)(state);
             });
-
-            slash.config(ctx);
         })
         .use(commonmark)
         .use(listener)
@@ -54,19 +47,7 @@ function MilkdownEditor(props:MilkdownEditorProps) {
         .use(cursor)
         .use(remarkPlugins)
         .use(gdriveEmbed.plugins)
-        .use(slash.plugins)
-        .use(slash2.plugins)
 );
 
   return <Milkdown />;
-}
-
-export default function(props:MilkdownEditorProps) {
-  return (
-<MilkdownProvider>
-    <ProsemirrorAdapterProvider>
-        <MilkdownEditor content={props.content} onContentUpdated={props.onContentUpdated} readonly={props.readonly}/>
-    </ProsemirrorAdapterProvider>
-</MilkdownProvider>
-    );
 }
