@@ -1,12 +1,14 @@
-# markdown-editor
+# gdrive-markdown-editor
+
+Markdown editor that integrates with your Google Drive.
 
 ## Custom tags
 
 ### Embed file from google drive 
 ```
-'''gd[alt] <google fileId>
+::gdrive{src="googleFileId"}
 ```
-This tag will load file from your google drive and embed it into document.
+This tag will load file from your google drive and embed it into document as image.
 
 ## Development notes
 
