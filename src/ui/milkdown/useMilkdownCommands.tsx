@@ -7,7 +7,6 @@ import {
     insertHrCommand,
     toggleEmphasisCommand,
     toggleStrongCommand,
-    toggleLinkCommand,
     wrapInBlockquoteCommand
   } from "@milkdown/preset-commonmark";
 import { gdriveCommand } from "./gdrive-plugin";
@@ -18,7 +17,7 @@ export default function useMilkdownCommands() {
     const [loading, getInstance] = useInstance();
 
     function callCommand<T>(cmd: $Command<T>, payload?: T) {
-        return () => getInstance().ctx.get(commandsCtx).call(cmd.key, payload);
+        return () => !loading && getInstance().ctx.get(commandsCtx).call(cmd.key, payload);
     }
 
     const commands:Command[] = [{
