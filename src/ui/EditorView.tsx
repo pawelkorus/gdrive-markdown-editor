@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MilkdownEditor } from './milkdown';
-import CommandPalette from './CommandPalette';
+import { CommandPalette } from './commandPalette';
 import useMilkdownCommands from './milkdown/useMilkdownCommands';
 
 export type Props = {

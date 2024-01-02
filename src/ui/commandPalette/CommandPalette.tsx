@@ -1,22 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalHeader } from 'react-bootstrap';
-import useCommandItemFilter from './useCommandItemFilter';
-
-export type Item = {
-    id: string,
-    name: string
-}
+import useItemFilter from './useItemFilter';
+import { CommandPaletteItem } from './types';
 
 interface CommandPaletteProps {
     show: boolean;
-    commands: Item[]
-    onItemSelected?: (commandPalleteItem: Item) => void
+    commands: CommandPaletteItem[]
+    onItemSelected?: (commandPalleteItem: CommandPaletteItem) => void
 }
 
 const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSelected}) => {
     const [isVisible, setIsVisible] = useState(show);
     const [selected, setSelected] = useState(0);
-    const [filteredCommands, byName] = useCommandItemFilter(commands);
+    const [filteredCommands, byName] = useItemFilter(commands);
     const filterInputRef = React.createRef<HTMLInputElement>();
 
     useEffect(() => {

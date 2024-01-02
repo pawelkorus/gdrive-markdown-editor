@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Item } from "./CommandPalette";
+import { CommandPaletteItem } from "./types";
 
-export default function useCommandItemFilter(commands:Item[]): [Item[], (query:string) => void] {
+export default function useCommandItemFilter(commands:CommandPaletteItem[]): [CommandPaletteItem[], (query:string) => void] {
     const [filteredCommands, setFilteredCommands] = useState(commands);
 
     function byName(query:string) {
