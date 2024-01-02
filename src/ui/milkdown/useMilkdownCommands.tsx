@@ -1,5 +1,5 @@
 import { useInstance } from "@milkdown/react";
-import Command from "../Command";
+import { Command, useCommandManager } from "../../command";
 import {
     wrapInHeadingCommand,
     turnIntoTextCommand,
@@ -13,8 +13,9 @@ import { gdriveCommand } from "./gdrive-plugin";
 import { commandsCtx } from '@milkdown/core';
 import type { $Command } from '@milkdown/utils';
 
-export default function useMilkdownCommands() {
+export default function useMilkdownCommands(): [() => void] {
     const [loading, getInstance] = useInstance();
+    const [registerCommand, unregisterCommand] = useCommandManager()
 
     function callCommand<T>(cmd: $Command<T>, payload?: T) {
         return () => !loading && getInstance().ctx.get(commandsCtx).call(cmd.key, payload);
@@ -87,5 +88,7 @@ export default function useMilkdownCommands() {
         }
     ];
 
-    return [commands]
+    commands.forEach(registerCommand);
+    
+    return [() => commands.forEach(unregisterCommand)];
 }

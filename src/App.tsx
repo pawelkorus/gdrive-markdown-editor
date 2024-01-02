@@ -24,6 +24,7 @@ import {
 import { Spinner } from "react-bootstrap"
 import { MilkdownProvider } from "@milkdown/react"
 import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/react"
+import { CommandsContextProvider } from "./command"
 
 
 export default ():React.ReactElement => {
@@ -101,25 +102,27 @@ export default ():React.ReactElement => {
         </div>
     </div>
     : 
-            <NotificationView message={message}>
-                {editMode && <MilkdownProvider>
-                    <ProsemirrorAdapterProvider>
-                        <EditorView 
-                                fileName={fileName}
-                                content={content} 
-                                onCloseClicked={closeEditMode} 
-                                onSaveClicked={saveContent}
-                                onFileNameChanged={handleFileNameChange}
-                            />
-                    </ProsemirrorAdapterProvider>
-                </MilkdownProvider>
-                }
+    <CommandsContextProvider>
+        <NotificationView message={message}>
+            {editMode && <MilkdownProvider>
+                <ProsemirrorAdapterProvider>
+                    <EditorView 
+                            fileName={fileName}
+                            content={content} 
+                            onCloseClicked={closeEditMode} 
+                            onSaveClicked={saveContent}
+                            onFileNameChanged={handleFileNameChange}
+                        />
+                </ProsemirrorAdapterProvider>
+            </MilkdownProvider>
+            }
 
-                {!editMode && <MilkdownProvider>
-                    <ProsemirrorAdapterProvider>
-                        <ViewerView content={content} onEditClicked={enableEditMode}/>
-                    </ProsemirrorAdapterProvider>
-                </MilkdownProvider>
-                }
-            </NotificationView>
+            {!editMode && <MilkdownProvider>
+                <ProsemirrorAdapterProvider>
+                    <ViewerView content={content} onEditClicked={enableEditMode}/>
+                </ProsemirrorAdapterProvider>
+            </MilkdownProvider>
+            }
+        </NotificationView>
+    </CommandsContextProvider>
 }

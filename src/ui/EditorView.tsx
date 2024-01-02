@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MilkdownEditor } from './milkdown';
 import { CommandPalette } from './commandPalette';
 import useMilkdownCommands from './milkdown/useMilkdownCommands';
+import { useCommands } from '../command';
 
 export type Props = {
     fileName: string,
@@ -25,13 +26,16 @@ export class FileNameChangeEvent {
 }
 
 export default function(props:Props):React.ReactElement {
-    const [fileName, setFileName] = useState(props.fileName)
-    const [updatedContent, setUpdatedContent] = useState(props.content)
-    const [isDirty, setIsDirty] = useState(false)
-    const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
-    const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
-    const [commandPaletteVisible, setCommandPaletteVisible] = useState(false);
-    const [commands] = useMilkdownCommands();
+    const [ fileName, setFileName ] = useState(props.fileName)
+    const [ updatedContent, setUpdatedContent ] = useState(props.content)
+    const [ isDirty, setIsDirty ] = useState(false)
+    const [ lastSavedTimestamp, setLastSavedTimestamp ] = useState(null)
+    const [ editFileNameEnabled, setEditFileNameEnabled ] = useState(false)
+    const [ commandPaletteVisible, setCommandPaletteVisible ] = useState(false);
+    const [ deregisterCommands ] = useMilkdownCommands();
+    const [ commands, executeCommand ] = useCommands();
+
+    useEffect(() => { return () => deregisterCommands() }, []);
 
     useEffect(() => {
         if(isDirty) {
@@ -76,8 +80,8 @@ export default function(props:Props):React.ReactElement {
         }
     }
 
-    function executeCommand(id:string) {
-        commands.filter(c => c.id === id).forEach(c => c.execute());
+    function triggerCommandAndClosePalette(id:string) {
+        executeCommand(id);
         setCommandPaletteVisible(false);
     }
 
@@ -103,6 +107,6 @@ export default function(props:Props):React.ReactElement {
             <MilkdownEditor content={updatedContent} onContentUpdated={updateContent}/>
         </div>
     </div>
-    <CommandPalette show={commandPaletteVisible} commands={commands} onItemSelected={item => executeCommand(item.id)}></CommandPalette>
+    <CommandPalette show={commandPaletteVisible} commands={commands} onItemSelected={item => triggerCommandAndClosePalette(item.id)}></CommandPalette>
 </div>
 )}
