@@ -96,7 +96,7 @@ export default ():React.ReactElement => {
     <div className="container-fluid h-100 d-flex">
         <div className="mx-auto my-auto">
             <Spinner animation="border" role="status">
-                <span className="sr-only">Loading...</span>
+                <span className="visually-hidden">Loading...</span>
             </Spinner>
         </div>
     </div>
