@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MilkdownEditor } from './milkdown';
-import { CommandPalette } from './commandPalette';
 import useMilkdownCommands from './milkdown/useMilkdownCommands';
-import { useCommands } from '../command';
 
 export type Props = {
     fileName: string,
@@ -31,10 +29,8 @@ export default function(props:Props):React.ReactElement {
     const [ isDirty, setIsDirty ] = useState(false)
     const [ lastSavedTimestamp, setLastSavedTimestamp ] = useState(null)
     const [ editFileNameEnabled, setEditFileNameEnabled ] = useState(false)
-    const [ commandPaletteVisible, setCommandPaletteVisible ] = useState(false);
     const [ deregisterCommands ] = useMilkdownCommands();
-    const [ commands, executeCommand ] = useCommands();
-
+    
     useEffect(() => { return () => deregisterCommands() }, []);
 
     useEffect(() => {
@@ -68,25 +64,8 @@ export default function(props:Props):React.ReactElement {
         setUpdatedContent(markdown)
     }
 
-    function keyDown(event:React.KeyboardEvent) {
-        if(event.key === '/' && !commandPaletteVisible) {
-            event.preventDefault();
-            setCommandPaletteVisible(true);
-        }
-
-        if(event.key === 'Escape' && commandPaletteVisible) {
-            event.preventDefault();
-            setCommandPaletteVisible(false);
-        }
-    }
-
-    function triggerCommandAndClosePalette(id:string) {
-        executeCommand(id);
-        setCommandPaletteVisible(false);
-    }
-
     return (
-<div className="container-fluid p-2 d-flex flex-column min-vh-100" onKeyDown={keyDown}>
+<div className="container-fluid p-2 d-flex flex-column min-vh-100">
     <div className="d-flex flex-row align-items-center justify-content-end">
         {editFileNameEnabled ? (
             <input
@@ -107,6 +86,5 @@ export default function(props:Props):React.ReactElement {
             <MilkdownEditor content={updatedContent} onContentUpdated={updateContent}/>
         </div>
     </div>
-    <CommandPalette show={commandPaletteVisible} commands={commands} onItemSelected={item => triggerCommandAndClosePalette(item.id)}></CommandPalette>
 </div>
 )}
