@@ -1,23 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalHeader } from 'react-bootstrap';
 import useItemFilter from './useItemFilter';
 import { CommandPaletteItem } from './types';
 
-interface CommandPaletteProps {
-    show: boolean;
+interface CommandPaletteProps extends PropsWithChildren<{
     commands: CommandPaletteItem[]
     onItemSelected?: (commandPalleteItem: CommandPaletteItem) => void
-}
+}> {}
 
-const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSelected}) => {
-    const [isVisible, setIsVisible] = useState(show);
+const CommandPalette: React.FC<CommandPaletteProps> = ({children, commands, onItemSelected}) => {
+    const [isVisible, setIsVisible] = useState(false);
     const [selected, setSelected] = useState(0);
     const [filteredCommands, byName] = useItemFilter(commands);
     const filterInputRef = React.createRef<HTMLInputElement>();
-
-    useEffect(() => {
-        setIsVisible(show);
-    }, [show]);
 
     useEffect(() => {
         if (filterInputRef.current) {
@@ -27,7 +22,8 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSe
 
     function onKeydown(e: React.KeyboardEvent<Element>) {
         const key = e.key;
-        if (key === "ArrowDown") {
+
+        if (key === "ArrowDown" && isVisible) {
             e.preventDefault();
             setSelected((s) => {
                 console.log(s);
@@ -35,7 +31,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSe
             });
             return;
         }
-        if (key === "ArrowUp") {
+        if (key === "ArrowUp" && isVisible) {
             e.preventDefault();
             setSelected((s) => {
                 console.log(s)
@@ -43,12 +39,26 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSe
             });
             return;
         }
-        if (key === "Enter") {
+        if (key === "Enter" && isVisible) {
             e.preventDefault();
-            if (onItemSelected) {
-                onItemSelected(filteredCommands[selected]);
-            }
+            handleCommandSelected(filteredCommands[selected]);
             return;
+        }
+        if (key === "/" && !isVisible) {
+            e.preventDefault();
+            setIsVisible(true);
+            return;
+        }
+        if(key === 'Escape' && isVisible) {
+            e.preventDefault();
+            setIsVisible(false)
+        }
+    }
+
+    function handleCommandSelected(item:CommandPaletteItem) {
+        setIsVisible(false);
+        if (onItemSelected) {
+            onItemSelected(item);
         }
     }
 
@@ -58,6 +68,10 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSe
     }
 
     return (
+<>
+    <div onKeyDown={onKeydown}>
+        {children}
+
         <Modal show={isVisible} fullscreen="sm-down">
             <ModalHeader>
                 <input ref={filterInputRef} 
@@ -65,7 +79,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSe
                     className="form-control" 
                     placeholder="Search..." 
                     onChange={filterItemsByName} 
-                    onKeyDown={onKeydown}
                 />
             </ModalHeader>
             <ModalBody>
@@ -74,7 +87,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSe
                         <li  key={i.toString()} 
                             className={`list-group-item ${i === selected ? 'active' : ''}`} 
                             aria-current={i === selected ? true : false} 
-                            onMouseDown={() => onItemSelected && onItemSelected(item)}
+                            onMouseDown={() => handleCommandSelected(item)}
                             onMouseMove={() => setSelected(i)}
                             >
                             {item.name}
@@ -83,6 +96,8 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({show, commands, onItemSe
                 </ul>
             </ModalBody>
         </Modal>
+    </div>
+</>
     );
 };
 

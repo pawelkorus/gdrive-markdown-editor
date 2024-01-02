@@ -24,15 +24,17 @@ import {
 import { Spinner } from "react-bootstrap"
 import { MilkdownProvider } from "@milkdown/react"
 import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/react"
-import { CommandsContextProvider } from "./command"
+import { CommandsContextProvider, useCommands } from "./command"
+import { CommandPalette } from "./ui/commandPalette"
 
 
-export default ():React.ReactElement => {
+function RootView():React.ReactElement {
     const [loading, setLoading] = useState(true)
     const [fileName, setFileName] = useState("RandomFilename.md")
     const [content, setContent] = useState("Initializing"); 
     const [editMode, setEditMode] = useState(false)
     const [message, setMessage] = useState(null)
+    const [ commands, executeCommand ] = useCommands();
 
     useEffect(() => {
         const googleApi = async function() {
@@ -102,7 +104,7 @@ export default ():React.ReactElement => {
         </div>
     </div>
     : 
-    <CommandsContextProvider>
+    <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}>
         <NotificationView message={message}>
             {editMode && <MilkdownProvider>
                 <ProsemirrorAdapterProvider>
@@ -124,5 +126,13 @@ export default ():React.ReactElement => {
             </MilkdownProvider>
             }
         </NotificationView>
-    </CommandsContextProvider>
+    </CommandPalette>
+}
+
+export default ():React.ReactElement => {
+    return (
+        <CommandsContextProvider>
+            <RootView />
+        </CommandsContextProvider>
+    )
 }
