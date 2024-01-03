@@ -217,7 +217,7 @@ export async function createFile(filename: string, content:string, parent:string
         uploadType: "media"
     }, {
         name: filename + ".md",
-        // mimeType: "text/markdown",
+        mimeType: "text/markdown",
         parents: [
             parent
         ],
