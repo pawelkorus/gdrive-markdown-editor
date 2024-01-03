@@ -1,5 +1,5 @@
 import { useInstance } from "@milkdown/react";
-import { Command, useCommandManager } from "../../command";
+import { useCommandManager } from "../../command";
 import {
     wrapInHeadingCommand,
     turnIntoTextCommand,
@@ -12,16 +12,17 @@ import {
 import { gdriveCommand } from "./gdrive-plugin";
 import { commandsCtx } from '@milkdown/core';
 import type { $Command } from '@milkdown/utils';
+import { useCallback, useEffect, useMemo } from "react";
 
-export default function useMilkdownCommands(): [() => void] {
+export default function useMilkdownCommands() {
     const [loading, getInstance] = useInstance();
     const [registerCommand, unregisterCommand] = useCommandManager()
-
-    function callCommand<T>(cmd: $Command<T>, payload?: T) {
+    
+    const callCommand = useCallback((function<T>(cmd: $Command<T>, payload?: T) {
         return () => !loading && getInstance().ctx.get(commandsCtx).call(cmd.key, payload);
-    }
-
-    const commands:Command[] = [{
+    }), [loading, getInstance]);
+    
+    const commands = useMemo(() => [{
             id: "heading1",
             execute: callCommand(wrapInHeadingCommand, 1),
             name: "Heading 1"
@@ -86,9 +87,14 @@ export default function useMilkdownCommands(): [() => void] {
             execute: callCommand(toggleStrongCommand),
             name: "Toggle strong"
         }
-    ];
-
-    commands.forEach(registerCommand);
+    ], [callCommand]);
     
-    return [() => commands.forEach(unregisterCommand)];
+    useEffect(() => {
+        console.log("register milkdown commands");
+        registerCommand(commands);
+        return () => {
+            console.log("unregister milkdown commands");
+            unregisterCommand(commands);
+        }
+    }, [commands])
 }

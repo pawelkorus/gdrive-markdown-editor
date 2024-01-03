@@ -5,7 +5,7 @@ import { Command } from "./Command";
 export function useCommands(): [Command[], (id: string) => void] {
   const commandsContext = useContext(CommandsContext);
 
-  return [ commandsContext.getCommands(), commandsContext.executeCommand ];
+  return [ commandsContext.commands, commandsContext.executeCommand ];
 }
 
 export function useCommandManager() {

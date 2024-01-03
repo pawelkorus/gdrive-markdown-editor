@@ -1,18 +1,22 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalHeader } from 'react-bootstrap';
-import useItemFilter from './useItemFilter';
 import { CommandPaletteItem } from './types';
+import { useCommands } from '../../command';
 
 interface CommandPaletteProps extends PropsWithChildren<{
-    commands: CommandPaletteItem[]
     onItemSelected?: (commandPalleteItem: CommandPaletteItem) => void
 }> {}
 
-const CommandPalette: React.FC<CommandPaletteProps> = ({children, commands, onItemSelected}) => {
+const CommandPalette: React.FC<CommandPaletteProps> = ({children, onItemSelected}) => {
     const [isVisible, setIsVisible] = useState(false);
     const [selected, setSelected] = useState(0);
-    const [filteredCommands, byName] = useItemFilter(commands);
+    const [ commands ] = useCommands();
     const filterInputRef = React.createRef<HTMLInputElement>();
+    const [filteredCommands, setFilteredCommands] = useState([]);
+
+    useEffect(() => {
+        setFilteredCommands(commands);
+    }, [commands, isVisible]);
 
     useEffect(() => {
         if (filterInputRef.current) {
@@ -20,7 +24,20 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({children, commands, onIt
         }
     }, [filterInputRef]);
 
-    function onKeydown(e: React.KeyboardEvent<Element>) {
+    useEffect(() => {
+        document.addEventListener('keydown', onKeydown);
+
+        return () => {
+            document.removeEventListener('keydown', onKeydown);
+        };
+    }, [isVisible]);
+
+    function byName(query:string) {
+        setFilteredCommands(commands.filter(command => command.name.toLowerCase().includes(query.toLowerCase())))
+    }
+
+    function onKeydown(e:KeyboardEvent) {
+        console.log(e);
         const key = e.key;
 
         if (key === "ArrowDown" && isVisible) {
@@ -69,34 +86,32 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({children, commands, onIt
 
     return (
 <>
-    <div onKeyDown={onKeydown}>
-        {children}
+    {children}
 
-        <Modal show={isVisible} fullscreen="sm-down">
-            <ModalHeader>
-                <input ref={filterInputRef} 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Search..." 
-                    onChange={filterItemsByName} 
-                />
-            </ModalHeader>
-            <ModalBody>
-                <ul className="list-group">
-                {filteredCommands.map((item, i) => (
-                        <li  key={i.toString()} 
-                            className={`list-group-item ${i === selected ? 'active' : ''}`} 
-                            aria-current={i === selected ? true : false} 
-                            onMouseDown={() => handleCommandSelected(item)}
-                            onMouseMove={() => setSelected(i)}
-                            >
-                            {item.name}
-                        </li>
-                        ))}
-                </ul>
-            </ModalBody>
-        </Modal>
-    </div>
+    <Modal show={isVisible} fullscreen="sm-down">
+        <ModalHeader>
+            <input ref={filterInputRef} 
+                type="text" 
+                className="form-control" 
+                placeholder="Search..." 
+                onChange={filterItemsByName} 
+            />
+        </ModalHeader>
+        <ModalBody>
+            <ul className="list-group">
+            {filteredCommands.map((item, i) => (
+                    <li  key={i.toString()} 
+                        className={`list-group-item ${i === selected ? 'active' : ''}`} 
+                        aria-current={i === selected ? true : false} 
+                        onMouseDown={() => handleCommandSelected(item)}
+                        onMouseMove={() => setSelected(i)}
+                        >
+                        {item.name}
+                    </li>
+                    ))}
+            </ul>
+        </ModalBody>
+    </Modal>
 </>
     );
 };

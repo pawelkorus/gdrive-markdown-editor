@@ -34,7 +34,7 @@ function RootView():React.ReactElement {
     const [content, setContent] = useState("Initializing"); 
     const [editMode, setEditMode] = useState(false)
     const [message, setMessage] = useState(null)
-    const [ commands, executeCommand ] = useCommands();
+    const [ , executeCommand ] = useCommands();
 
     useEffect(() => {
         const googleApi = async function() {
@@ -104,7 +104,7 @@ function RootView():React.ReactElement {
         </div>
     </div>
     : 
-    <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}>
+    <CommandPalette onItemSelected={(item) => executeCommand(item.id)}>
         <NotificationView message={message}>
             {editMode && <MilkdownProvider>
                 <ProsemirrorAdapterProvider>
@@ -131,8 +131,8 @@ function RootView():React.ReactElement {
 
 export default ():React.ReactElement => {
     return (
-        <CommandsContextProvider>
+<CommandsContextProvider>
             <RootView />
-        </CommandsContextProvider>
+</CommandsContextProvider>
     )
 }

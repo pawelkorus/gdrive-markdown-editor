@@ -29,9 +29,7 @@ export default function(props:Props):React.ReactElement {
     const [ isDirty, setIsDirty ] = useState(false)
     const [ lastSavedTimestamp, setLastSavedTimestamp ] = useState(null)
     const [ editFileNameEnabled, setEditFileNameEnabled ] = useState(false)
-    const [ deregisterCommands ] = useMilkdownCommands();
-    
-    useEffect(() => { return () => deregisterCommands() }, []);
+    useMilkdownCommands();
 
     useEffect(() => {
         if(isDirty) {
@@ -60,7 +58,6 @@ export default function(props:Props):React.ReactElement {
     }
 
     function updateContent(markdown:string) {
-        console.log('updateContent')
         setUpdatedContent(markdown)
     }
 
