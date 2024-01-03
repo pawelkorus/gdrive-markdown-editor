@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MilkdownEditor } from './milkdown';
+import { MilkdownEditor, WrapWithProviders } from './milkdown';
 import useMilkdownCommands from './milkdown/useMilkdownCommands';
 
 export type Props = {
@@ -23,7 +23,7 @@ export class FileNameChangeEvent {
     ) {}
 }
 
-export default function(props:Props):React.ReactElement {
+function EditorView(props:Props):React.ReactElement {
     const [ fileName, setFileName ] = useState(props.fileName)
     const [ updatedContent, setUpdatedContent ] = useState(props.content)
     const [ isDirty, setIsDirty ] = useState(false)
@@ -85,3 +85,7 @@ export default function(props:Props):React.ReactElement {
     </div>
 </div>
 )}
+
+export default function(props:Props):React.ReactElement {
+    return <WrapWithProviders><EditorView {...props}/></WrapWithProviders>
+}

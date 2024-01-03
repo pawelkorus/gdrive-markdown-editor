@@ -1,10 +1,11 @@
-import React, { useCallback } from "react"
+import React from "react"
 import {
     EditorView,
     ViewerView,
     NotificationView,
     SaveEvent,
-    FileNameChangeEvent
+    FileNameChangeEvent,
+    useGlobalCommands
 } from "./ui"
 import { useEffect, useState } from 'react'
 import { 
@@ -15,26 +16,20 @@ import {
     StateFromGoogleAction,
     authorizeInstall,
 } from "./google"
-import {
-    loadFile,
-    save,
-    createFile,
-    updateFileName
-} from "./service"
 import { Spinner } from "react-bootstrap"
-import { MilkdownProvider } from "@milkdown/react"
-import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/react"
 import { CommandsContextProvider, useCommands } from "./command"
 import { CommandPalette } from "./ui/commandPalette"
-
+import { GdriveFileContextProvider } from "./service/gdrivefile/GdriveFileContext"
+import { useGdriveFile, useGdriveFileCommands } from "./service/gdrivefile"
 
 function RootView():React.ReactElement {
     const [loading, setLoading] = useState(true)
-    const [fileName, setFileName] = useState("RandomFilename.md")
-    const [content, setContent] = useState("Initializing"); 
     const [editMode, setEditMode] = useState(false)
     const [message, setMessage] = useState(null)
     const [ , executeCommand ] = useCommands();
+    const [ fileDetails, loadFile ] = useGdriveFile();
+    const { createFile, updateContent, updateFileName } = useGdriveFileCommands();
+    useGlobalCommands()
 
     useEffect(() => {
         const googleApi = async function() {
@@ -42,9 +37,7 @@ function RootView():React.ReactElement {
         
             if(StateFromGoogleAction.Open == googleState.action) {
                 try {
-                    const { name, content } = await loadFile(googleState.fileId, googleState.userId);
-                    setFileName(name)
-                    setContent(content)
+                    await loadFile(googleState.fileId, googleState.userId)
                     setEditMode(false)
                 } catch(e : unknown) {
                     console.error(e);
@@ -52,9 +45,7 @@ function RootView():React.ReactElement {
                 }
             } else if(StateFromGoogleAction.New == googleState.action) {
                 try {
-                    const { name, content } = await createFile("Newfile.md", googleState.folderId);
-                    setFileName(name);
-                    setContent(content);
+                    createFile(googleState.folderId);
                     setEditMode(true);
                 } catch(e: unknown) {
                     console.error(e);
@@ -74,26 +65,24 @@ function RootView():React.ReactElement {
         
         if(loading) {
             googleApi()
-            setContent('Initialized')
         }
     }, [])
 
-    const enableEditMode = useCallback(() => {
+    const enableEditMode = () => {
         setEditMode(true)
-    }, []);
+    };
 
-    const closeEditMode = useCallback(() => {
+    const closeEditMode = () => {
         setEditMode(false)
-    }, []);
+    };
 
-    const saveContent = useCallback(async (e:SaveEvent) => {
-        await save(e.content);
-        setContent(e.content)
-    }, []);
+    const saveContent = async (e:SaveEvent) => {
+        await updateContent(e.content);
+    };
 
-    const handleFileNameChange = useCallback(async (e:FileNameChangeEvent) => {
+    const handleFileNameChange = async (e:FileNameChangeEvent) => {
         await updateFileName(e.fileName)
-    }, []);
+    };
 
     return loading? 
     <div className="container-fluid h-100 d-flex">
@@ -106,33 +95,26 @@ function RootView():React.ReactElement {
     : 
     <CommandPalette onItemSelected={(item) => executeCommand(item.id)}>
         <NotificationView message={message}>
-            {editMode && <MilkdownProvider>
-                <ProsemirrorAdapterProvider>
-                    <EditorView 
-                            fileName={fileName}
-                            content={content} 
-                            onCloseClicked={closeEditMode} 
-                            onSaveClicked={saveContent}
-                            onFileNameChanged={handleFileNameChange}
-                        />
-                </ProsemirrorAdapterProvider>
-            </MilkdownProvider>
+            {editMode && <EditorView 
+                fileName={fileDetails.name}
+                content={fileDetails.content} 
+                onCloseClicked={closeEditMode} 
+                onSaveClicked={saveContent}
+                onFileNameChanged={handleFileNameChange}
+            />
             }
 
-            {!editMode && <MilkdownProvider>
-                <ProsemirrorAdapterProvider>
-                    <ViewerView content={content} onEditClicked={enableEditMode}/>
-                </ProsemirrorAdapterProvider>
-            </MilkdownProvider>
-            }
+            {!editMode && <ViewerView content={fileDetails.content} onEditClicked={enableEditMode}/> }
         </NotificationView>
     </CommandPalette>
 }
 
 export default ():React.ReactElement => {
     return (
-<CommandsContextProvider>
-            <RootView />
-</CommandsContextProvider>
+<GdriveFileContextProvider>
+    <CommandsContextProvider>
+                <RootView />
+    </CommandsContextProvider>
+</GdriveFileContextProvider>
     )
 }

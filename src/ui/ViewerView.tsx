@@ -1,12 +1,12 @@
 import React from "react"
-import { MilkdownEditor } from "./milkdown"
+import { MilkdownEditor, WrapWithProviders } from "./milkdown"
 
 type Props = {
     content: string
     onEditClicked?: () => void
 }
 
-export default function(props:Props):React.ReactElement {
+function ViewerView(props:Props):React.ReactElement {
     return (
 <div>
     <div className="container-fluid p-2">
@@ -23,3 +23,7 @@ export default function(props:Props):React.ReactElement {
     </div>
 </div>
 )}
+
+export default function(props:Props):React.ReactElement {
+    return <WrapWithProviders><ViewerView {...props}/></WrapWithProviders>
+}

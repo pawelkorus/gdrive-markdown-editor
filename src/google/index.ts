@@ -125,6 +125,29 @@ export function showPicker():Promise<string> {
     });
 }
 
+export function showMarkdownPicker():Promise<string> {
+    return new Promise((resolve, reject) => {
+        const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true).setMimeTypes("text/markdown");
+        
+        const picker = new google.picker.PickerBuilder()
+            .addView(view)
+            .setOAuthToken(latestTokenResponse.access_token)
+            .setDeveloperKey(API_KEY)
+            .setCallback((res:google.picker.ResponseObject) => {
+                if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+                    const doc = res[google.picker.Response.DOCUMENTS][0];
+                    const url = doc[google.picker.Document.URL];
+                    const fileId = doc[google.picker.Document.ID]
+                    resolve(fileId)
+                } else if(res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
+                    reject("no pick")
+                }
+            })
+            .build();
+        picker.setVisible(true);
+    });
+}
+
 export function loadGis() {
     return new Promise((resolve, reject) => {
         const gisEle = document.createElement('script') as HTMLScriptElement
@@ -138,7 +161,7 @@ export function loadGis() {
     })
 }
 
-export async function authorizeFileAccess(userId: string) {
+export async function authorizeFileAccess(userId?: string) {
     return new Promise(async (resolve, reject) => {
         waitForTokenResult = new TokenCallbackResult(resolve, reject);
 
