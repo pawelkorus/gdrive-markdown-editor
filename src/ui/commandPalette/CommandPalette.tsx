@@ -1,63 +1,39 @@
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalHeader } from 'react-bootstrap';
 import { CommandPaletteItem } from './types';
-import { useCommands } from '../../service/command';
 
 interface CommandPaletteProps extends PropsWithChildren<{
+    commands: CommandPaletteItem[],
     onItemSelected?: (commandPalleteItem: CommandPaletteItem) => void
 }> {}
 
-const CommandPalette: React.FC<CommandPaletteProps> = ({children, onItemSelected}) => {
+const CommandPalette: React.FC<CommandPaletteProps> = ({commands, children, onItemSelected}) => {
     const [isVisible, setIsVisible] = useState(false);
     const [selected, setSelected] = useState(0);
-    const [ commands ] = useCommands();
     const filterInputRef = React.createRef<HTMLInputElement>();
     const [filteredCommands, setFilteredCommands] = useState([]);
 
-    useEffect(() => {
-        setFilteredCommands(commands);
-    }, [commands, isVisible]);
-
-    useEffect(() => {
-        if (filterInputRef.current) {
-            filterInputRef.current.focus();
-        }
-    }, [filterInputRef]);
-
-    useEffect(() => {
-        document.addEventListener('keydown', onKeydown);
-
-        return () => {
-            document.removeEventListener('keydown', onKeydown);
-        };
-    }, [isVisible]);
-
-    function byName(query:string) {
-        setFilteredCommands(commands.filter(command => command.name.toLowerCase().includes(query.toLowerCase())))
-    }
-
-    function onKeydown(e:KeyboardEvent) {
+    const onKeyDown = useCallback((e:KeyboardEvent) => {
         console.log(e);
         const key = e.key;
 
         if (key === "ArrowDown" && isVisible) {
             e.preventDefault();
             setSelected((s) => {
-                console.log(s);
-                return Math.min(s + 1, filteredCommands.length - 1)
+                return Math.min(s + 1, commands.length - 1)
             });
             return;
         }
         if (key === "ArrowUp" && isVisible) {
             e.preventDefault();
             setSelected((s) => {
-                console.log(s)
                 return Math.max(s - 1, 0)
             });
             return;
         }
         if (key === "Enter" && isVisible) {
             e.preventDefault();
+            console.log(filteredCommands[selected]);
             handleCommandSelected(filteredCommands[selected]);
             return;
         }
@@ -70,6 +46,28 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({children, onItemSelected
             e.preventDefault();
             setIsVisible(false)
         }
+    }, [selected, isVisible, filteredCommands]);
+
+    useEffect(() => {
+        setFilteredCommands(commands);
+    }, [commands, isVisible]);
+
+    useEffect(() => {
+        if (filterInputRef.current) {
+            filterInputRef.current.focus();
+        }
+    }, [filterInputRef]);
+
+    useEffect(() => {
+        document.addEventListener('keydown', onKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [onKeyDown]);
+
+    function byName(query:string) {
+        setFilteredCommands(commands.filter(command => command.name.toLowerCase().includes(query.toLowerCase())))
     }
 
     function handleCommandSelected(item:CommandPaletteItem) {

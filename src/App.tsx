@@ -26,9 +26,9 @@ function RootView():React.ReactElement {
     const [loading, setLoading] = useState(true)
     const [editMode, setEditMode] = useState(false)
     const [message, setMessage] = useState(null)
-    const [ , executeCommand ] = useCommands();
-    const [ fileDetails, loadFile ] = useGdriveFile();
-    const { createFile, updateContent, updateFileName } = useGdriveFileCommands();
+    const [commands , executeCommand] = useCommands();
+    const [fileDetails, loadFile] = useGdriveFile();
+    const {createFile, updateContent, updateFileName } = useGdriveFileCommands();
     useGlobalCommands()
 
     useEffect(() => {
@@ -93,7 +93,7 @@ function RootView():React.ReactElement {
         </div>
     </div>
     : 
-    <CommandPalette onItemSelected={(item) => executeCommand(item.id)}>
+    <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}>
         <NotificationView message={message}>
             {editMode && <EditorView 
                 fileName={fileDetails.name}
