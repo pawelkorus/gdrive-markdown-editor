@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import {
     EditorView,
     ViewerView,
@@ -78,22 +78,22 @@ function RootView():React.ReactElement {
         }
     }, [])
 
-    function enableEditMode() {
+    const enableEditMode = useCallback(() => {
         setEditMode(true)
-    }
+    }, []);
 
-    function closeEditMode() {
+    const closeEditMode = useCallback(() => {
         setEditMode(false)
-    }
+    }, []);
 
-    async function saveContent(e:SaveEvent) {
+    const saveContent = useCallback(async (e:SaveEvent) => {
         await save(e.content);
         setContent(e.content)
-    }
+    }, []);
 
-    async function handleFileNameChange(e:FileNameChangeEvent) {
+    const handleFileNameChange = useCallback(async (e:FileNameChangeEvent) => {
         await updateFileName(e.fileName)
-    }
+    }, []);
 
     return loading? 
     <div className="container-fluid h-100 d-flex">
