@@ -21,33 +21,33 @@ export default function MilkdownEditor(props:MilkdownEditorProps) {
     const setProseState = useSetProseState();
     
     useEditor((root) =>
-    Editor.make()
-        .config((ctx) => {
-            ctx.set(rootCtx, root);
-            ctx.set(defaultValueCtx, props.content)
+        Editor.make()
+            .config((ctx) => {
+                ctx.set(rootCtx, root);
+                ctx.set(defaultValueCtx, props.content)
 
-            ctx.update(editorViewOptionsCtx, (prev) => ({
-                ...prev,
-                editable: () => !props.readonly
-            }))
+                ctx.update(editorViewOptionsCtx, (prev) => ({
+                    ...prev,
+                    editable: () => !props.readonly
+                }))
 
-            ctx.get(listenerCtx)
-            .markdownUpdated((_, doc) => {
-                props.onContentUpdated && props.onContentUpdated(doc);
+                ctx.get(listenerCtx)
+                .markdownUpdated((_, doc) => {
+                    props.onContentUpdated && props.onContentUpdated(doc);
+                })
+                .updated((_, doc) => {
+                    const state = doc.toJSON();
+                    setProseState(state);
+                    debounce(setProseState, 100)(state);
+                });
             })
-            .updated((_, doc) => {
-                const state = doc.toJSON();
-                setProseState(state);
-                debounce(setProseState, 100)(state);
-            });
-        })
-        .use(commonmark)
-        .use(listener)
-        .use(history)
-        .use(cursor)
-        .use(remarkPlugins)
-        .use(gdriveEmbed.plugins)
-);
+            .use(commonmark)
+            .use(listener)
+            .use(history)
+            .use(cursor)
+            .use(remarkPlugins)
+            .use(gdriveEmbed.plugins)
+    , [props.content]);
 
-  return <Milkdown />;
+    return <Milkdown />;
 }
