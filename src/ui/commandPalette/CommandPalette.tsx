@@ -10,11 +10,10 @@ interface CommandPaletteProps extends PropsWithChildren<{
 const CommandPalette: React.FC<CommandPaletteProps> = ({commands, children, onItemSelected}) => {
     const [isVisible, setIsVisible] = useState(false);
     const [selected, setSelected] = useState(0);
-    const filterInputRef = React.createRef<HTMLInputElement>();
     const [filteredCommands, setFilteredCommands] = useState([]);
+    const filterInputRef = React.createRef<HTMLInputElement>();
 
     const onKeyDown = useCallback((e:KeyboardEvent) => {
-        console.log(e);
         const key = e.key;
 
         if (key === "ArrowDown" && isVisible) {
