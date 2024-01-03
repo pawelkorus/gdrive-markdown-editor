@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx } from '@milkdown/core';
 import { Milkdown, useEditor } from '@milkdown/react';
 import { commonmark } from '@milkdown/preset-commonmark';
@@ -16,7 +16,7 @@ type MilkdownEditorProps = {
     onContentUpdated?: (markdown:string) => void
 }
 
-export default function MilkdownEditor(props:MilkdownEditorProps) {
+export default memo(function(props:MilkdownEditorProps) {
     const gdriveEmbed = useGdriveEmbed();
     const setProseState = useSetProseState();
     
@@ -47,7 +47,7 @@ export default function MilkdownEditor(props:MilkdownEditorProps) {
             .use(cursor)
             .use(remarkPlugins)
             .use(gdriveEmbed.plugins)
-    , [props.content]);
+    , []);
 
     return <Milkdown />;
-}
+});

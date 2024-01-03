@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { MilkdownEditor, WrapWithProviders } from './milkdown';
 import useMilkdownCommands from './milkdown/useMilkdownCommands';
 
@@ -46,6 +46,10 @@ function EditorView(props:Props):React.ReactElement {
         setIsDirty(true);
     }, [updatedContent]);
 
+    const updateContent = useCallback((markdown:string) => {
+        setUpdatedContent(markdown)
+    }, []);
+
     function save(newContent:string) {
         props.onSaveClicked && props.onSaveClicked(new SaveEvent(newContent))
         setLastSavedTimestamp(new Date())
@@ -55,10 +59,6 @@ function EditorView(props:Props):React.ReactElement {
     function handleFileNameChange() {
         props.onFileNameChanged && props.onFileNameChanged(new FileNameChangeEvent(fileName))
         setEditFileNameEnabled(false)
-    }
-
-    function updateContent(markdown:string) {
-        setUpdatedContent(markdown)
     }
 
     return (
@@ -80,7 +80,7 @@ function EditorView(props:Props):React.ReactElement {
     </div>
     <div className="d-flex flex-row flex-fill mt-4">
         <div className="position-relative" style={{flex: 1}}>
-            <MilkdownEditor content={updatedContent} onContentUpdated={updateContent}/>
+            <MilkdownEditor content={props.content} onContentUpdated={updateContent}/>
         </div>
     </div>
 </div>
