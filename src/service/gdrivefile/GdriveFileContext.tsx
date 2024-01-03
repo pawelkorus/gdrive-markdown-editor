@@ -38,12 +38,12 @@ export function GdriveFileContextProvider(props:Props):React.ReactElement {
     const updateContent = useCallback(async (content:string) => {
         await googleApi.save(fileDetails.id, content);
         setFileDetails({...fileDetails, content});
-    }, []);
+    }, [fileDetails]);
 
     const updateFileName = useCallback(async (fileName:string) => {
         await googleApi.updateFileName(fileDetails.id, fileName);
         setFileDetails({...fileDetails, name: fileName});
-    }, []);
+    }, [fileDetails]);
 
     const createFile = useCallback(async (folderId:string, userId?:string) => {
         await googleApi.authorizeFileAccess(userId)
