@@ -65,10 +65,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({commands, children, onIt
         };
     }, [onKeyDown]);
 
-    function byName(query:string) {
-        setFilteredCommands(commands.filter(command => command.name.toLowerCase().includes(query.toLowerCase())))
-    }
-
     function handleCommandSelected(item:CommandPaletteItem) {
         setIsVisible(false);
         if (onItemSelected) {
@@ -77,7 +73,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({commands, children, onIt
     }
 
     function filterItemsByName(e: React.ChangeEvent<HTMLInputElement>) {
-        byName(e.target.value);
+        setFilteredCommands(commands.filter(command => command.name.toLowerCase().includes(e.target.value.toLowerCase())))
         setSelected(0);
     }
 
