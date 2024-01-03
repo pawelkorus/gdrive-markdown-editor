@@ -21,5 +21,10 @@
             "dom"
         ],
         "jsx": "react"
-    }
+    },
+    "exclude": [
+        "node_modules",
+        "target",
+        "test"
+    ]
 }
