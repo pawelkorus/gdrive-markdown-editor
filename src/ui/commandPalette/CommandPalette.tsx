@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { Modal, ModalBody, ModalHeader } from 'react-bootstrap';
 import { CommandPaletteItem } from './types';
-import { useCommands } from '../../command';
+import { useCommands } from '../../service/command';
 
 interface CommandPaletteProps extends PropsWithChildren<{
     onItemSelected?: (commandPalleteItem: CommandPaletteItem) => void
