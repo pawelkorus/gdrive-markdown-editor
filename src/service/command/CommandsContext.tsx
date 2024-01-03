@@ -17,7 +17,7 @@ export const CommandsContext = createContext<CommandsContextState>({
     executeCommand: () => { throw Error("CommandsContext not initialized"); }
 });
 
-export type Props = PropsWithChildren<unknown>
+type Props = PropsWithChildren<unknown>
 
 export function CommandsContextProvider(props:Props):React.ReactElement {
     const [commandRegistry, setCommandRegistry] = useState<CommandsRegistry>({});

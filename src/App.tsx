@@ -17,7 +17,7 @@ import {
     authorizeInstall,
 } from "./google"
 import { Spinner } from "react-bootstrap"
-import { CommandsContextProvider, useCommands } from "./command"
+import { CommandsContextProvider, useCommands } from "./service/command"
 import { CommandPalette } from "./ui/commandPalette"
 import { GdriveFileContextProvider } from "./service/gdrivefile/GdriveFileContext"
 import { useGdriveFile, useGdriveFileCommands } from "./service/gdrivefile"

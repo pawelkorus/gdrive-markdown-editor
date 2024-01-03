@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { Command, useCommandManager } from "../command";
+import { Command, useCommandManager } from "../service/command";
 import { showMarkdownPicker } from "../google";
 
 export default function useGlobalCommands() {

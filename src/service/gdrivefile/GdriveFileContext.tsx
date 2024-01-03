@@ -12,7 +12,7 @@ export type GdriveFileContextState = {
 }
 
 // Create the context
-const GdriveFileContext = React.createContext<GdriveFileContextState>({
+export const GdriveFileContext = React.createContext<GdriveFileContextState>({
     fileDetails: undefined,
     loadFile: () => { throw Error("GdriveFileContext not initialized"); },
     createFile: () => { throw Error("GdriveFileContext not initialized"); },
@@ -20,9 +20,7 @@ const GdriveFileContext = React.createContext<GdriveFileContextState>({
     updateFileName: () => { throw Error("GdriveFileContext not initialized"); }
 });
 
-export default GdriveFileContext;
-
-export type Props = PropsWithChildren<object>;
+type Props = PropsWithChildren<object>;
 
 export function GdriveFileContextProvider(props:Props):React.ReactElement {
     const [fileDetails, setFileDetails] = useState<FileDetails>({

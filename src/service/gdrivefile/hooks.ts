@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import GdriveFileContext from "./GdriveFileContext";
+import { GdriveFileContext } from "./GdriveFileContext";
 import { FileDetails } from "./GdriveFileContext";
 
 export function useGdriveFile(): [FileDetails, (fileId: string, userId?: string) => void] {
