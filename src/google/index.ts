@@ -62,7 +62,7 @@ export async function initializeGapiClient() {
 }
 
 export function loadGapi() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const apiEle = document.createElement('script') as HTMLScriptElement
         apiEle.defer = true
         apiEle.src = "https://apis.google.com/js/api.js"
@@ -80,7 +80,7 @@ function loadGapiClient():Promise<boolean> {
     return new Promise((resolve, reject) => {
         gapi.load('client', {
             callback: () => resolve(true),
-            onerror: (err:any) => reject("Failed to load gapi client. " + err),
+            onerror: (err: unknown) => reject("Failed to load gapi client. " + err),
             timeout: 15000,
             ontimeout: () => reject("Timeout when loading gapi client")
         })
@@ -91,7 +91,7 @@ function loadPicker():Promise<boolean> {
     return new Promise((resolve, reject) => {
         gapi.load('picker', {
             callback: () => resolve(true),
-            onerror: (err:any) => reject("Failed to load picker. " + err),
+            onerror: (err: unknown) => reject("Failed to load picker. " + err),
             timeout: 15000,
             ontimeout: () => reject("Timeout when loading picker")
         });
@@ -113,7 +113,6 @@ export function showPicker():Promise<string> {
             .setCallback((res:google.picker.ResponseObject) => {
                 if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
                     const doc = res[google.picker.Response.DOCUMENTS][0];
-                    const url = doc[google.picker.Document.URL];
                     const fileId = doc[google.picker.Document.ID]
                     resolve(fileId)
                 } else if(res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
@@ -136,7 +135,6 @@ export function showMarkdownPicker():Promise<string> {
             .setCallback((res:google.picker.ResponseObject) => {
                 if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
                     const doc = res[google.picker.Response.DOCUMENTS][0];
-                    const url = doc[google.picker.Document.URL];
                     const fileId = doc[google.picker.Document.ID]
                     resolve(fileId)
                 } else if(res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
@@ -149,7 +147,7 @@ export function showMarkdownPicker():Promise<string> {
 }
 
 export function loadGis() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const gisEle = document.createElement('script') as HTMLScriptElement
         gisEle.defer = true
         gisEle.src = "https://accounts.google.com/gsi/client"
@@ -162,7 +160,7 @@ export function loadGis() {
 }
 
 export async function authorizeFileAccess(userId?: string) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         waitForTokenResult = new TokenCallbackResult(resolve, reject);
 
         tokenClient.requestAccessToken({
@@ -173,7 +171,7 @@ export async function authorizeFileAccess(userId?: string) {
 }
 
 export async function authorizeInstall() {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
         waitForTokenResult = new TokenCallbackResult(resolve, reject);
 
         tokenClient.requestAccessToken({
