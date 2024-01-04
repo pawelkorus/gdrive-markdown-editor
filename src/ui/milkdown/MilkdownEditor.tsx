@@ -48,11 +48,6 @@ export default memo(function(props:MilkdownEditorProps) {
                 .use(remarkPlugins)
                 .use(gdriveEmbed.plugins)
         , [props.content]);
-
-    // useEffect(() => {
-    //     console.log("MilkdownEditor useEffect", props.content);
-    //     get()?.ctx.set(defaultValueCtx, props.content);
-    // }, [props.content])
-
+        
     return <Milkdown />;
 });
