@@ -127,7 +127,8 @@ export function showPicker():Promise<string> {
 
 export function showMarkdownPicker():Promise<string> {
     return new Promise((resolve, reject) => {
-        const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true).setMimeTypes("text/markdown");
+        const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
+            .setIncludeFolders(true)
         
         const picker = new google.picker.PickerBuilder()
             .addView(view)
