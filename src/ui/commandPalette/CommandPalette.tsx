@@ -32,7 +32,6 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({commands, children, onIt
         }
         if (key === "Enter" && isVisible) {
             e.preventDefault();
-            console.log(filteredCommands[selected]);
             handleCommandSelected(filteredCommands[selected]);
             return;
         }

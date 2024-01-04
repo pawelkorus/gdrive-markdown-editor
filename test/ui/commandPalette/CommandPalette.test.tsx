@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, fireEvent, screen, waitForElementToBeRemoved, waitFor } from '@testing-library/react';
 import CommandPalette from '../../../src/ui/commandPalette/CommandPalette';
 
 function prepareCommands() {
@@ -22,13 +22,19 @@ function prepareCommands() {
     return commands;
 }
 
-test('command palette opens after pressing /', () => {   
+test('command palette opens after pressing / and hides after pressing Escape', () => {   
     render(<CommandPalette commands={prepareCommands()}/>);
 
     expect(document.body).toMatchSnapshot();
 
     fireEvent.keyDown(document, { key: '/' });
 
+    waitFor(() => screen.getByRole('dialog'));
+    expect(document.body).toMatchSnapshot();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    waitForElementToBeRemoved(() => screen.getByRole('dialog'));
     expect(document.body).toMatchSnapshot();
 })
 
