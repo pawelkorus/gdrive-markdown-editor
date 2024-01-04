@@ -16,11 +16,12 @@ import {
     StateFromGoogleAction,
     authorizeInstall,
 } from "./google"
-import { Spinner } from "react-bootstrap"
+import { Button, Spinner } from "react-bootstrap"
 import { CommandsContextProvider, useCommands } from "./service/command"
 import { CommandPalette } from "./ui/commandPalette"
 import { GdriveFileContextProvider } from "./service/gdrivefile/GdriveFileContext"
 import { useGdriveFile, useGdriveFileCommands } from "./service/gdrivefile"
+import { openMarkdownFileCmd } from "./ui/useGlobalCommands"
 
 function RootView():React.ReactElement {
     const [loading, setLoading] = useState(true)
@@ -84,6 +85,8 @@ function RootView():React.ReactElement {
         await updateFileName(e.fileName)
     };
 
+    console.log(loading, editMode, message, fileDetails)
+
     return loading? 
     <div className="container-fluid h-100 d-flex">
         <div className="mx-auto my-auto">
@@ -94,8 +97,10 @@ function RootView():React.ReactElement {
     </div>
     : 
     <>
-        { message && <NotificationView message={message}></NotificationView> }
-        { editMode && !message && <EditorView 
+        { !fileDetails.id && <NotificationView message={message}>
+            <Button onClick={() => executeCommand(openMarkdownFileCmd)}></Button>
+        </NotificationView> }
+        { fileDetails.id && editMode && <EditorView 
                 fileName={fileDetails.name}
                 content={fileDetails.content} 
                 onCloseClicked={closeEditMode} 
@@ -103,7 +108,7 @@ function RootView():React.ReactElement {
                 onFileNameChanged={handleFileNameChange}
             />
         }
-        {!editMode && !message &&  <ViewerView content={fileDetails.content} onEditClicked={enableEditMode}/> }
+        { fileDetails.id && !editMode &&  <ViewerView content={fileDetails.content} onEditClicked={enableEditMode}/> }
         <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}></CommandPalette>
     </>
 }
@@ -112,7 +117,7 @@ export default ():React.ReactElement => {
     return (
 <GdriveFileContextProvider>
     <CommandsContextProvider>
-                <RootView />
+        <RootView />
     </CommandsContextProvider>
 </GdriveFileContextProvider>
     )

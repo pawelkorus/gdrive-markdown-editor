@@ -109,6 +109,7 @@ export function showPicker():Promise<string> {
             .addView(view)
             .addView(uploadView)
             .setOAuthToken(latestTokenResponse.access_token)
+            .setAppId(CLIENT_ID)
             .setDeveloperKey(API_KEY)
             .setCallback((res:google.picker.ResponseObject) => {
                 if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
@@ -132,6 +133,7 @@ export function showMarkdownPicker():Promise<string> {
             .addView(view)
             .setOAuthToken(latestTokenResponse.access_token)
             .setDeveloperKey(API_KEY)
+            .setAppId(CLIENT_ID)
             .setCallback((res:google.picker.ResponseObject) => {
                 if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
                     const doc = res[google.picker.Response.DOCUMENTS][0];
@@ -165,7 +167,8 @@ export async function authorizeFileAccess(userId?: string) {
 
         tokenClient.requestAccessToken({
             scope: SCOPE_FILE_ACCESS + " https://www.googleapis.com/auth/drive.readonly",
-            hint: userId
+            hint: userId,
+            include_granted_scopes: true
         });
     })
 }
