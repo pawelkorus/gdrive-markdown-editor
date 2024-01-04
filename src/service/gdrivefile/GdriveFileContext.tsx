@@ -45,9 +45,9 @@ export function GdriveFileContextProvider(props:Props):React.ReactElement {
         setFileDetails({...fileDetails, name: fileName});
     }, [fileDetails]);
 
-    const createFile = useCallback(async (folderId:string, userId?:string) => {
+    const createFile = useCallback(async (fileName: string, folderId:string, userId?:string) => {
         await googleApi.authorizeFileAccess(userId)
-        const fileDetails = await googleApi.createFile("Newfile.md", "", folderId)
+        const fileDetails = await googleApi.createFile(fileName, "# Hello world", folderId)
         setFileDetails(fileDetails);
     }, []);
 

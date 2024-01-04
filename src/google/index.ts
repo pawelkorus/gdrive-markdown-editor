@@ -149,6 +149,33 @@ export function showMarkdownPicker():Promise<string> {
     });
 }
 
+export function showFolderPicker():Promise<string> {
+    return new Promise((resolve, reject) => {
+        const docsView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+            .setIncludeFolders(true) 
+            .setMimeTypes('application/vnd.google-apps.folder')
+            .setSelectFolderEnabled(true);
+
+        const picker = new google.picker.PickerBuilder()
+            .addView(docsView)
+            .setSelectableMimeTypes("application/vnd.google-apps.folder")
+            .setOAuthToken(latestTokenResponse.access_token)
+            .setDeveloperKey(API_KEY)
+            .setAppId(CLIENT_ID)
+            .setCallback((res:google.picker.ResponseObject) => {
+                if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+                    const doc = res[google.picker.Response.DOCUMENTS][0];
+                    const fileId = doc[google.picker.Document.ID]
+                    resolve(fileId)
+                } else if(res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
+                    reject("no pick")
+                }
+            })
+            .build();
+        picker.setVisible(true);
+    });
+}
+
 export function loadGis() {
     return new Promise((resolve) => {
         const gisEle = document.createElement('script') as HTMLScriptElement
