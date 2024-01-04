@@ -24,12 +24,11 @@ import { useGdriveFile, useGdriveFileCommands } from "./service/gdrivefile"
 import { openMarkdownFileCmd } from "./ui/useGlobalCommands"
 
 function RootView():React.ReactElement {
-    const [loading, setLoading] = useState(true)
-    const [editMode, setEditMode] = useState(false)
     const [message, setMessage] = useState(null)
     const [commands , executeCommand] = useCommands();
     const [fileDetails, loadFile] = useGdriveFile();
     const {createFile, updateContent, updateFileName } = useGdriveFileCommands();
+    const [view, setView] = useState("loading")
     useGlobalCommands()
 
     useEffect(() => {
@@ -39,42 +38,40 @@ function RootView():React.ReactElement {
             if(StateFromGoogleAction.Open == googleState.action) {
                 try {
                     await loadFile(googleState.fileId, googleState.userId)
-                    setEditMode(false)
+                    setViewerView();
                 } catch(e : unknown) {
                     console.error(e);
-                    setMessage("Can't load file. " + e);
+                    setNotificationView("Can't load file. " + e);
                 }
             } else if(StateFromGoogleAction.New == googleState.action) {
                 try {
                     createFile(googleState.folderId);
-                    setEditMode(true);
+                    setEditorView();
                 } catch(e: unknown) {
                     console.error(e);
-                    setMessage("Can't create file. " + e);
+                    setNotificationView("Can't create file. " + e);
                 }
             } else if(StateFromGoogleAction.Install == googleState.action) {
                 try {
                     await authorizeInstall();
-                    setMessage("Application installed into your google drive successfully.")
+                    setNotificationView("Application installed into your google drive successfully.")
                 } catch (e : unknown) {
-                    setMessage("Can't install app into you google drive." + e)
+                    setNotificationView("Can't install app into you google drive." + e)
                 }
+            } else {
+                setNotificationView("Unknown action " + googleState.action);
             }
-
-            setLoading(false)
         }
         
-        if(loading) {
-            googleApi()
-        }
+        googleApi()
     }, [])
 
     const enableEditMode = () => {
-        setEditMode(true)
+        setEditorView();
     };
 
     const closeEditMode = () => {
-        setEditMode(false)
+        setViewerView();
     };
 
     const saveContent = async (e:SaveEvent) => {
@@ -85,31 +82,42 @@ function RootView():React.ReactElement {
         await updateFileName(e.fileName)
     };
 
-    return loading? 
-    <div className="container-fluid h-100 d-flex">
+    const setEditorView = () => {
+        setView("editor");
+    };
+
+    const setViewerView = () => {
+        setView("viewer");
+    };
+
+    const setNotificationView = (message?:string) => {
+        setMessage(message);
+        setView("notification");
+    };
+
+    return  (<>
+    { view === "loading" && <div className="container-fluid h-100 d-flex">
         <div className="mx-auto my-auto">
             <Spinner animation="border" role="status">
                 <span className="visually-hidden">Loading...</span>
             </Spinner>
         </div>
-    </div>
-    : 
-    <>
-        { !fileDetails.id && <NotificationView message={message}>
+    </div> }
+    { view === "notification" && <NotificationView message={message}>
             <Button onClick={() => executeCommand(openMarkdownFileCmd)}></Button>
         </NotificationView> }
-        { fileDetails.id && editMode && <EditorView 
-                fileName={fileDetails.name}
-                content={fileDetails.content} 
-                onCloseClicked={closeEditMode} 
-                onSaveClicked={saveContent}
-                onFileNameChanged={handleFileNameChange}
-            />
-        }
-        { fileDetails.id && !editMode &&  <ViewerView content={fileDetails.content} onEditClicked={enableEditMode}/> }
-        <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}></CommandPalette>
-    </>
-}
+    { view === "editor" && <EditorView 
+            fileName={fileDetails.name}
+            content={fileDetails.content} 
+            onCloseClicked={closeEditMode} 
+            onSaveClicked={saveContent}
+            onFileNameChanged={handleFileNameChange}
+        />
+    }
+    { view === "viewer" && <ViewerView content={fileDetails.content} onEditClicked={enableEditMode}/> }
+    { view !== "loading" && <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}></CommandPalette> }
+</>
+)}
 
 export default ():React.ReactElement => {
     return (
