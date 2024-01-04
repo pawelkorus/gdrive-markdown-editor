@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from 'react';
+import React, { memo } from 'react';
 import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx } from '@milkdown/core';
 import { Milkdown, useEditor } from '@milkdown/react';
 import { commonmark } from '@milkdown/preset-commonmark';
