@@ -85,8 +85,6 @@ function RootView():React.ReactElement {
         await updateFileName(e.fileName)
     };
 
-    console.log(loading, editMode, message, fileDetails)
-
     return loading? 
     <div className="container-fluid h-100 d-flex">
         <div className="mx-auto my-auto">
