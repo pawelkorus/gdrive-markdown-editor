@@ -93,20 +93,19 @@ function RootView():React.ReactElement {
         </div>
     </div>
     : 
-    <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}>
-        <NotificationView message={message}>
-            {editMode && <EditorView 
+    <>
+        { message && <NotificationView message={message}></NotificationView> }
+        { editMode && !message && <EditorView 
                 fileName={fileDetails.name}
                 content={fileDetails.content} 
                 onCloseClicked={closeEditMode} 
                 onSaveClicked={saveContent}
                 onFileNameChanged={handleFileNameChange}
             />
-            }
-
-            {!editMode && <ViewerView content={fileDetails.content} onEditClicked={enableEditMode}/> }
-        </NotificationView>
-    </CommandPalette>
+        }
+        {!editMode && !message &&  <ViewerView content={fileDetails.content} onEditClicked={enableEditMode}/> }
+        <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}></CommandPalette>
+    </>
 }
 
 export default ():React.ReactElement => {
