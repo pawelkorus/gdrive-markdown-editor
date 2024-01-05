@@ -5,8 +5,6 @@ import { commonmark } from '@milkdown/preset-commonmark';
 import { history } from '@milkdown/plugin-history';
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { cursor } from '@milkdown/plugin-cursor';
-import { useSetProseState } from './dev-plugin/ProseStateProvider';
-import { debounce } from 'lodash';
 import { useGdriveEmbed } from './gdrive-plugin';
 import { remarkPlugins } from './remark-plugin';
 
