@@ -18,7 +18,6 @@ type MilkdownEditorProps = {
 
 export default memo(function(props:MilkdownEditorProps) {
     const gdriveEmbed = useGdriveEmbed();
-    const setProseState = useSetProseState();
     
     useEditor((root) => 
         Editor.make()
@@ -35,11 +34,6 @@ export default memo(function(props:MilkdownEditorProps) {
                     .markdownUpdated((_, doc) => {
                         props.onContentUpdated && props.onContentUpdated(doc);
                     })
-                    .updated((_, doc) => {
-                        const state = doc.toJSON();
-                        setProseState(state);
-                        debounce(setProseState, 100)(state);
-                    });
                 })
                 .use(commonmark)
                 .use(listener)
