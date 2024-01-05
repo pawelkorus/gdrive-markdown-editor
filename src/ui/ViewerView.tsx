@@ -1,12 +1,14 @@
 import React from "react"
 import { MilkdownEditor, WrapWithProviders } from "./milkdown"
+import { useGdriveFile } from "../service/gdrivefile"
 
 type Props = {
-    content: string
     onEditClicked?: () => void
 }
 
 function ViewerView(props:Props):React.ReactElement {
+    const [fileDetails] = useGdriveFile();
+
     return (
 <div>
     <div className="container-fluid p-2">
@@ -18,7 +20,7 @@ function ViewerView(props:Props):React.ReactElement {
 
     <div className="container-lg mt-4">
         <div className="row">
-            <MilkdownEditor content={props.content} readonly={true}/>
+            <MilkdownEditor content={fileDetails.content} readonly={true}/>
         </div>
     </div>
 </div>

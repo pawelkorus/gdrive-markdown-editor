@@ -1,40 +1,25 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { MilkdownEditor, WrapWithProviders } from './milkdown';
 import useMilkdownCommands from './milkdown/useMilkdownCommands';
+import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile';
 
 export type Props = {
-    fileName: string,
-    content: string,
-    onFileNameChanged?: (event:FileNameChangeEvent) => void
-    onSaveClicked?: (event:SaveEvent) => void
     onCloseClicked?: () => void
-    onTogglePreviewClicked?: () => void
-}
-
-export class SaveEvent {
-    constructor(
-        public content:string
-    ) {}
-}
-
-export class FileNameChangeEvent {
-    constructor(
-        public fileName:string
-    ) {}
 }
 
 function EditorView(props:Props):React.ReactElement {
-    const [ fileName, setFileName ] = useState(props.fileName)
-    const [ updatedContent, setUpdatedContent ] = useState(props.content)
     const [ isDirty, setIsDirty ] = useState(false)
     const [ lastSavedTimestamp, setLastSavedTimestamp ] = useState(null)
     const [ editFileNameEnabled, setEditFileNameEnabled ] = useState(false)
+    const [ fileDetails ] = useGdriveFile();
+    const [ updatedContent, setUpdatedContent ] = useState(fileDetails.content)
+    const { updateContent, updateFileName } = useGdriveFileCommands();
     useMilkdownCommands();
 
     useEffect(() => {
         if(isDirty) {
             const interval = setInterval(() => {
-                if(isDirty) save(updatedContent)
+                if(isDirty) commitContentChange(updatedContent)
             }, 5000);
             return () => {
                 clearInterval(interval);
@@ -42,22 +27,23 @@ function EditorView(props:Props):React.ReactElement {
         }
     }, [updatedContent, isDirty]);
 
-    useEffect(() => {
-        setIsDirty(true);
-    }, [updatedContent]);
+    const initialContent = useCallback(() => {
+        return fileDetails.content;
+    }, [fileDetails.id]);
 
-    const updateContent = useCallback((markdown:string) => {
+    const handleContentUpdate = useCallback((markdown:string) => {
         setUpdatedContent(markdown)
+        setIsDirty(true);
     }, []);
 
-    function save(newContent:string) {
-        props.onSaveClicked && props.onSaveClicked(new SaveEvent(newContent))
+    function commitContentChange(newContent:string) {
+        updateContent(newContent);
         setLastSavedTimestamp(new Date())
         setIsDirty(false)
     }
 
-    function handleFileNameChange() {
-        props.onFileNameChanged && props.onFileNameChanged(new FileNameChangeEvent(fileName))
+    function commitFileNameChange(fileName:string) {
+        updateFileName(fileName)
         setEditFileNameEnabled(false)
     }
 
@@ -68,21 +54,20 @@ function EditorView(props:Props):React.ReactElement {
             {editFileNameEnabled ? (
                 <input
                 type="text"
-                value={fileName}
-                onChange={e => setFileName(e.target.value)}
-                onBlur={handleFileNameChange}
+                value={fileDetails.name}
+                onBlur={e => commitFileNameChange(e.target.value)}
                 autoFocus
                 className='form-control me-auto'
                 />
-            ) : ( <h5 className='me-auto mb-0' onClick={() => setEditFileNameEnabled(true)}>{fileName}</h5> )}
+            ) : ( <h5 className='me-auto mb-0' onClick={() => setEditFileNameEnabled(true)}>{fileDetails.name}</h5> )}
             {lastSavedTimestamp != null && <span className="ms-1"><small className="text-success">Last saved at {lastSavedTimestamp.toLocaleString()}</small></span>}
-            <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={() => save(updatedContent)}>Save</button>
+            <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={() => commitContentChange(updatedContent)}>Save</button>
             <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={props.onCloseClicked}>Close</button>
         </div>
     </div>
     <div className="container-lg mt-4">
         <div className="row">
-            <MilkdownEditor content={props.content} onContentUpdated={updateContent}/>
+            <MilkdownEditor content={initialContent()} onContentUpdated={handleContentUpdate}/>
         </div>
     </div>
 </>

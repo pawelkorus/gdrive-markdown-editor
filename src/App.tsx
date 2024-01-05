@@ -3,8 +3,6 @@ import {
     EditorView,
     ViewerView,
     NotificationView,
-    SaveEvent,
-    FileNameChangeEvent,
     useGlobalCommands
 } from "./ui"
 import { useEffect, useState } from 'react'
@@ -26,8 +24,8 @@ import { openMarkdownFileCmd } from "./ui/useGlobalCommands"
 function RootView():React.ReactElement {
     const [message, setMessage] = useState(null)
     const [commands , executeCommand] = useCommands();
-    const [fileDetails, loadFile] = useGdriveFile();
-    const {createFile, updateContent, updateFileName } = useGdriveFileCommands();
+    const [,loadFile] = useGdriveFile();
+    const {createFile} = useGdriveFileCommands();
     const [view, setView] = useState("loading")
     useGlobalCommands()
 
@@ -74,14 +72,6 @@ function RootView():React.ReactElement {
         setViewerView();
     };
 
-    const saveContent = async (e:SaveEvent) => {
-        await updateContent(e.content);
-    };
-
-    const handleFileNameChange = async (e:FileNameChangeEvent) => {
-        await updateFileName(e.fileName)
-    };
-
     const setEditorView = () => {
         setView("editor");
     };
@@ -106,15 +96,8 @@ function RootView():React.ReactElement {
     { view === "notification" && <NotificationView message={message}>
             <Button onClick={() => executeCommand(openMarkdownFileCmd)}></Button>
         </NotificationView> }
-    { view === "editor" && <EditorView 
-            fileName={fileDetails.name}
-            content={fileDetails.content} 
-            onCloseClicked={closeEditMode} 
-            onSaveClicked={saveContent}
-            onFileNameChanged={handleFileNameChange}
-        />
-    }
-    { view === "viewer" && <ViewerView content={fileDetails.content} onEditClicked={enableEditMode}/> }
+    { view === "editor" && <EditorView onCloseClicked={closeEditMode} /> }
+    { view === "viewer" && <ViewerView onEditClicked={enableEditMode}/> }
     { view !== "loading" && <CommandPalette commands={commands} onItemSelected={(item) => executeCommand(item.id)}></CommandPalette> }
 </>
 )}
