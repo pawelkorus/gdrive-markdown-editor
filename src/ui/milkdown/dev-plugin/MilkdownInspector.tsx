@@ -1,11 +1,8 @@
-import React from "react";
-import { useProseState } from "./ProseStateProvider";
-import { MilkdownEditor } from "..";
+import React, { useEffect, useState } from "react";
 import { JSONTree } from 'react-json-tree'
-
-type Props = {
-    content: string
-}
+import debounce from "lodash.debounce";
+import { usePluginViewContext } from "@prosemirror-adapter/react";
+import { EditorState } from "@milkdown/prose/state";
 
 const twilight = {
     scheme: "twilight",
@@ -25,16 +22,21 @@ const twilight = {
     base0D: "#7587a6",
     base0E: "#9b859d",
     base0F: "#9b703f",
-  };
+};
 
-export default function(props:Props):React.ReactElement {
-    const proseState = useProseState()
+export default function():React.ReactElement {
+    const [editorState, setEditorState] = useState();
+    const {view, prevState} = usePluginViewContext();
 
+    useEffect(() => {
+        const state = view.state.toJSON();
+        setEditorState(state);
+    }, [view, prevState])
+    
     return (
 <div>
-    <MilkdownEditor content={props.content} />
     <JSONTree
-        data={proseState}
+        data={editorState}
         theme={twilight}
     />
 </div>
