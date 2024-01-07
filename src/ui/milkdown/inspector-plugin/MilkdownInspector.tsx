@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { JSONTree } from 'react-json-tree'
-import debounce from "lodash.debounce";
 import { usePluginViewContext } from "@prosemirror-adapter/react";
-import { EditorState } from "@milkdown/prose/state";
 
 const twilight = {
     scheme: "twilight",
