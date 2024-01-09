@@ -1,5 +1,5 @@
 export type Command = {
-    id: string;
-    name: string;
-    execute: () => void;
-};
+  id: string
+  name: string
+  execute: () => void
+}

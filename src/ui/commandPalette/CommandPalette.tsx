@@ -1,111 +1,113 @@
-import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react';
-import { Modal, ModalBody, ModalHeader } from 'react-bootstrap';
-import { CommandPaletteItem } from './types';
+import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react'
+import { Modal, ModalBody, ModalHeader } from 'react-bootstrap'
+import { CommandPaletteItem } from './types'
 
 interface CommandPaletteProps extends PropsWithChildren<{
-    commands: CommandPaletteItem[],
-    onItemSelected?: (commandPalleteItem: CommandPaletteItem) => void
+  commands: CommandPaletteItem[]
+  onItemSelected?: (commandPalleteItem: CommandPaletteItem) => void
 }> {}
 
-const CommandPalette: React.FC<CommandPaletteProps> = ({commands, children, onItemSelected}) => {
-    const [isVisible, setIsVisible] = useState(false);
-    const [selected, setSelected] = useState(0);
-    const [filteredCommands, setFilteredCommands] = useState([]);
-    const filterInputRef = React.createRef<HTMLInputElement>();
+const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onItemSelected }) => {
+  const [isVisible, setIsVisible] = useState(false)
+  const [selected, setSelected] = useState(0)
+  const [filteredCommands, setFilteredCommands] = useState([])
+  const filterInputRef = React.createRef<HTMLInputElement>()
 
-    const onKeyDown = useCallback((e:KeyboardEvent) => {
-        const key = e.key;
+  const onKeyDown = useCallback((e: KeyboardEvent) => {
+    const key = e.key
 
-        if (key === "ArrowDown" && isVisible) {
-            e.preventDefault();
-            setSelected((s) => {
-                return Math.min(s + 1, commands.length - 1)
-            });
-            return;
-        }
-        if (key === "ArrowUp" && isVisible) {
-            e.preventDefault();
-            setSelected((s) => {
-                return Math.max(s - 1, 0)
-            });
-            return;
-        }
-        if (key === "Enter" && isVisible) {
-            e.preventDefault();
-            handleCommandSelected(filteredCommands[selected]);
-            return;
-        }
-        if (key === "/" && !isVisible) {
-            e.preventDefault();
-            setIsVisible(true);
-            return;
-        }
-        if(key === 'Escape' && isVisible) {
-            e.preventDefault();
-            setIsVisible(false)
-        }
-    }, [selected, isVisible, filteredCommands]);
-
-    useEffect(() => {
-        setFilteredCommands(commands);
-    }, [commands, isVisible]);
-
-    useEffect(() => {
-        if (filterInputRef.current) {
-            filterInputRef.current.focus();
-        }
-    }, [filterInputRef]);
-
-    useEffect(() => {
-        document.addEventListener('keydown', onKeyDown);
-
-        return () => {
-            document.removeEventListener('keydown', onKeyDown);
-        };
-    }, [onKeyDown]);
-
-    function handleCommandSelected(item:CommandPaletteItem) {
-        setIsVisible(false);
-        if (onItemSelected) {
-            onItemSelected(item);
-        }
+    if (key === 'ArrowDown' && isVisible) {
+      e.preventDefault()
+      setSelected((s) => {
+        return Math.min(s + 1, commands.length - 1)
+      })
+      return
     }
-
-    function filterItemsByName(e: React.ChangeEvent<HTMLInputElement>) {
-        setFilteredCommands(commands.filter(command => command.name.toLowerCase().includes(e.target.value.toLowerCase())))
-        setSelected(0);
+    if (key === 'ArrowUp' && isVisible) {
+      e.preventDefault()
+      setSelected((s) => {
+        return Math.max(s - 1, 0)
+      })
+      return
     }
+    if (key === 'Enter' && isVisible) {
+      e.preventDefault()
+      handleCommandSelected(filteredCommands[selected])
+      return
+    }
+    if (key === '/' && !isVisible) {
+      e.preventDefault()
+      setIsVisible(true)
+      return
+    }
+    if (key === 'Escape' && isVisible) {
+      e.preventDefault()
+      setIsVisible(false)
+    }
+  }, [selected, isVisible, filteredCommands])
 
-    return (
-<>
-    {children}
+  useEffect(() => {
+    setFilteredCommands(commands)
+  }, [commands, isVisible])
 
-    <Modal show={isVisible} fullscreen="sm-down">
+  useEffect(() => {
+    if (filterInputRef.current) {
+      filterInputRef.current.focus()
+    }
+  }, [filterInputRef])
+
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [onKeyDown])
+
+  function handleCommandSelected(item: CommandPaletteItem) {
+    setIsVisible(false)
+    if (onItemSelected) {
+      onItemSelected(item)
+    }
+  }
+
+  function filterItemsByName(e: React.ChangeEvent<HTMLInputElement>) {
+    setFilteredCommands(commands.filter(command => command.name.toLowerCase().includes(e.target.value.toLowerCase())))
+    setSelected(0)
+  }
+
+  return (
+    <>
+      {children}
+
+      <Modal show={isVisible} fullscreen="sm-down">
         <ModalHeader>
-            <input ref={filterInputRef} 
-                type="text" 
-                className="form-control" 
-                placeholder="Search..." 
-                onChange={filterItemsByName} 
-            />
+          <input
+            ref={filterInputRef}
+            type="text"
+            className="form-control"
+            placeholder="Search..."
+            onChange={filterItemsByName}
+          />
         </ModalHeader>
         <ModalBody>
-            <ul className="list-group">
+          <ul className="list-group">
             {filteredCommands.map((item, i) => (
-                    <li  key={i.toString()} 
-                        className={`list-group-item ${i === selected ? 'active' : ''}`} 
-                        aria-current={i === selected ? true : false} 
-                        onMouseDown={() => handleCommandSelected(item)}
-                        onMouseMove={() => setSelected(i)}
-                        >
-                        {item.name}
-                    </li>
-                    ))}
-            </ul>
+              <li
+                key={i.toString()}
+                className={`list-group-item ${i === selected ? 'active' : ''}`}
+                aria-current={i === selected ? true : false}
+                onMouseDown={() => handleCommandSelected(item)}
+                onMouseMove={() => setSelected(i)}
+              >
+                {item.name}
+              </li>
+            ))}
+          </ul>
         </ModalBody>
-    </Modal>
-</>
-    );
-};
+      </Modal>
+    </>
+  )
+}
 
-export default CommandPalette;
+export default CommandPalette

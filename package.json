@@ -54,7 +54,6 @@
     "develop-debug": "webpack serve --mode development --config webpack.js",
     "develop-local": "webpack serve --mode development --env local --config webpack.js",
     "lint": "eslint .",
-    "lint-and-fix": "eslint . --fix",
     "test": "jest"
   },
   "dependencies": {

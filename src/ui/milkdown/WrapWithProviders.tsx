@@ -1,16 +1,17 @@
-import { MilkdownProvider } from '@milkdown/react';
-import { ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
-import React, { PropsWithChildren } from 'react';
+import { MilkdownProvider } from '@milkdown/react'
+import { ProsemirrorAdapterProvider } from '@prosemirror-adapter/react'
+import React, { PropsWithChildren } from 'react'
 
-type Props = PropsWithChildren<object>;
+type Props = PropsWithChildren<object>
 
 const WrapWithProviders: React.FC<Props> = ({ children }) => {
-    return (
-<MilkdownProvider>
-    <ProsemirrorAdapterProvider>
+  return (
+    <MilkdownProvider>
+      <ProsemirrorAdapterProvider>
         {children}
-    </ProsemirrorAdapterProvider>
-</MilkdownProvider>
-)};
+      </ProsemirrorAdapterProvider>
+    </MilkdownProvider>
+  )
+}
 
-export default WrapWithProviders;
+export default WrapWithProviders
