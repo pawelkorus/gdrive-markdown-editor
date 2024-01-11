@@ -16,7 +16,9 @@
 		"vscode": {
 			"extensions": [
 				"EditorConfig.EditorConfig",
-				"eamodio.gitlens"
+				"eamodio.gitlens",
+				"GitHub.copilot",
+				"GitHub.copilot-chat"
 			]
 		}
 	},
