@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useCallback, useState } from 'react'
 import * as googleApi from '../../google'
 
-export type FileDetails = googleApi.FileDetails
+export type FileDetails = googleApi.FileDetailsWithContent
 
 export type GdriveFileContextState = {
   fileDetails: FileDetails
@@ -26,6 +26,7 @@ export function GdriveFileContextProvider(props: Props): React.ReactElement {
   const [fileDetails, setFileDetails] = useState<FileDetails>({
     id: undefined,
     name: '',
+    mimeType: '',
     content: '',
   })
 

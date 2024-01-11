@@ -50,6 +50,12 @@ function initializeTokenClient() {
 export type FileDetails = {
   id: string
   name: string
+  mimeType: string
+}
+
+export type FolderDetails = FileDetails
+
+export type FileDetailsWithContent = FileDetails & {
   content: string
 }
 
@@ -150,7 +156,7 @@ export function showMarkdownPicker(): Promise<string> {
   })
 }
 
-export function showFolderPicker(): Promise<string> {
+export function showFolderPicker(): Promise<FolderDetails> {
   return new Promise((resolve, reject) => {
     const docsView = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
       .setIncludeFolders(true)
@@ -167,7 +173,13 @@ export function showFolderPicker(): Promise<string> {
         if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
           const doc = res[google.picker.Response.DOCUMENTS][0]
           const fileId = doc[google.picker.Document.ID]
-          resolve(fileId)
+          const name = doc[google.picker.Document.NAME]
+          const mimeType = doc[google.picker.Document.MIME_TYPE]
+          resolve({
+            id: fileId,
+            name: name,
+            mimeType: mimeType,
+          })
         }
         else if (res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
           reject('no pick')
@@ -213,12 +225,12 @@ export async function authorizeInstall() {
   })
 }
 
-export async function loadFile(fileId: string): Promise<FileDetails> {
+export async function loadFile(fileId: string): Promise<FileDetailsWithContent> {
   // https://developers.google.com/drive/api/v3/reference/files
   const results = await Promise.all([
     gapi.client.drive.files.get({
       fileId: fileId,
-      fields: 'id,name',
+      fields: 'id,name,mimeType,fileExtension',
     }),
     gapi.client.drive.files.get({
       fileId: fileId,
@@ -232,6 +244,7 @@ export async function loadFile(fileId: string): Promise<FileDetails> {
   return {
     id: fileId,
     name: metadataResponse.result.name,
+    mimeType: metadataResponse.result.mimeType,
     content: response.body,
   }
 }
@@ -245,7 +258,7 @@ export async function loadBinaryFile(fileId: string): Promise<string> {
   return btoa(response.body)
 }
 
-export async function createFile(filename: string, content: string, parent: string): Promise<FileDetails> {
+export async function createFile(filename: string, content: string, parent: string): Promise<FileDetailsWithContent> {
   const response = await gapi.client.drive.files.create({
     uploadType: 'media',
   }, {
@@ -259,6 +272,7 @@ export async function createFile(filename: string, content: string, parent: stri
   return {
     id: response.result.id,
     name: response.result.name,
+    mimeType: response.result.mimeType,
     content: content,
   }
 }
