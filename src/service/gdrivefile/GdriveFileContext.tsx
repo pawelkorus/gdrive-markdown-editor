@@ -3,10 +3,16 @@ import * as googleApi from '../../google'
 
 export type FileDetails = googleApi.FileDetailsWithContent
 
+export type CreateFileParams = {
+  folderId: string
+  userId?: string
+  fileName?: string
+}
+
 export type GdriveFileContextState = {
   fileDetails: FileDetails
   loadFile: (fileId: string, userId?: string) => Promise<void>
-  createFile: (fileName: string, folderId: string) => Promise<void>
+  createFile: (params: CreateFileParams) => Promise<void>
   updateContent: (content: string) => Promise<void>
   updateFileName: (fileName: string) => Promise<void>
 }
@@ -46,9 +52,9 @@ export function GdriveFileContextProvider(props: Props): React.ReactElement {
     setFileDetails({ ...fileDetails, name: fileName })
   }, [fileDetails])
 
-  const createFile = useCallback(async (fileName: string, folderId: string, userId?: string) => {
-    await googleApi.authorizeFileAccess(userId)
-    const fileDetails = await googleApi.createFile(fileName, '# Hello world', folderId)
+  const createFile = useCallback(async (params: CreateFileParams) => {
+    await googleApi.authorizeFileAccess(params.userId)
+    const fileDetails = await googleApi.createFile(params.fileName || 'New file', '# Hello world', params.folderId)
     setFileDetails(fileDetails)
   }, [])
 

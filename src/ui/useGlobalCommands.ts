@@ -28,7 +28,7 @@ export default function useGlobalCommands() {
       execute: async () => {
         const details = await showFolderPicker()
         if (details.id) {
-          createFile('Untitled', details.id)
+          createFile({ folderId: details.id })
         }
       },
       name: 'Create markdown file',

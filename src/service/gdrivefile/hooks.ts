@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { GdriveFileContext } from './GdriveFileContext'
+import { CreateFileParams, GdriveFileContext } from './GdriveFileContext'
 import { FileDetails } from './GdriveFileContext'
 
 export function useGdriveFile(): [FileDetails, (fileId: string, userId?: string) => void] {
@@ -9,7 +9,7 @@ export function useGdriveFile(): [FileDetails, (fileId: string, userId?: string)
 }
 
 type GdriveFileCommands = {
-  createFile: (folderId: string, userId?: string) => Promise<void>
+  createFile: (params: CreateFileParams) => Promise<void>
   updateContent: (newContent: string) => Promise<void>
   updateFileName: (newName: string) => Promise<void>
 }

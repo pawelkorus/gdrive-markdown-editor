@@ -45,7 +45,7 @@ function RootView(): React.ReactElement {
       }
       else if (StateFromGoogleAction.New == googleState.action) {
         try {
-          createFile(googleState.folderId)
+          createFile({ folderId: googleState.folderId })
           setEditorView()
         }
         catch (e: unknown) {
