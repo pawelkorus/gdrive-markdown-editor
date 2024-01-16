@@ -24,7 +24,7 @@ import { openMarkdownFileCmd } from './ui/useGlobalCommands'
 function RootView(): React.ReactElement {
   const [message, setMessage] = useState(null)
   const [commands, executeCommand] = useCommands()
-  const [,loadFile] = useGdriveFile()
+  const [file, loadFile] = useGdriveFile()
   const { createFile } = useGdriveFileCommands()
   const [view, setView] = useState('loading')
   useGlobalCommands()
@@ -69,6 +69,12 @@ function RootView(): React.ReactElement {
 
     googleApi()
   }, [])
+
+  useEffect(() => {
+    if (file) {
+      setView('viewer')
+    }
+  }, [file.id])
 
   const enableEditMode = () => {
     setEditorView()
