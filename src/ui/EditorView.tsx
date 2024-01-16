@@ -55,7 +55,7 @@ function EditorView(props: Props): React.ReactElement {
             ? (
               <input
                 type="text"
-                value={fileDetails.name}
+                defaultValue={fileDetails.name}
                 onBlur={e => commitFileNameChange(e.target.value)}
                 autoFocus
                 className="form-control me-auto"
