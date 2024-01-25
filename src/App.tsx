@@ -3,6 +3,7 @@ import {
   EditorView,
   ViewerView,
   NotificationView,
+  SourceView,
   useGlobalCommands,
 } from './ui'
 import { useEffect, useState } from 'react'
@@ -15,7 +16,7 @@ import {
   authorizeInstall,
 } from './google'
 import { Button, Spinner } from 'react-bootstrap'
-import { CommandsContextProvider, useCommands } from './service/command'
+import { CommandsContextProvider, useCommandManager, useCommands } from './service/command'
 import { CommandPalette } from './ui/commandPalette'
 import { GdriveFileContextProvider } from './service/gdrivefile/GdriveFileContext'
 import { useGdriveFile, useGdriveFileCommands } from './service/gdrivefile'
@@ -28,6 +29,24 @@ function RootView(): React.ReactElement {
   const { createFile } = useGdriveFileCommands()
   const [view, setView] = useState('loading')
   useGlobalCommands()
+
+  const [registerCommand, unregisterCommand] = useCommandManager()
+  useEffect(() => {
+    const commands = [
+      {
+        id: 'openMarkdownEditor',
+        name: 'Open markdown editor',
+        execute: () => {
+          setSourceView()
+        }
+      }
+    ]
+
+    registerCommand(commands)
+    return () => {
+      unregisterCommand(commands)
+    }
+  }, [])
 
   useEffect(() => {
     const googleApi = async function () {
@@ -92,6 +111,10 @@ function RootView(): React.ReactElement {
     setView('viewer')
   }
 
+  const setSourceView = () => {
+    setView('source')
+  }
+
   const setNotificationView = (message?: string) => {
     setMessage(message)
     setView('notification')
@@ -114,6 +137,7 @@ function RootView(): React.ReactElement {
         </NotificationView>
       ) }
       { view === 'editor' && <EditorView onCloseClicked={closeEditMode} /> }
+      { view === 'source' && <SourceView onCloseClicked={closeEditMode} /> }
       { view === 'viewer' && <ViewerView onEditClicked={enableEditMode} /> }
       { view !== 'loading' && <CommandPalette commands={commands} onItemSelected={item => executeCommand(item.id)}></CommandPalette> }
     </>
