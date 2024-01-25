@@ -43,7 +43,7 @@ export function CommandsContextProvider(props: Props): React.ReactElement {
     }
   }, [])
 
-  const unregisterCommand = (command: Command | Command[]) => {
+  const unregisterCommand = useCallback((command: Command | Command[]) => {
     if (!Array.isArray(command)) {
       command = [command]
     }
@@ -52,15 +52,15 @@ export function CommandsContextProvider(props: Props): React.ReactElement {
       delete commandRegistry[c.id]
     })
     setCommands(Object.values(commandRegistry))
-  }
+  }, [])
 
-  const executeCommand = (commandId: string) => {
+  const executeCommand = useCallback((commandId: string) => {
     const commandRegistry = commandRegistryRef.current
     const command = commandRegistry[commandId]
     if (command) {
       command.execute()
     }
-  }
+  }, [])
 
   const value: CommandsContextState = {
     commands: commands,
