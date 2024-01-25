@@ -34,12 +34,19 @@ function RootView(): React.ReactElement {
   useEffect(() => {
     const commands = [
       {
-        id: 'openMarkdownEditor',
-        name: 'Open markdown editor',
+        id: 'editUsingSourceEditor',
+        name: 'Edit using source editor',
         execute: () => {
           setSourceView()
-        }
-      }
+        },
+      },
+      {
+        id: 'editUsingWyswygEditor',
+        name: 'Edit using WYSWYG editor',
+        execute: () => {
+          setEditorView()
+        },
+      },
     ]
 
     registerCommand(commands)
