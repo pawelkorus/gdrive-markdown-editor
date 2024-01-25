@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, createContext, useCallback, useState } from 'react'
+import React, { PropsWithChildren, createContext, useCallback, useRef, useState } from 'react'
 import { Command } from './Command'
 
 type CommandsRegistry = Record<string, Command>
@@ -20,40 +20,50 @@ export const CommandsContext = createContext<CommandsContextState>({
 type Props = PropsWithChildren<unknown>
 
 export function CommandsContextProvider(props: Props): React.ReactElement {
-  const [commandRegistry, setCommandRegistry] = useState<CommandsRegistry>({})
+  const commandRegistryRef = useRef<CommandsRegistry>({})
+  const [commands, setCommands] = useState<Command[]>([])
+
   const registerCommand = useCallback((command: Command | Command[]) => {
     if (!Array.isArray(command)) {
       command = [command]
     }
+    const commandRegistry = commandRegistryRef.current
     const additionalCommands: CommandsRegistry = {}
+
     command.forEach((c) => {
       if (!commandRegistry[c.id]) additionalCommands[c.id] = c
     })
 
     if (Object.values(additionalCommands).length > 0) {
       console.log('Registering commands', additionalCommands)
-      setCommandRegistry({ ...commandRegistry, ...additionalCommands })
+      console.log('Existing commands', commandRegistry)
+      commandRegistryRef.current = { ...commandRegistry, ...additionalCommands }
+
+      setCommands(Object.values(commandRegistryRef.current))
     }
-  }, [commandRegistry])
-  const unregisterCommand = useCallback((command: Command | Command[]) => {
+  }, [])
+
+  const unregisterCommand = (command: Command | Command[]) => {
     if (!Array.isArray(command)) {
       command = [command]
     }
+    const commandRegistry = commandRegistryRef.current
     command.forEach((c) => {
       delete commandRegistry[c.id]
     })
-    setCommandRegistry({ ...commandRegistry })
-  }, [commandRegistry])
+    setCommands(Object.values(commandRegistry))
+  }
 
-  const executeCommand = useCallback((commandId: string) => {
+  const executeCommand = (commandId: string) => {
+    const commandRegistry = commandRegistryRef.current
     const command = commandRegistry[commandId]
     if (command) {
       command.execute()
     }
-  }, [commandRegistry])
+  }
 
   const value: CommandsContextState = {
-    commands: Object.values(commandRegistry),
+    commands: commands,
     registerCommand,
     unregisterCommand,
     executeCommand,
