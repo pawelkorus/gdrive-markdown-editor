@@ -37,8 +37,7 @@ export function GdriveFileContextProvider(props: Props): React.ReactElement {
   })
 
   const loadFile = useCallback(async (fileId: string, userId?: string) => {
-    await googleApi.authorizeFileAccess(userId)
-    const fileDetails = await googleApi.loadFile(fileId)
+    const fileDetails = await googleApi.loadFile(fileId, userId)
     setFileDetails(fileDetails)
   }, [])
 
@@ -53,8 +52,12 @@ export function GdriveFileContextProvider(props: Props): React.ReactElement {
   }, [fileDetails])
 
   const createFile = useCallback(async (params: CreateFileParams) => {
-    await googleApi.authorizeFileAccess(params.userId)
-    const fileDetails = await googleApi.createFile(params.fileName || 'New file', '# Hello world', params.folderId)
+    const fileDetails = await googleApi.createFile({
+      filename: params.fileName || 'New file',
+      content: '# Hello world',
+      parent: params.folderId,
+      userId: params.userId,
+    })
     setFileDetails(fileDetails)
   }, [])
 

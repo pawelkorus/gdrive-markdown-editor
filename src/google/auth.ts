@@ -56,28 +56,60 @@ export function loadGis() {
   })
 }
 
-export async function authorizeFileAccess(userId?: string) {
-  return new Promise((resolve, reject) => {
-    waitForTokenResult = new TokenCallbackResult(resolve, reject)
-
-    tokenClient!.requestAccessToken({
-      scope: SCOPE_FILE_ACCESS + ' https://www.googleapis.com/auth/drive.readonly',
-      hint: userId,
-      include_granted_scopes: true,
-    })
-  })
+export function authorizeInstall(): Promise<unknown> {
+  return requestAccess(Permissions.INSTALL)
 }
 
-export async function authorizeInstall() {
-  return new Promise((resolve, reject) => {
-    waitForTokenResult = new TokenCallbackResult(resolve, reject)
-
-    tokenClient!.requestAccessToken({
-      scope: SCOPE_INSTALL,
-    })
-  })
+export enum Permissions {
+  INSTALL = 'INSTALL',
+  SAVE_SELECTED_FILE = 'SAVE_FILE',
+  READ_SELECTED_FILE = 'READ_SELECTED_FILE',
+  BROWSE_FILES = 'BROWSE_FILES',
+  READ_FILE = 'READ_FILE',
 }
 
 export function currentToken(): google.accounts.oauth2.TokenResponse {
   return latestTokenResponse!
+}
+
+export function requestAccess(requiredPesmission: Permissions, userId?: string): Promise<unknown> {
+  function toScope(permission: Permissions): string {
+    switch (permission) {
+      case Permissions.INSTALL:
+        return SCOPE_INSTALL
+      case Permissions.SAVE_SELECTED_FILE:
+      case Permissions.READ_SELECTED_FILE:
+      case Permissions.BROWSE_FILES:
+      case Permissions.READ_FILE:
+        return SCOPE_FILE_ACCESS
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    waitForTokenResult = new TokenCallbackResult(resolve, reject)
+
+    tokenClient!.requestAccessToken({
+      scope: toScope(requiredPesmission),
+      hint: userId,
+    })
+  })
+}
+
+export function hasPermission(permission: Permissions): boolean {
+  if (!latestTokenResponse) return false
+
+  switch (permission) {
+    case Permissions.SAVE_SELECTED_FILE:
+      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
+    case Permissions.READ_SELECTED_FILE:
+      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
+    case Permissions.BROWSE_FILES:
+      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
+    case Permissions.READ_FILE:
+      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
+    case Permissions.INSTALL:
+      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_INSTALL)
+    default:
+      return false
+  }
 }
