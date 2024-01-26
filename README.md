@@ -18,6 +18,10 @@ According to [this SO](https://stackoverflow.com/questions/11680429/using-google
 
 Gdrive expose special scope `https://www.googleapis.com/auth/drive.file` that allows to "Create new Drive files, or modify existing files, that you open with an app or that the user shares with an app while using the Google Picker API or the app's file picker.". In order to use this scope with Google Picker API you need to pass your client id when creation google picker object.
 
+### GDrive UI Integration
+
+When configuring GDrive UI Integration there is an option to automatically show consent screen after user opens applicatin. This will trigger authentication code flow. After user gives consent browser will be redirected to the application with oauth flow parameters included as query parameters (code, scopes)
+
 ## References
 
 * [Google Authorization library](https://developers.google.com/identity/oauth2/web/guides/overview?hl=en)
