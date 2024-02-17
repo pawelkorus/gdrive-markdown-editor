@@ -113,3 +113,5 @@ export function hasPermission(permission: Permissions): boolean {
       return false
   }
 }
+
+export function 

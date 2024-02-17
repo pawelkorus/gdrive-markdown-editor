@@ -57,40 +57,42 @@ function RootView(): React.ReactElement {
 
   useEffect(() => {
     const googleApi = async function () {
-      const googleState = await Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient).then(parseGoogleState)
+      // const googleState = await Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient).then(parseGoogleState)
+      const googleState = await Promise.all([loadGapi(), loadGis()])
 
-      if (StateFromGoogleAction.Open == googleState.action) {
-        try {
-          await loadFile(googleState.fileId, googleState.userId)
-          setViewerView()
-        }
-        catch (e: unknown) {
-          console.error(e)
-          setNotificationView('Can\'t load file. ' + e)
-        }
-      }
-      else if (StateFromGoogleAction.New == googleState.action) {
-        try {
-          createFile({ folderId: googleState.folderId })
-          setEditorView()
-        }
-        catch (e: unknown) {
-          console.error(e)
-          setNotificationView('Can\'t create file. ' + e)
-        }
-      }
-      else if (StateFromGoogleAction.Install == googleState.action) {
-        try {
-          await authorizeInstall()
-          setNotificationView('Application installed into your google drive successfully.')
-        }
-        catch (e: unknown) {
-          setNotificationView('Can\'t install app into you google drive.' + e)
-        }
-      }
-      else {
-        setNotificationView('Unknown action ' + googleState.action)
-      }
+      // if (StateFromGoogleAction.Open == googleState.action) {
+      //   try {
+      //     await loadFile(googleState.fileId, googleState.userId)
+      //     setViewerView()
+      //   }
+      //   catch (e: unknown) {
+      //     console.error(e)
+      //     setNotificationView('Can\'t load file. ' + e)
+      //   }
+      // }
+      // else if (StateFromGoogleAction.New == googleState.action) {
+      //   try {
+      //     createFile({ folderId: googleState.folderId })
+      //     setEditorView()
+      //   }
+      //   catch (e: unknown) {
+      //     console.error(e)
+      //     setNotificationView('Can\'t create file. ' + e)
+      //   }
+      // }
+      // else if (StateFromGoogleAction.Install == googleState.action) {
+      //   try {
+      //     await authorizeInstall()
+      //     setNotificationView('Application installed into your google drive successfully.')
+      //   }
+      //   catch (e: unknown) {
+      //     setNotificationView('Can\'t install app into you google drive.' + e)
+      //   }
+      // }
+      // else {
+      //  setNotificationView('Unknown action ' + googleState.action)
+      // }
+      setNotificationView('Unknown action ')
     }
 
     googleApi()
@@ -127,8 +129,22 @@ function RootView(): React.ReactElement {
     setView('notification')
   }
 
+  function aaa() {
+    console.log("loggedin")
+  }
+
   return (
     <>
+      <div
+            id="g_id_onload"
+            data-client_id="413355556847-pd76u4ckm8d8jisjg2fmlamgisejh4nn.apps.googleusercontent.com"
+            data-context="use"
+            data-callback={aaa}
+            data-nonce=""
+            data-auto_select="true"
+            data-itp_support="true"
+          >
+      </div>
       { view === 'loading' && (
         <div className="container-fluid h-100 d-flex">
           <div className="mx-auto my-auto">
@@ -139,9 +155,9 @@ function RootView(): React.ReactElement {
         </div>
       ) }
       { view === 'notification' && (
-        <NotificationView message={message}>
-          <Button onClick={() => executeCommand(openMarkdownFileCmd)}></Button>
-        </NotificationView>
+        <>
+          <Button onClick={() => executeCommand(openMarkdownFileCmd)}>Dupa</Button>
+        </>
       ) }
       { view === 'editor' && <EditorView onCloseClicked={closeEditMode} /> }
       { view === 'source' && <SourceView onCloseClicked={closeEditMode} /> }
