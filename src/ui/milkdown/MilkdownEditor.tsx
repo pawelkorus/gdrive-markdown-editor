@@ -7,6 +7,7 @@ import { listener, listenerCtx } from '@milkdown/plugin-listener'
 import { cursor } from '@milkdown/plugin-cursor'
 import { useGdriveEmbed } from './gdrive-plugin'
 import { remarkPlugins } from './remark-plugin'
+import { useYoutubeEmbed } from './youtube-plugin'
 
 type MilkdownEditorProps = {
   content: string
@@ -16,6 +17,7 @@ type MilkdownEditorProps = {
 
 export default memo(function (props: MilkdownEditorProps) {
   const gdriveEmbed = useGdriveEmbed()
+  const youtubeEmbed = useYoutubeEmbed()
 
   useEditor(root =>
     Editor.make()
@@ -39,6 +41,7 @@ export default memo(function (props: MilkdownEditorProps) {
       .use(cursor)
       .use(remarkPlugins)
       .use(gdriveEmbed.plugins)
+      .use(youtubeEmbed.plugins)
   , [props.content])
 
   return <Milkdown />
