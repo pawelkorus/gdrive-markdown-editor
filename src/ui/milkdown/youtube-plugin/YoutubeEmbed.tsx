@@ -5,11 +5,9 @@ export default function (): React.ReactElement {
   const { contentRef, node } = useNodeViewContext()
 
   return (
-    <p data-type="youtube" className="text-center">
+    <p data-type="youtube" className="text-center ratio ratio-16x9">
       <iframe
         ref={contentRef}
-        width="560"
-        height="315"
         src={'https://www.youtube.com/embed/' + node.attrs.src}
         allowFullScreen
       >
