@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should render youtube embed iframe 1`] = `
+<body>
+  <div>
+    <div
+      data-milkdown-root="true"
+    >
+      <div
+        class="milkdown"
+      >
+        <div
+          class="ProseMirror editor"
+          contenteditable="true"
+          role="textbox"
+          translate="no"
+        >
+          <div
+            data-node-view-root="true"
+          >
+            <p
+              class="text-center ratio ratio-16x9"
+              data-type="youtube"
+            >
+              <iframe
+                allowfullscreen=""
+                src="https://www.youtube.com/embed/sampleyoutube"
+              />
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

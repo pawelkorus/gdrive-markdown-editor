@@ -1,6 +1,7 @@
 import React from 'react'
 import { render, fireEvent, screen, waitForElementToBeRemoved, waitFor } from '@testing-library/react'
 import CommandPalette from '../../../src/ui/commandPalette/CommandPalette'
+import { jest } from '@jest/globals'
 
 function prepareCommands() {
   const commands = [{
