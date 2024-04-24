@@ -45,7 +45,7 @@
     "webpack-dev-server": "5.0.4"
   },
   "engines": {
-    "node": ">18.0.0"
+    "node": ">20.0.0"
   },
   "scripts": {
     "build-prod": "webpack --mode production --config webpack.js",
