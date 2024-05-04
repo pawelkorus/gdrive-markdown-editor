@@ -9,6 +9,7 @@ interface CommandPaletteProps extends PropsWithChildren<{
 
 const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onItemSelected }) => {
   const [isVisible, setIsVisible] = useState(false)
+  const [lastShiftTimestamp, setLastShiftTimestamp] = useState(0)
   const [selected, setSelected] = useState(0)
   const [filteredCommands, setFilteredCommands] = useState([])
   const filterInputRef = React.createRef<HTMLInputElement>()
@@ -35,16 +36,22 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onI
       handleCommandSelected(filteredCommands[selected])
       return
     }
-    if (key === '/' && !isVisible) {
-      e.preventDefault()
-      setIsVisible(true)
+    if (key === 'Shift' && !isVisible) {
+      if (Date.now() - lastShiftTimestamp < 500) {
+        e.preventDefault()
+        setLastShiftTimestamp(0)
+        setIsVisible(true)
+      }
+      else {
+        setLastShiftTimestamp(Date.now())
+      }
       return
     }
     if (key === 'Escape' && isVisible) {
       e.preventDefault()
       setIsVisible(false)
     }
-  }, [selected, isVisible, filteredCommands])
+  }, [selected, isVisible, filteredCommands, lastShiftTimestamp])
 
   useEffect(() => {
     setFilteredCommands(commands)

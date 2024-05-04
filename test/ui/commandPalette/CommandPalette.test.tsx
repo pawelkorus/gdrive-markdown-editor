@@ -23,12 +23,13 @@ function prepareCommands() {
   return commands
 }
 
-test('command palette opens after pressing / and hides after pressing Escape', () => {
+test('command palette opens after pressing Shift 2 times fast and hides after pressing Escape', () => {
   render(<CommandPalette commands={prepareCommands()} />)
 
   expect(document.body).toMatchSnapshot()
 
-  fireEvent.keyDown(document, { key: '/' })
+  fireEvent.keyDown(document, { key: 'Shift' })
+  fireEvent.keyDown(document, { key: 'Shift' })
 
   waitFor(() => screen.getByRole('dialog'))
   expect(document.body).toMatchSnapshot()
@@ -39,12 +40,43 @@ test('command palette opens after pressing / and hides after pressing Escape', (
   expect(document.body).toMatchSnapshot()
 })
 
+test('command palette does not open after pressing Shift only once', () => {
+  render(<CommandPalette commands={prepareCommands()} />)
+
+  expect(document.body).toMatchSnapshot()
+
+  fireEvent.keyDown(document, { key: 'Shift' })
+
+  waitFor(() => {
+    expect(screen.queryByRole('dialog')).not.toBeNull()
+  })
+  expect(document.body).toMatchSnapshot()
+})
+
+test('command palette does not open if time between pressing Shift key is too long', () => {
+  jest.useFakeTimers()
+
+  render(<CommandPalette commands={prepareCommands()} />)
+
+  expect(document.body).toMatchSnapshot()
+
+  fireEvent.keyDown(document, { key: 'Shift' })
+  jest.advanceTimersByTime(1000) // Adjust the time as needed
+  fireEvent.keyDown(document, { key: 'Shift' })
+
+  waitFor(() => {
+    expect(screen.queryByRole('dialog')).toBeNull()
+  })
+  expect(document.body).toMatchSnapshot()
+})
+
 test('should execute callback after command is selected by keyboard', () => {
   const mockOnSelectCallback = jest.fn()
 
   render(<CommandPalette commands={prepareCommands()} onItemSelected={mockOnSelectCallback} />)
 
-  fireEvent.keyDown(document, { key: '/' })
+  fireEvent.keyDown(document, { key: 'Shift' })
+  fireEvent.keyDown(document, { key: 'Shift' })
   fireEvent.keyDown(document, { key: 'ArrowDown' })
   fireEvent.keyDown(document, { key: 'Enter' })
 
@@ -57,7 +89,8 @@ test('should execute callback after command is selected by mouse click', () => {
 
   render(<CommandPalette commands={prepareCommands()} onItemSelected={mockOnSelectCallback} />)
 
-  fireEvent.keyDown(document, { key: '/' })
+  fireEvent.keyDown(document, { key: 'Shift' })
+  fireEvent.keyDown(document, { key: 'Shift' })
   fireEvent.mouseDown(screen.getByText('ab'))
 
   expect(mockOnSelectCallback).toHaveBeenCalledWith({ id: 'ab', name: 'ab', execute: expect.any(Function) })
@@ -67,7 +100,8 @@ test('should execute callback after command is selected by mouse click', () => {
 test('should filter commands based on input value', () => {
   render(<CommandPalette commands={prepareCommands()} />)
 
-  fireEvent.keyDown(document, { key: '/' })
+  fireEvent.keyDown(document, { key: 'Shift' })
+  fireEvent.keyDown(document, { key: 'Shift' })
 
   const filterInput = screen.getByPlaceholderText('Search...')
   fireEvent.change(filterInput, { target: { value: 'a' } })

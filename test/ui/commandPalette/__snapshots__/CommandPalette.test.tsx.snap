@@ -1,12 +1,48 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`command palette opens after pressing / and hides after pressing Escape 1`] = `
+exports[`command palette does not open after pressing Shift only once 1`] = `
+<body
+  class=""
+  style="padding-right: 1024px;"
+>
+  <div />
+</body>
+`;
+
+exports[`command palette does not open after pressing Shift only once 2`] = `
+<body
+  class=""
+  style="padding-right: 1024px;"
+>
+  <div />
+</body>
+`;
+
+exports[`command palette does not open if time between pressing Shift key is too long 1`] = `
+<body
+  class=""
+  style="padding-right: 1024px;"
+>
+  <div />
+</body>
+`;
+
+exports[`command palette does not open if time between pressing Shift key is too long 2`] = `
+<body
+  class=""
+  style="padding-right: 1024px;"
+>
+  <div />
+</body>
+`;
+
+exports[`command palette opens after pressing Shift 2 times fast and hides after pressing Escape 1`] = `
 <body>
   <div />
 </body>
 `;
 
-exports[`command palette opens after pressing / and hides after pressing Escape 2`] = `
+exports[`command palette opens after pressing Shift 2 times fast and hides after pressing Escape 2`] = `
 <body
   class="modal-open"
   data-rr-ui-modal-open=""
@@ -70,7 +106,7 @@ exports[`command palette opens after pressing / and hides after pressing Escape 
 </body>
 `;
 
-exports[`command palette opens after pressing / and hides after pressing Escape 3`] = `
+exports[`command palette opens after pressing Shift 2 times fast and hides after pressing Escape 3`] = `
 <body
   class="modal-open"
   data-rr-ui-modal-open=""
