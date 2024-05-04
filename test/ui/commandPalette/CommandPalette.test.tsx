@@ -23,7 +23,7 @@ function prepareCommands() {
   return commands
 }
 
-test('command palette opens after pressing Shift 2 times fast and hides after pressing Escape', () => {
+test('command palette opens after pressing Shift 2 times fast and hides after pressing Escape', async () => {
   render(<CommandPalette commands={prepareCommands()} />)
 
   expect(document.body).toMatchSnapshot()
@@ -31,29 +31,26 @@ test('command palette opens after pressing Shift 2 times fast and hides after pr
   fireEvent.keyDown(document, { key: 'Shift' })
   fireEvent.keyDown(document, { key: 'Shift' })
 
-  waitFor(() => screen.getByRole('dialog'))
+  await waitFor(() => screen.getByRole('dialog'))
   expect(document.body).toMatchSnapshot()
 
   fireEvent.keyDown(document, { key: 'Escape' })
 
-  waitForElementToBeRemoved(() => screen.getByRole('dialog'))
+  await waitForElementToBeRemoved(() => screen.getByRole('dialog'))
   expect(document.body).toMatchSnapshot()
 })
 
-test('command palette does not open after pressing Shift only once', () => {
+test('command palette does not open after pressing Shift only once', async () => {
   render(<CommandPalette commands={prepareCommands()} />)
 
   expect(document.body).toMatchSnapshot()
 
   fireEvent.keyDown(document, { key: 'Shift' })
 
-  waitFor(() => {
-    expect(screen.queryByRole('dialog')).not.toBeNull()
-  })
   expect(document.body).toMatchSnapshot()
 })
 
-test('command palette does not open if time between pressing Shift key is too long', () => {
+test('command palette does not open if time between pressing Shift key is too long', async () => {
   jest.useFakeTimers()
 
   render(<CommandPalette commands={prepareCommands()} />)
@@ -64,13 +61,11 @@ test('command palette does not open if time between pressing Shift key is too lo
   jest.advanceTimersByTime(1000) // Adjust the time as needed
   fireEvent.keyDown(document, { key: 'Shift' })
 
-  waitFor(() => {
-    expect(screen.queryByRole('dialog')).toBeNull()
-  })
+  expect(screen.queryByRole('dialog')).toBeNull()
   expect(document.body).toMatchSnapshot()
 })
 
-test('should execute callback after command is selected by keyboard', () => {
+test('should execute callback after command is selected by keyboard', async () => {
   const mockOnSelectCallback = jest.fn()
 
   render(<CommandPalette commands={prepareCommands()} onItemSelected={mockOnSelectCallback} />)
@@ -81,10 +76,10 @@ test('should execute callback after command is selected by keyboard', () => {
   fireEvent.keyDown(document, { key: 'Enter' })
 
   expect(mockOnSelectCallback).toHaveBeenCalledWith({ id: 'ab', name: 'ab', execute: expect.any(Function) })
-  waitForElementToBeRemoved(() => screen.getByRole('dialog'))
+  await waitForElementToBeRemoved(() => screen.getByRole('dialog'))
 })
 
-test('should execute callback after command is selected by mouse click', () => {
+test('should execute callback after command is selected by mouse click', async () => {
   const mockOnSelectCallback = jest.fn()
 
   render(<CommandPalette commands={prepareCommands()} onItemSelected={mockOnSelectCallback} />)
@@ -94,10 +89,10 @@ test('should execute callback after command is selected by mouse click', () => {
   fireEvent.mouseDown(screen.getByText('ab'))
 
   expect(mockOnSelectCallback).toHaveBeenCalledWith({ id: 'ab', name: 'ab', execute: expect.any(Function) })
-  waitForElementToBeRemoved(() => screen.getByRole('dialog'))
+  await waitForElementToBeRemoved(() => screen.getByRole('dialog'))
 })
 
-test('should filter commands based on input value', () => {
+test('should filter commands based on input value', async () => {
   render(<CommandPalette commands={prepareCommands()} />)
 
   fireEvent.keyDown(document, { key: 'Shift' })
