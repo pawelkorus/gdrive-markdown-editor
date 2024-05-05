@@ -13,6 +13,10 @@ export type FileDetailsWithContent = FileDetails & {
   content: string
 }
 
+export type FileDetailsWithLink = FileDetails & {
+  url: string
+}
+
 export enum Errors {
   NO_FILE_SELECTED = 'NO_FILE_SELECTED',
   PERMISSION_DENIED = 'PERMISSION_DENIED',
@@ -255,5 +259,19 @@ async function ensurePermissionGranted(permission: Permissions, userId?: string)
 
   if (!hasPermission(permission)) {
     throw new Error(Errors.PERMISSION_DENIED)
+  }
+}
+
+export async function getFileMetadata(fileId: string): Promise<FileDetailsWithLink> {
+  await ensurePermissionGranted(Permissions.READ_SELECTED_FILE)
+  const response = await gapi.client.drive.files.get({
+    fileId: fileId,
+    fields: 'name, mimeType, webViewLink',
+  })
+  return {
+    id: fileId,
+    name: response.result.name!,
+    mimeType: response.result.mimeType,
+    url: response.result.webViewLink!,
   }
 }

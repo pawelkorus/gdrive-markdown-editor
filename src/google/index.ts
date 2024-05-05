@@ -9,8 +9,10 @@ export {
   loadFile,
   loadGapi,
   initializeGapiClient,
+  getFileMetadata,
   FileDetails,
   FileDetailsWithContent,
+  FileDetailsWithLink,
 } from './api'
 
 export {
