@@ -9,7 +9,7 @@ import {
   toggleStrongCommand,
   wrapInBlockquoteCommand,
 } from '@milkdown/preset-commonmark'
-import { gdriveCommand } from './gdrive-plugin'
+import { gdriveCommand } from './gdrive-embed-plugin'
 import { commandsCtx } from '@milkdown/core'
 import type { $Command } from '@milkdown/utils'
 import { useCallback, useEffect, useMemo } from 'react'
