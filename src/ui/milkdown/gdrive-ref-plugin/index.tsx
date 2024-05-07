@@ -9,8 +9,8 @@ export const useGdriveRef = () => {
   const nodeViewFactory = useNodeViewFactory()
 
   const node = $node('gdrive-ref', () => ({
-    inline: false,
-    group: 'block',
+    inline: true,
+    group: 'inline',
     selectable: false,
     draggable: false,
     marks: '',
@@ -31,7 +31,7 @@ export const useGdriveRef = () => {
       },
     }],
     parseMarkdown: {
-      match: node => node.type === 'leafDirective' && node.name === 'gdrive-ref',
+      match: node => node.type === 'textDirective' && node.name === 'gdrive-ref',
       runner: (state, node, type) => {
         state.addNode(type, {
           src: (node.attributes as { src: string }).src,
@@ -41,7 +41,7 @@ export const useGdriveRef = () => {
     toMarkdown: {
       match: node => node.type.name === 'gdrive-ref',
       runner: (state, node) => {
-        state.addNode('leafDirective', undefined, undefined, {
+        state.addNode('textDirective', undefined, undefined, {
           name: 'gdrive-ref',
           attributes: {
             src: node.attrs.src,
