@@ -13,10 +13,12 @@ import { gdriveCommand } from './gdrive-embed-plugin'
 import { commandsCtx } from '@milkdown/core'
 import type { $Command } from '@milkdown/utils'
 import { useCallback, useEffect, useMemo } from 'react'
+import { useGdriveRefCommands } from './gdrive-ref-plugin'
 
 export default function useMilkdownCommands() {
   const [loading, getInstance] = useInstance()
   const [registerCommand, unregisterCommand] = useCommandManager()
+  const gdriveRefCommands = useGdriveRefCommands()
 
   const callCommand = useCallback(function<T>(cmd: $Command<T>, payload?: T) {
     return () => !loading && getInstance().ctx.get(commandsCtx).call(cmd.key, payload)
@@ -86,6 +88,11 @@ export default function useMilkdownCommands() {
     id: 'strong',
     execute: callCommand(toggleStrongCommand),
     name: 'Toggle strong',
+  },
+  {
+    id: 'referenceGdriveFile',
+    execute: callCommand(gdriveRefCommands.referenceGdriveFileCommand),
+    name: 'Reference google drive file',
   },
   ], [callCommand])
 
