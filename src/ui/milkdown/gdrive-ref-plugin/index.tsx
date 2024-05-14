@@ -21,6 +21,9 @@ const node = $node('gdrive-ref', () => ({
     src: {
       default: '',
     },
+    label: {
+      default: '',
+    },
   },
   parseDOM: [{
     tag: 'a[data-type="gdrive-ref"]',
@@ -28,7 +31,7 @@ const node = $node('gdrive-ref', () => ({
       if (!(dom instanceof HTMLElement))
         throw expectDomTypeError(dom)
 
-      return { src: dom.dataset.src }
+      return { src: dom.dataset.src, label: dom.textContent }
     },
   }],
   parseMarkdown: {
@@ -36,6 +39,7 @@ const node = $node('gdrive-ref', () => ({
     runner: (state, node, type) => {
       state.addNode(type, {
         src: (node.attributes as { src: string }).src,
+        label: (node.children.length > 0 && node.children[0].value) || '',
       })
     },
   },
@@ -47,6 +51,7 @@ const node = $node('gdrive-ref', () => ({
         attributes: {
           src: node.attrs.src,
         },
+        children: [{ type: 'text', value: node.attrs.label }],
       })
     },
   },
