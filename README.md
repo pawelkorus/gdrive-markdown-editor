@@ -10,7 +10,15 @@ Markdown editor that integrates with your Google Drive.
 ```
 This tag will load file from your google drive and embed it into document as image.
 
-## Development notes
+## Developer notes
+
+### Google Authentication & Authorization
+
+Google made process of authentication and authorization separate. To authenticate you can use one of the buttons documented here: https://developers.google.com/identity/gsi/web/guides/overview
+
+Google also promotes the granular authorization. So when access to user data is needed application should request only minimal set of required permissions. For authorization library might be used that will display pop up whenever permissions are requested. This library is documented here: https://developers.google.com/identity/oauth2/web/guides/overview
+
+Note, that if authorization is not triggered by user gesture pop up will blocked by browsers usually.
 
 ### Google picker api
 

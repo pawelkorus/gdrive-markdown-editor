@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { StrictMode } from 'react'
 import {
   EditorView,
   ViewerView,
@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import {
   loadGapi,
   loadGis,
+  initializeTokenClient,
   initializeGapiClient,
   parseGoogleState,
   StateFromGoogleAction,
@@ -19,8 +20,10 @@ import { Button, Spinner } from 'react-bootstrap'
 import { CommandsContextProvider, useCommandManager, useCommands } from './service/command'
 import { CommandPalette } from './ui/commandPalette'
 import { GdriveFileContextProvider } from './service/gdrivefile/GdriveFileContext'
+import { UserContextProvider, useUser } from './service/user'
 import { useGdriveFile, useGdriveFileCommands } from './service/gdrivefile'
 import { openMarkdownFileCmd } from './ui/useGlobalCommands'
+import GoogleSSO from './ui/googleSSO'
 
 function RootView(): React.ReactElement {
   const [message, setMessage] = useState(null)
@@ -28,6 +31,7 @@ function RootView(): React.ReactElement {
   const [file, loadFile] = useGdriveFile()
   const { createFile } = useGdriveFileCommands()
   const [view, setView] = useState('loading')
+  const [user] = useUser()
   useGlobalCommands()
 
   const [registerCommand, unregisterCommand] = useCommandManager()
@@ -56,8 +60,20 @@ function RootView(): React.ReactElement {
   }, [])
 
   useEffect(() => {
+    const load = async function () {
+      await loadGis()
+      setAuthenticationView()
+    }
+
+    load()
+  }, [])
+
+  useEffect(() => {
+    if (!user) return
+
     const googleApi = async function () {
-      const googleState = await Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient).then(parseGoogleState)
+      initializeTokenClient(user.id)
+      const googleState = await loadGapi().then(initializeGapiClient).then(parseGoogleState)
 
       if (StateFromGoogleAction.Open == googleState.action) {
         try {
@@ -94,7 +110,7 @@ function RootView(): React.ReactElement {
     }
 
     googleApi()
-  }, [])
+  }, [user])
 
   useEffect(() => {
     if (file) {
@@ -127,6 +143,10 @@ function RootView(): React.ReactElement {
     setView('notification')
   }
 
+  const setAuthenticationView = () => {
+    setView('authentication')
+  }
+
   return (
     <>
       { view === 'loading' && (
@@ -138,6 +158,7 @@ function RootView(): React.ReactElement {
           </div>
         </div>
       ) }
+      { view === 'authentication' && <GoogleSSO></GoogleSSO> }
       { view === 'notification' && (
         <NotificationView message={message}>
           <Button onClick={() => executeCommand(openMarkdownFileCmd)}></Button>
@@ -153,10 +174,14 @@ function RootView(): React.ReactElement {
 
 export default (): React.ReactElement => {
   return (
-    <GdriveFileContextProvider>
-      <CommandsContextProvider>
-        <RootView />
-      </CommandsContextProvider>
-    </GdriveFileContextProvider>
+    <StrictMode>
+      <UserContextProvider>
+        <GdriveFileContextProvider>
+          <CommandsContextProvider>
+            <RootView />
+          </CommandsContextProvider>
+        </GdriveFileContextProvider>
+      </UserContextProvider>
+    </StrictMode>
   )
 }
