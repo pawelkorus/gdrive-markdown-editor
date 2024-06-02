@@ -26,7 +26,6 @@ let latestTokenResponse: google.accounts.oauth2.TokenResponse | undefined = unde
 let tokenClient: google.accounts.oauth2.TokenClient | undefined = undefined
 
 export function initializeTokenClient(loginHint: string | undefined) {
-  console.log(loginHint)
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPE_INSTALL,
