@@ -25,10 +25,12 @@ let waitForTokenResult: TokenCallbackResult
 let latestTokenResponse: google.accounts.oauth2.TokenResponse | undefined = undefined
 let tokenClient: google.accounts.oauth2.TokenClient | undefined = undefined
 
-function initializeTokenClient() {
+export function initializeTokenClient(loginHint: string | undefined) {
+  console.log(loginHint)
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPE_INSTALL,
+    prompt: '',
     callback: async (tokenResponse: google.accounts.oauth2.TokenResponse) => {
       latestTokenResponse = tokenResponse
 
@@ -40,6 +42,7 @@ function initializeTokenClient() {
 
       waitForTokenResult.resolve(tokenResponse)
     },
+    login_hint: loginHint,
   })
 }
 
@@ -49,7 +52,6 @@ export function loadGis() {
     gisEle.defer = true
     gisEle.src = 'https://accounts.google.com/gsi/client'
     gisEle.addEventListener('load', () => {
-      initializeTokenClient()
       resolve(true)
     })
     document.body.appendChild(gisEle)
@@ -113,5 +115,3 @@ export function hasPermission(permission: Permissions): boolean {
       return false
   }
 }
-
-export function 

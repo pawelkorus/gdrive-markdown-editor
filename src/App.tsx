@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { StrictMode } from 'react'
 import {
   EditorView,
   ViewerView,
@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import {
   loadGapi,
   loadGis,
+  initializeTokenClient,
   initializeGapiClient,
   parseGoogleState,
   StateFromGoogleAction,
@@ -19,8 +20,10 @@ import { Button, Spinner } from 'react-bootstrap'
 import { CommandsContextProvider, useCommandManager, useCommands } from './service/command'
 import { CommandPalette } from './ui/commandPalette'
 import { GdriveFileContextProvider } from './service/gdrivefile/GdriveFileContext'
+import { UserContextProvider, useUser } from './service/user'
 import { useGdriveFile, useGdriveFileCommands } from './service/gdrivefile'
 import { openMarkdownFileCmd } from './ui/useGlobalCommands'
+import GoogleSSO from './ui/googleSSO'
 
 function RootView(): React.ReactElement {
   const [message, setMessage] = useState(null)
@@ -28,6 +31,7 @@ function RootView(): React.ReactElement {
   const [file, loadFile] = useGdriveFile()
   const { createFile } = useGdriveFileCommands()
   const [view, setView] = useState('loading')
+  const [user] = useUser()
   useGlobalCommands()
 
   const [registerCommand, unregisterCommand] = useCommandManager()
@@ -56,47 +60,57 @@ function RootView(): React.ReactElement {
   }, [])
 
   useEffect(() => {
-    const googleApi = async function () {
-      // const googleState = await Promise.all([loadGapi(), loadGis()]).then(initializeGapiClient).then(parseGoogleState)
-      const googleState = await Promise.all([loadGapi(), loadGis()])
+    const load = async function () {
+      await loadGis()
+      setAuthenticationView()
+    }
 
-      // if (StateFromGoogleAction.Open == googleState.action) {
-      //   try {
-      //     await loadFile(googleState.fileId, googleState.userId)
-      //     setViewerView()
-      //   }
-      //   catch (e: unknown) {
-      //     console.error(e)
-      //     setNotificationView('Can\'t load file. ' + e)
-      //   }
-      // }
-      // else if (StateFromGoogleAction.New == googleState.action) {
-      //   try {
-      //     createFile({ folderId: googleState.folderId })
-      //     setEditorView()
-      //   }
-      //   catch (e: unknown) {
-      //     console.error(e)
-      //     setNotificationView('Can\'t create file. ' + e)
-      //   }
-      // }
-      // else if (StateFromGoogleAction.Install == googleState.action) {
-      //   try {
-      //     await authorizeInstall()
-      //     setNotificationView('Application installed into your google drive successfully.')
-      //   }
-      //   catch (e: unknown) {
-      //     setNotificationView('Can\'t install app into you google drive.' + e)
-      //   }
-      // }
-      // else {
-      //  setNotificationView('Unknown action ' + googleState.action)
-      // }
-      setNotificationView('Unknown action ')
+    load()
+  }, [])
+
+  useEffect(() => {
+    if (!user) return
+
+    const googleApi = async function () {
+      initializeTokenClient(user.id)
+      const googleState = await loadGapi().then(initializeGapiClient).then(parseGoogleState)
+
+      if (StateFromGoogleAction.Open == googleState.action) {
+        try {
+          await loadFile(googleState.fileId, googleState.userId)
+          setViewerView()
+        }
+        catch (e: unknown) {
+          console.error(e)
+          setNotificationView('Can\'t load file. ' + e)
+        }
+      }
+      else if (StateFromGoogleAction.New == googleState.action) {
+        try {
+          createFile({ folderId: googleState.folderId })
+          setEditorView()
+        }
+        catch (e: unknown) {
+          console.error(e)
+          setNotificationView('Can\'t create file. ' + e)
+        }
+      }
+      else if (StateFromGoogleAction.Install == googleState.action) {
+        try {
+          await authorizeInstall()
+          setNotificationView('Application installed into your google drive successfully.')
+        }
+        catch (e: unknown) {
+          setNotificationView('Can\'t install app into you google drive.' + e)
+        }
+      }
+      else {
+        setNotificationView('Unknown action ' + googleState.action)
+      }
     }
 
     googleApi()
-  }, [])
+  }, [user])
 
   useEffect(() => {
     if (file) {
@@ -129,22 +143,12 @@ function RootView(): React.ReactElement {
     setView('notification')
   }
 
-  function aaa() {
-    console.log("loggedin")
+  const setAuthenticationView = () => {
+    setView('authentication')
   }
 
   return (
     <>
-      <div
-            id="g_id_onload"
-            data-client_id="413355556847-pd76u4ckm8d8jisjg2fmlamgisejh4nn.apps.googleusercontent.com"
-            data-context="use"
-            data-callback={aaa}
-            data-nonce=""
-            data-auto_select="true"
-            data-itp_support="true"
-          >
-      </div>
       { view === 'loading' && (
         <div className="container-fluid h-100 d-flex">
           <div className="mx-auto my-auto">
@@ -154,10 +158,11 @@ function RootView(): React.ReactElement {
           </div>
         </div>
       ) }
+      { view === 'authentication' && <GoogleSSO></GoogleSSO> }
       { view === 'notification' && (
-        <>
-          <Button onClick={() => executeCommand(openMarkdownFileCmd)}>Dupa</Button>
-        </>
+        <NotificationView message={message}>
+          <Button onClick={() => executeCommand(openMarkdownFileCmd)}></Button>
+        </NotificationView>
       ) }
       { view === 'editor' && <EditorView onCloseClicked={closeEditMode} /> }
       { view === 'source' && <SourceView onCloseClicked={closeEditMode} /> }
@@ -169,10 +174,14 @@ function RootView(): React.ReactElement {
 
 export default (): React.ReactElement => {
   return (
-    <GdriveFileContextProvider>
-      <CommandsContextProvider>
-        <RootView />
-      </CommandsContextProvider>
-    </GdriveFileContextProvider>
+    <StrictMode>
+      <UserContextProvider>
+        <GdriveFileContextProvider>
+          <CommandsContextProvider>
+            <RootView />
+          </CommandsContextProvider>
+        </GdriveFileContextProvider>
+      </UserContextProvider>
+    </StrictMode>
   )
 }
