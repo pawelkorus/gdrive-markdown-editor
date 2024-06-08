@@ -24,37 +24,47 @@ class TokenCallbackResult {
 let waitForTokenResult: TokenCallbackResult
 let latestTokenResponse: google.accounts.oauth2.TokenResponse | undefined = undefined
 let tokenClient: google.accounts.oauth2.TokenClient | undefined = undefined
+let gisLibraryPromise: Promise<void> | undefined
 
-export function initializeTokenClient(loginHint: string | undefined) {
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPE_INSTALL,
-    prompt: '',
-    callback: async (tokenResponse: google.accounts.oauth2.TokenResponse) => {
-      latestTokenResponse = tokenResponse
+async function ensureTokenClient(loginHint: string | undefined) {
+  await loadGis()
+  if (!tokenClient) {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPE_INSTALL,
+      prompt: '',
+      callback: async (tokenResponse: google.accounts.oauth2.TokenResponse) => {
+        latestTokenResponse = tokenResponse
 
-      if (!waitForTokenResult) return
+        if (!waitForTokenResult) return
 
-      if (tokenResponse.error !== undefined) {
-        waitForTokenResult.reject(tokenResponse.error)
-      }
+        if (tokenResponse.error !== undefined) {
+          waitForTokenResult.reject(tokenResponse.error)
+        }
 
-      waitForTokenResult.resolve(tokenResponse)
-    },
-    login_hint: loginHint,
-  })
+        waitForTokenResult.resolve(tokenResponse)
+      },
+      login_hint: loginHint,
+    })
+  }
+
+  return tokenClient
 }
 
-export function loadGis() {
-  return new Promise((resolve) => {
-    const gisEle = document.createElement('script') as HTMLScriptElement
-    gisEle.defer = true
-    gisEle.src = 'https://accounts.google.com/gsi/client'
-    gisEle.addEventListener('load', () => {
-      resolve(true)
+function loadGis() {
+  if (!gisLibraryPromise) {
+    gisLibraryPromise = new Promise((resolve) => {
+      const gisEle = document.createElement('script') as HTMLScriptElement
+      gisEle.defer = true
+      gisEle.src = 'https://accounts.google.com/gsi/client'
+      gisEle.addEventListener('load', () => {
+        resolve()
+      })
+      document.body.appendChild(gisEle)
     })
-    document.body.appendChild(gisEle)
-  })
+  }
+
+  return gisLibraryPromise
 }
 
 export function authorizeInstall(): Promise<unknown> {
@@ -73,7 +83,9 @@ export function currentToken(): google.accounts.oauth2.TokenResponse {
   return latestTokenResponse!
 }
 
-export function requestAccess(requiredPesmission: Permissions, userId?: string): Promise<unknown> {
+export async function requestAccess(requiredPesmission: Permissions, userId?: string): Promise<unknown> {
+  const tokenClient = await ensureTokenClient(userId)
+
   function toScope(permission: Permissions): string {
     switch (permission) {
       case Permissions.INSTALL:
@@ -89,7 +101,7 @@ export function requestAccess(requiredPesmission: Permissions, userId?: string):
   return new Promise((resolve, reject) => {
     waitForTokenResult = new TokenCallbackResult(resolve, reject)
 
-    tokenClient!.requestAccessToken({
+    tokenClient.requestAccessToken({
       scope: toScope(requiredPesmission),
       hint: userId,
     })

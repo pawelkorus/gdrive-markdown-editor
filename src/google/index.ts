@@ -16,8 +16,6 @@ export {
 } from './api'
 
 export {
-  loadGis,
-  initializeTokenClient,
   authorizeInstall,
 } from './auth'
 

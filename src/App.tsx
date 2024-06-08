@@ -9,8 +9,6 @@ import {
 import { useEffect, useState } from 'react'
 import {
   loadGapi,
-  loadGis,
-  initializeTokenClient,
   initializeGapiClient,
   parseGoogleState,
   StateFromGoogleAction,
@@ -60,8 +58,6 @@ function RootView(): React.ReactElement {
   useEffect(() => {
     const googleApi = async function () {
       const googleState = parseGoogleState()
-      await loadGis()
-      initializeTokenClient(googleState.userId)
       await loadGapi()
       await initializeGapiClient()
 
