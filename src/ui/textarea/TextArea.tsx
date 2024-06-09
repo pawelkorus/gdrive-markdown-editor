@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react'
+import autosize from 'autosize'
 
 interface TextAreaProps {
   value: string
@@ -12,9 +13,7 @@ const TextArea: React.FC<TextAreaProps> = ({ value, onChange }) => {
     const textAreaRef = ref.current
 
     if (textAreaRef) {
-      textAreaRef.style.height = '0px'
-      const scrollHeight = textAreaRef.scrollHeight
-      textAreaRef.style.height = scrollHeight + 'px'
+      autosize(textAreaRef)
     }
   }, [])
 
