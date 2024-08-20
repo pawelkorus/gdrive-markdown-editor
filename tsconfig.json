@@ -3,7 +3,7 @@
         "outDir": "target/",
         "sourceMap": true,
         "noImplicitAny": true,
-        "target": "es5",
+        "target": "ES2018",
         "allowJs": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
