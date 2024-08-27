@@ -8,10 +8,10 @@ import {
   toggleEmphasisCommand,
   toggleStrongCommand,
   wrapInBlockquoteCommand,
-} from '@milkdown/preset-commonmark'
+} from '@milkdown/kit/preset/commonmark'
 import { gdriveCommand } from './gdrive-embed-plugin'
-import { commandsCtx } from '@milkdown/core'
-import type { $Command } from '@milkdown/utils'
+import { commandsCtx } from '@milkdown/kit/core'
+import type { $Command } from '@milkdown/kit/utils'
 import { useCallback, useEffect, useMemo } from 'react'
 import { useGdriveRefCommands } from './gdrive-ref-plugin'
 

@@ -1,7 +1,7 @@
-import { $node, $nodeAttr, $inputRule } from '@milkdown/utils'
+import { $node, $nodeAttr, $inputRule } from '@milkdown/kit/utils'
 import { expectDomTypeError } from '@milkdown/exception'
 import { withMeta } from './with-meta'
-import { InputRule } from '@milkdown/prose/inputrules'
+import { InputRule } from '@milkdown/kit/prose/inputrules'
 import { useNodeViewFactory } from '@prosemirror-adapter/react'
 import { nodeView } from './view'
 

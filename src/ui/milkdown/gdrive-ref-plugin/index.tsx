@@ -1,13 +1,13 @@
-import { Cmd } from '@milkdown/core'
-import { Ctx } from '@milkdown/ctx'
-import { EditorState, Transaction } from '@milkdown/prose/state'
-import { $node, $view, $command } from '@milkdown/utils'
+import { Cmd } from '@milkdown/kit/core'
+import { Ctx } from '@milkdown/kit/ctx'
+import { EditorState, Transaction } from '@milkdown/kit/prose/state'
+import { $node, $view, $command } from '@milkdown/kit/utils'
 import { expectDomTypeError } from '@milkdown/exception'
 import { withMeta } from './with-meta'
 import { useNodeViewFactory } from '@prosemirror-adapter/react'
 import GDriveRef from './GDriveRef'
 import { showPicker } from '../../../google'
-import type { NodeViewConstructor } from '@milkdown/prose/view'
+import type { NodeViewConstructor } from '@milkdown/kit/prose/view'
 
 const node = $node('gdrive-ref', () => ({
   inline: true,

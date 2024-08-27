@@ -1,5 +1,5 @@
-import { $view } from '@milkdown/utils'
-import type { NodeViewConstructor } from '@milkdown/prose/view'
+import { $view } from '@milkdown/kit/utils'
+import type { NodeViewConstructor } from '@milkdown/kit/prose/view'
 import { ReactNodeViewUserOptions } from '@prosemirror-adapter/react'
 import { withMeta } from './with-meta'
 import { gdriveNode } from '.'
