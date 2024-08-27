@@ -25,26 +25,27 @@ export const youtubeNode = $node('youtube', () => ({
       default: '',
     },
   },
-  parseDOM: [{
-    tag: 'p[data-type="youtube"]',
-    getAttrs: (dom) => {
-      if (!(dom instanceof HTMLElement))
-        throw expectDomTypeError(dom)
+  parseDOM: [
+    {
+      tag: 'p[data-type="youtube"]',
+      getAttrs: (dom) => {
+        if (!(dom instanceof HTMLElement))
+          throw expectDomTypeError(dom)
 
-      const ifFrameNode = dom.children.length === 1 && dom.children[0]
-      if (!(ifFrameNode instanceof HTMLIFrameElement))
-        throw new Error('Expected iframe element with youtube embed')
+        const ifFrameNode = dom.children.length === 1 && dom.children[0]
+        if (!(ifFrameNode instanceof HTMLIFrameElement))
+          throw new Error('Expected iframe element with youtube embed')
 
-      if (!ifFrameNode.src)
-        throw new Error('Cannot find src attribute in iframe')
+        if (!ifFrameNode.src)
+          throw new Error('Cannot find src attribute in iframe')
 
-      const src = ifFrameNode.src.replace('https://www.youtube.com/embed/', '')
-      if (!src)
-        throw new Error('Cannot find youtube video id from src')
+        const src = ifFrameNode.src.replace('https://www.youtube.com/embed/', '')
+        if (!src)
+          throw new Error('Cannot find youtube video id from src')
 
-      return { src }
+        return { src }
+      },
     },
-  },
   ],
   parseMarkdown: {
     match: node => node.type === 'leafDirective' && node.name === 'youtube',
