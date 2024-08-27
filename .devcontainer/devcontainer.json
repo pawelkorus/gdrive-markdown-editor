@@ -15,10 +15,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"EditorConfig.EditorConfig",
-				"eamodio.gitlens",
-				"GitHub.copilot",
-				"GitHub.copilot-chat"
+				"EditorConfig.EditorConfig"
 			]
 		}
 	}
