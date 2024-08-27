@@ -2,6 +2,14 @@
 
 Markdown editor that integrates with your Google Drive.
 
+## Generic directives
+
+Custom tags might be created using [Generic directives](https://talk.commonmark.org/t/generic-directives-plugins-syntax/444). Generic directives are implemented via `remark-directive` plugin.
+In short this specification introduce following syntax to denote different types of nodes:
+  * directives with prefix `:` denote inline directives (something like `a`)
+  * directives with prefix `::` denote leaf block directives (something like `p`)
+  * directives with prefix `:::` denote container block directives (something like `div`)
+
 ## Custom tags
 
 ### Embed file from google drive 
