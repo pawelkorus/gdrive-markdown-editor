@@ -18,6 +18,13 @@ In short this specification introduce following syntax to denote different types
 ```
 This tag will load file from your google drive and embed it into document as image.
 
+### Embed youtube videos
+
+```
+::youtube{src="videoId"}
+```
+This tag will create embed with youtube video.
+
 ## Developer notes
 
 ### Google Authentication & Authorization
