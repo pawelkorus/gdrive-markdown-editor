@@ -21,6 +21,7 @@ import { GdriveFileContextProvider } from './service/gdrivefile/GdriveFileContex
 import { UserContextProvider } from './service/user'
 import { useGdriveFile, useGdriveFileCommands } from './service/gdrivefile'
 import { openMarkdownFileCmd } from './ui/useGlobalCommands'
+import InstalledView from './ui/InstalledView'
 
 function RootView(): React.ReactElement {
   const [message, setMessage] = useState(null)
@@ -84,7 +85,7 @@ function RootView(): React.ReactElement {
       else if (StateFromGoogleAction.Install == googleState.action) {
         try {
           await authorizeInstall()
-          setNotificationView('Application installed into your google drive successfully.')
+          setInstalledView()
         }
         catch (e: unknown) {
           setNotificationView('Can\'t install app into you google drive.' + e)
@@ -129,6 +130,10 @@ function RootView(): React.ReactElement {
     setView('notification')
   }
 
+  const setInstalledView = () => {
+    setView('installed')
+  }
+
   return (
     <>
       { view === 'loading' && (
@@ -145,6 +150,7 @@ function RootView(): React.ReactElement {
           <Button onClick={() => executeCommand(openMarkdownFileCmd)}></Button>
         </NotificationView>
       ) }
+      { view === 'installed' && <InstalledView /> }
       { view === 'editor' && <EditorView onCloseClicked={closeEditMode} /> }
       { view === 'source' && <SourceView onCloseClicked={closeEditMode} /> }
       { view === 'viewer' && <ViewerView onEditClicked={enableEditMode} /> }

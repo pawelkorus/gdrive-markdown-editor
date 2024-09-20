@@ -10,6 +10,7 @@ export {
   loadGapi,
   initializeGapiClient,
   getFileMetadata,
+  getUserRecentlyModifiedFiles,
   FileDetails,
   FileDetailsWithContent,
   FileDetailsWithLink,

@@ -275,3 +275,23 @@ export async function getFileMetadata(fileId: string): Promise<FileDetailsWithLi
     url: response.result.webViewLink!,
   }
 }
+
+export async function getUserRecentlyModifiedFiles(): Promise<(FileDetails & {viewedByMeTime: string})[]> {
+  await ensurePermissionGranted(Permissions.BROWSE_FILES)
+
+  const response = await gapi.client.drive.files.list({
+    pageSize: 10,
+    fields: 'files(id, name, mimeType, viewedByMeTime)',
+    orderBy: 'viewedByMeTime desc',
+    q: "fileExtension='md' or mimeType='text/markdown'",
+  })
+
+  const files = response.result.files || []
+
+  return files.map(file => ({
+    id: file.id!,
+    name: file.name!,
+    mimeType: file.mimeType!,
+    viewedByMeTime: file.viewedByMeTime!,
+  }))
+}
