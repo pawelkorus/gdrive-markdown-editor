@@ -295,3 +295,56 @@ export async function getUserRecentlyModifiedFiles(): Promise<(FileDetails & {vi
     viewedByMeTime: file.viewedByMeTime!,
   }))
 }
+
+export async function createFileInAppDirectory(filename: string, content: string): Promise<FileDetailsWithContent> {
+  await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA);
+  
+  const appFolderId = 'appDataFolder'; // Special alias for the app-specific folder
+
+  const response = await gapi.client.drive.files.create({
+    uploadType: 'media',
+  }, {
+    name: filename,
+    mimeType: 'text/markdown',
+    parents: [appFolderId],
+  });
+
+  return {
+    id: response.result.id!,
+    name: response.result.name!,
+    mimeType: response.result.mimeType,
+    content: content,
+  };
+}
+
+export async function findFileInAppDirectory(filename: string): Promise<FileDetails | null> {
+  await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA);
+
+  const response = await gapi.client.drive.files.list({
+    q: `name='${filename}' and 'appDataFolder' in parents`,
+    fields: 'files(id, name, mimeType)',
+    spaces: 'appDataFolder',
+  });
+
+  const files = response.result.files || [];
+  console.log(files)
+  if (files.length > 0) {
+    const file = files[0];
+    return {
+      id: file.id!,
+      name: file.name!,
+      mimeType: file.mimeType,
+    };
+  }
+
+  return null;
+}
+
+export async function deleteFileFromAppDirectory(fileId: string): Promise<void> {
+  await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA);
+
+  const result = await gapi.client.drive.files.delete({
+    fileId: fileId,
+  });
+}
+

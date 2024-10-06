@@ -4,3 +4,4 @@ export const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive
 export const SCOPE_FILE_ACCESS = 'https://www.googleapis.com/auth/drive.file'
 export const SCOPE_INSTALL = 'https://www.googleapis.com/auth/drive.install'
 export const SCOPE_DRIVE_READONLY = 'https://www.googleapis.com/auth/drive.readonly'
+export const SCOPE_DRIVE_APPDATA = 'https://www.googleapis.com/auth/drive.appdata'

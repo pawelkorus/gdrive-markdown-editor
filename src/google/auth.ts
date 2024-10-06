@@ -1,4 +1,4 @@
-import { CLIENT_ID, SCOPE_FILE_ACCESS, SCOPE_INSTALL } from './const'
+import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_FILE_ACCESS, SCOPE_INSTALL } from './const'
 
 type RequestTokenSuccess = (tokenReponse: google.accounts.oauth2.TokenResponse) => void
 type RequestTokenReject = (error: unknown) => void
@@ -77,6 +77,7 @@ export enum Permissions {
   READ_SELECTED_FILE = 'READ_SELECTED_FILE',
   BROWSE_FILES = 'BROWSE_FILES',
   READ_FILE = 'READ_FILE',
+  MAINTAIN_APP_DATA = 'MAINTAIN_APP_DATA',
 }
 
 export function currentToken(): google.accounts.oauth2.TokenResponse {
@@ -86,7 +87,7 @@ export function currentToken(): google.accounts.oauth2.TokenResponse {
 export async function requestAccess(requiredPesmission: Permissions, userId?: string): Promise<unknown> {
   const tokenClient = await ensureTokenClient(userId)
 
-  function toScope(permission: Permissions): string {
+  function toScope(permission: Permissions): string  {
     switch (permission) {
       case Permissions.INSTALL:
         return SCOPE_INSTALL
@@ -95,6 +96,8 @@ export async function requestAccess(requiredPesmission: Permissions, userId?: st
       case Permissions.BROWSE_FILES:
       case Permissions.READ_FILE:
         return SCOPE_FILE_ACCESS
+      case Permissions.MAINTAIN_APP_DATA:
+        return SCOPE_DRIVE_APPDATA
     }
   }
 
@@ -122,6 +125,8 @@ export function hasPermission(permission: Permissions): boolean {
       return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
     case Permissions.INSTALL:
       return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_INSTALL)
+    case Permissions.MAINTAIN_APP_DATA:
+      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_DRIVE_APPDATA)
     default:
       return false
   }

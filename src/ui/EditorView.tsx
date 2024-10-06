@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { MilkdownEditor, WrapWithProviders } from './milkdown'
 import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
+import { useDraftFileNotContext } from '../service/draftfile'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -12,32 +13,56 @@ function EditorView(props: Props): React.ReactElement {
   const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
   const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
   const [fileDetails] = useGdriveFile()
+  const [initialContent, setInitialContent] = useState(fileDetails.content)
   const [updatedContent, setUpdatedContent] = useState(fileDetails.content)
-  const { updateContent, updateFileName } = useGdriveFileCommands()
+  const {updateContent: updateGdriveContent, updateFileName} = useGdriveFileCommands()
+  const { 
+    fileDetails: draftFile, 
+    loadContent: loadDraftContent, 
+    updateContent: updateDraftContent,
+    discard: discardDraft 
+  } = useDraftFileNotContext(fileDetails)
   useMilkdownCommands()
+  const [draftAvailable, setDraftAvailable] = useState(false)
 
   useEffect(() => {
     if (isDirty) {
       const interval = setInterval(() => {
-        if (isDirty) commitContentChange(updatedContent)
-      }, 5000)
+        if (isDirty) autoSaveAction(updatedContent)
+      }, 2000)
       return () => {
         clearInterval(interval)
       }
     }
   }, [updatedContent, isDirty])
 
-  const initialContent = useCallback(() => {
-    return fileDetails.content
-  }, [fileDetails.id])
+  useEffect(() => {
+    if(!draftFile) {
+      setDraftAvailable(false)
+      return
+    }
+
+    if(draftFile.isNew) {
+      updateDraftContent(updatedContent)
+    } else {
+      setDraftAvailable(true)
+    }
+  }, [draftFile?.id])
 
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)
     setIsDirty(true)
   }, [])
 
+  function autoSaveAction(newContent: string) {
+    updateDraftContent(newContent)
+    setLastSavedTimestamp(new Date())
+    setIsDirty(false)
+  }
+
   function commitContentChange(newContent: string) {
-    updateContent(newContent)
+    updateGdriveContent(newContent)
+    updateDraftContent(newContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }
@@ -45,6 +70,29 @@ function EditorView(props: Props): React.ReactElement {
   function commitFileNameChange(fileName: string) {
     updateFileName(fileName)
     setEditFileNameEnabled(false)
+  }
+
+  function onCloseClicked() {
+    updateGdriveContent(updatedContent)
+    discardDraft()
+    props.onCloseClicked()
+  }
+
+  function onDiscardClicked() {
+    discardDraft()
+    props.onCloseClicked()
+  }
+
+  async function onUseDraftClicked() {
+    const content = await loadDraftContent()
+    setInitialContent(content)
+    setUpdatedContent(content)
+    setDraftAvailable(false)
+  }
+
+  function onDiscardDraftClicked() {
+    updateDraftContent(updatedContent)
+    setDraftAvailable(false)
   }
 
   return (
@@ -70,13 +118,23 @@ function EditorView(props: Props): React.ReactElement {
               </small>
             </span>
           )}
+          { draftAvailable && (
+          <div>
+            <div className="input-group" role="alert">
+              <span className="input-group-text">Draft available:</span>
+              <button className="btn btn-outline-primary" onClick={onUseDraftClicked}>Use</button>
+              <button className="btn btn-outline-danger" onClick={onDiscardDraftClicked}>Discard</button>
+            </div>
+          </div>
+          )}
           <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={() => commitContentChange(updatedContent)}>Save</button>
-          <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={props.onCloseClicked}>Close</button>
+          <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={onCloseClicked}>Save & Close</button>
+          <button className="btn btn-primary ms-1" id="btn-discard" type="button" onClick={onDiscardClicked}>Discard</button>
         </div>
       </div>
       <div className="container-lg mt-4">
         <div className="row">
-          <MilkdownEditor content={initialContent()} onContentUpdated={handleContentUpdate} />
+          <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
         </div>
       </div>
     </>
