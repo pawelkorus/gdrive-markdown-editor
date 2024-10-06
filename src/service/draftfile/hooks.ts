@@ -19,11 +19,11 @@ export function useDraftFileNotContext(origFileDetails:FileDetails): DraftFileAp
 
   useEffect(() => {
     const initialize = async () => {
-      const existingFile = await googleApi.findFileInAppDirectory("draft_" + origFileDetails.name)
+      const existingFile = await googleApi.findFileInAppDirectory("draft_" + origFileDetails.id)
       if (existingFile) {
         setFileDetails({ ...existingFile, isNew: false })
       } else {
-        const fileDetails = await googleApi.createFileInAppDirectory("draft_" + origFileDetails.name, "")
+        const fileDetails = await googleApi.createFileInAppDirectory("draft_" + origFileDetails.id, "")
         setFileDetails({ ...fileDetails, isNew: true })
       }
     }
