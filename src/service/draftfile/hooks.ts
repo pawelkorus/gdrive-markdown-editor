@@ -14,7 +14,7 @@ type DraftFileApi = {
   discard: () => Promise<void>
 }
 
-export function useDraftFileNotContext(origFileDetails:FileDetails): DraftFileApi {
+export function useDraftFile(origFileDetails: FileDetails): DraftFileApi {
   const [fileDetails, setFileDetails] = useState<DraftFileDetails | null>(null)
 
   useEffect(() => {

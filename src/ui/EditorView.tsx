@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { MilkdownEditor, WrapWithProviders } from './milkdown'
 import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
-import { useDraftFileNotContext } from '../service/draftfile'
+import { useDraftFile } from '../service/draftfile'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -21,7 +21,7 @@ function EditorView(props: Props): React.ReactElement {
     loadContent: loadDraftContent, 
     updateContent: updateDraftContent,
     discard: discardDraft 
-  } = useDraftFileNotContext(fileDetails)
+  } = useDraftFile(fileDetails)
   useMilkdownCommands()
   const [draftAvailable, setDraftAvailable] = useState(false)
 
