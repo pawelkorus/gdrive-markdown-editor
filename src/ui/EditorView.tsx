@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { MilkdownEditor, WrapWithProviders } from './milkdown'
 import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
-import { useDraftFile } from '../service/draftfile'
+import { useDraftFiles, DraftFileDetails } from '../service/draftfile'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -12,18 +12,21 @@ function EditorView(props: Props): React.ReactElement {
   const [isDirty, setIsDirty] = useState(false)
   const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
   const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
+  const [showDrafts, setShowDrafts] = useState(false)
   const [fileDetails] = useGdriveFile()
   const [initialContent, setInitialContent] = useState(fileDetails.content)
   const [updatedContent, setUpdatedContent] = useState(fileDetails.content)
   const {updateContent: updateGdriveContent, updateFileName} = useGdriveFileCommands()
   const { 
-    fileDetails: draftFile, 
-    loadContent: loadDraftContent, 
-    updateContent: updateDraftContent,
-    discard: discardDraft 
-  } = useDraftFile(fileDetails)
+    draftFiles,
+    selectedDraft,
+    createDraft,
+    discardDraft,
+    loadDraftContent,
+    saveDraftContent,
+    useDraft
+  } = useDraftFiles(fileDetails)
   useMilkdownCommands()
-  const [draftAvailable, setDraftAvailable] = useState(false)
 
   useEffect(() => {
     if (isDirty) {
@@ -37,17 +40,11 @@ function EditorView(props: Props): React.ReactElement {
   }, [updatedContent, isDirty])
 
   useEffect(() => {
-    if(!draftFile) {
-      setDraftAvailable(false)
-      return
+    const createInitialDraft = async () => {
+      await createDraft(updatedContent)
     }
-
-    if(draftFile.isNew) {
-      updateDraftContent(updatedContent)
-    } else {
-      setDraftAvailable(true)
-    }
-  }, [draftFile?.id])
+    createInitialDraft()
+  }, [])
 
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)
@@ -55,14 +52,14 @@ function EditorView(props: Props): React.ReactElement {
   }, [])
 
   function autoSaveAction(newContent: string) {
-    updateDraftContent(newContent)
+    saveDraftContent(selectedDraft.id, newContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }
 
   function commitContentChange(newContent: string) {
     updateGdriveContent(newContent)
-    updateDraftContent(newContent)
+    saveDraftContent(selectedDraft.id, newContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }
@@ -74,25 +71,24 @@ function EditorView(props: Props): React.ReactElement {
 
   function onCloseClicked() {
     updateGdriveContent(updatedContent)
-    discardDraft()
+    discardDraft(selectedDraft.id)
     props.onCloseClicked()
   }
 
   function onDiscardClicked() {
-    discardDraft()
+    discardDraft(selectedDraft.id)
     props.onCloseClicked()
   }
 
-  async function onUseDraftClicked() {
-    const content = await loadDraftContent()
+  async function onUseSpecificDraftClicked(draftFile: DraftFileDetails) {
+    setShowDrafts(false)
+    await useDraft(draftFile.id)
+    const content = await loadDraftContent(draftFile.id)
     setInitialContent(content)
-    setUpdatedContent(content)
-    setDraftAvailable(false)
   }
 
-  function onDiscardDraftClicked() {
-    updateDraftContent(updatedContent)
-    setDraftAvailable(false)
+  async function onDiscardSelectedDraftClicked(draftFile: DraftFileDetails) {
+    discardDraft(draftFile.id)
   }
 
   return (
@@ -118,12 +114,21 @@ function EditorView(props: Props): React.ReactElement {
               </small>
             </span>
           )}
-          { draftAvailable && (
+          { draftFiles && draftFiles.length == 1 && (
           <div>
             <div className="input-group" role="alert">
               <span className="input-group-text">Draft available:</span>
-              <button className="btn btn-outline-primary" onClick={onUseDraftClicked}>Use</button>
-              <button className="btn btn-outline-danger" onClick={onDiscardDraftClicked}>Discard</button>
+              <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use</button>
+              <button className="btn btn-outline-danger" onClick={() => onDiscardSelectedDraftClicked(draftFiles[0])}>Discard</button>
+            </div>
+          </div>
+          )}
+          { draftFiles && draftFiles.length > 1 && (
+          <div>
+            <div className="input-group" role="alert">
+              <span className="input-group-text">Multiple drafts available:</span>
+              <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use latest</button>
+              <button className="btn btn-outline-primary" onClick={() => setShowDrafts(true)}>Show all</button>
             </div>
           </div>
           )}
@@ -132,11 +137,28 @@ function EditorView(props: Props): React.ReactElement {
           <button className="btn btn-primary ms-1" id="btn-discard" type="button" onClick={onDiscardClicked}>Discard</button>
         </div>
       </div>
+      {showDrafts && (
+      <div className="container-lg mt-4">
+        <div className="row">
+            <div className="list-group">
+            {draftFiles.map((draftFile) => (
+              <div key={draftFile.id} className="list-group-item list-group-item-action">
+                {draftFile.id}
+                <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFile)}>Use</button>
+                <button className="btn btn-outline-danger" onClick={() => onDiscardSelectedDraftClicked(draftFile)}>Discard</button>
+              </div>
+            ))}
+            </div>
+        </div>
+      </div>
+      )}
+      {!showDrafts && (
       <div className="container-lg mt-4">
         <div className="row">
           <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
         </div>
       </div>
+      )}
     </>
   )
 }

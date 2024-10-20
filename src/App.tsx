@@ -161,7 +161,7 @@ function RootView(): React.ReactElement {
 
 export default (): React.ReactElement => {
   return (
-    <StrictMode>
+    // <StrictMode>
       <UserContextProvider>
         <GdriveFileContextProvider>
           <CommandsContextProvider>
@@ -169,6 +169,6 @@ export default (): React.ReactElement => {
           </CommandsContextProvider>
         </GdriveFileContextProvider>
       </UserContextProvider>
-    </StrictMode>
+    // </StrictMode>
   )
 }

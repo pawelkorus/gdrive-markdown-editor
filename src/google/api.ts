@@ -299,6 +299,8 @@ export async function getUserRecentlyModifiedFiles(): Promise<(FileDetails & {vi
 export async function createFileInAppDirectory(filename: string, content: string): Promise<FileDetailsWithContent> {
   await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA);
   
+  console.log('createFileInAppDirectory', filename)
+
   const appFolderId = 'appDataFolder'; // Special alias for the app-specific folder
 
   const response = await gapi.client.drive.files.create({
@@ -317,27 +319,23 @@ export async function createFileInAppDirectory(filename: string, content: string
   };
 }
 
-export async function findFileInAppDirectory(filename: string): Promise<FileDetails | null> {
+export async function findFileInAppDirectory(filename: string): Promise<FileDetails[]> {
   await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA);
 
   const response = await gapi.client.drive.files.list({
     q: `name='${filename}' and 'appDataFolder' in parents`,
-    fields: 'files(id, name, mimeType)',
+    fields: 'files(id, name, mimeType, createdTime)',
     spaces: 'appDataFolder',
+    orderBy: 'createdTime desc',
   });
 
   const files = response.result.files || [];
   console.log(files)
-  if (files.length > 0) {
-    const file = files[0];
-    return {
+  return files.map(file => ({
       id: file.id!,
       name: file.name!,
       mimeType: file.mimeType,
-    };
-  }
-
-  return null;
+  }))
 }
 
 export async function deleteFileFromAppDirectory(fileId: string): Promise<void> {
