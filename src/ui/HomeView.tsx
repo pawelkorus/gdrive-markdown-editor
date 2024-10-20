@@ -27,8 +27,8 @@ const InstalledView = (props: Props): React.ReactElement => {
           <h1>Recently accessed files</h1>
           <div className="list-group">
             {files.map(file => (
-            <div className="list-group-item list-group-item-action">
-              <div className="d-flex w-100 justify-content-between" onClick={(e) => handleFileClick(file.id)} key={file.id}>
+            <div key={file.id} className="list-group-item list-group-item-action">
+              <div className="d-flex w-100 justify-content-between" onClick={(e) => handleFileClick(file.id)}>
                 <h5 className="mb-1">{file.name}</h5>
                 <small>{file.viewedByMeTime}</small>
               </div>
