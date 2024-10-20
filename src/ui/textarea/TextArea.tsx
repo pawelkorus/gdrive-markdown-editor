@@ -21,7 +21,9 @@ const TextArea: React.FC<TextAreaProps> = ({ value, onChange }) => {
   useEffect(resizeTextArea, [])
 
   function onTextAreaValueChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
-    onChange && onChange(e.target.value)
+    if (onChange) {
+      onChange(e.target.value)
+    }
   }
 
   return (

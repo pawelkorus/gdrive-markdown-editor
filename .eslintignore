@@ -1,7 +1,0 @@
-node_modules
-target
-.idea
-.configit 
-_snapshots_
-*.typegen.ts
-webpack.js

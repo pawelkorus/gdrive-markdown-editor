@@ -16,15 +16,15 @@ function EditorView(props: Props): React.ReactElement {
   const [fileDetails] = useGdriveFile()
   const [initialContent, setInitialContent] = useState(fileDetails.content)
   const [updatedContent, setUpdatedContent] = useState(fileDetails.content)
-  const {updateContent: updateGdriveContent, updateFileName} = useGdriveFileCommands()
-  const { 
+  const { updateContent: updateGdriveContent, updateFileName } = useGdriveFileCommands()
+  const {
     draftFiles,
     selectedDraft,
     createDraft,
     discardDraft,
     loadDraftContent,
     saveDraftContent,
-    useDraft
+    useDraft,
   } = useDraftFiles(fileDetails)
   useMilkdownCommands()
 
@@ -97,13 +97,13 @@ function EditorView(props: Props): React.ReactElement {
         <div className="d-flex flex-row align-items-center justify-content-end">
           {editFileNameEnabled
             ? (
-              <input
-                type="text"
-                defaultValue={fileDetails.name}
-                onBlur={e => commitFileNameChange(e.target.value)}
-                autoFocus
-                className="form-control me-auto"
-              />
+                <input
+                  type="text"
+                  defaultValue={fileDetails.name}
+                  onBlur={e => commitFileNameChange(e.target.value)}
+                  autoFocus
+                  className="form-control me-auto"
+                />
               )
             : (<h5 className="me-auto mb-0" onClick={() => setEditFileNameEnabled(true)}>{fileDetails.name}</h5>)}
           {lastSavedTimestamp != null && (
@@ -115,22 +115,22 @@ function EditorView(props: Props): React.ReactElement {
             </span>
           )}
           { draftFiles && draftFiles.length == 1 && (
-          <div>
-            <div className="input-group" role="alert">
-              <span className="input-group-text">Draft available:</span>
-              <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use</button>
-              <button className="btn btn-outline-danger" onClick={() => onDiscardSelectedDraftClicked(draftFiles[0])}>Discard</button>
+            <div>
+              <div className="input-group" role="alert">
+                <span className="input-group-text">Draft available:</span>
+                <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use</button>
+                <button className="btn btn-outline-danger" onClick={() => onDiscardSelectedDraftClicked(draftFiles[0])}>Discard</button>
+              </div>
             </div>
-          </div>
           )}
           { draftFiles && draftFiles.length > 1 && (
-          <div>
-            <div className="input-group" role="alert">
-              <span className="input-group-text">Multiple drafts available:</span>
-              <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use latest</button>
-              <button className="btn btn-outline-primary" onClick={() => setShowDrafts(true)}>Show all</button>
+            <div>
+              <div className="input-group" role="alert">
+                <span className="input-group-text">Multiple drafts available:</span>
+                <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use latest</button>
+                <button className="btn btn-outline-primary" onClick={() => setShowDrafts(true)}>Show all</button>
+              </div>
             </div>
-          </div>
           )}
           <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={() => commitContentChange(updatedContent)}>Save</button>
           <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={onCloseClicked}>Save & Close</button>
@@ -138,26 +138,26 @@ function EditorView(props: Props): React.ReactElement {
         </div>
       </div>
       {showDrafts && (
-      <div className="container-lg mt-4">
-        <div className="row">
+        <div className="container-lg mt-4">
+          <div className="row">
             <div className="list-group">
-            {draftFiles.map((draftFile) => (
-              <div key={draftFile.id} className="list-group-item list-group-item-action">
-                {draftFile.id}
-                <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFile)}>Use</button>
-                <button className="btn btn-outline-danger" onClick={() => onDiscardSelectedDraftClicked(draftFile)}>Discard</button>
-              </div>
-            ))}
+              {draftFiles.map(draftFile => (
+                <div key={draftFile.id} className="list-group-item list-group-item-action">
+                  {draftFile.id}
+                  <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFile)}>Use</button>
+                  <button className="btn btn-outline-danger" onClick={() => onDiscardSelectedDraftClicked(draftFile)}>Discard</button>
+                </div>
+              ))}
             </div>
+          </div>
         </div>
-      </div>
       )}
       {!showDrafts && (
-      <div className="container-lg mt-4">
-        <div className="row">
-          <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
+        <div className="container-lg mt-4">
+          <div className="row">
+            <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
+          </div>
         </div>
-      </div>
       )}
     </>
   )

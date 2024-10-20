@@ -17,9 +17,9 @@ export default function (): React.ReactElement {
 
   return fileMetadata
     ? (
-      <a data-type="gdrive-ref" data-src={node.attrs.src} href={fileMetadata.url} ref={contentRef} onClick={handleClick}>
-        {node.attrs.label || fileMetadata.name}
-      </a>
+        <a data-type="gdrive-ref" data-src={node.attrs.src} href={fileMetadata.url} ref={contentRef} onClick={handleClick}>
+          {node.attrs.label || fileMetadata.name}
+        </a>
       )
     : <span>Loading...</span>
 }

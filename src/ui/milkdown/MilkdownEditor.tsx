@@ -34,7 +34,9 @@ export default memo(function (props: MilkdownEditorProps) {
 
         ctx.get(listenerCtx)
           .markdownUpdated((_, doc) => {
-            props.onContentUpdated && props.onContentUpdated(doc)
+            if (props.onContentUpdated) {
+              props.onContentUpdated(doc)
+            }
           })
       })
       .use(commonmark)

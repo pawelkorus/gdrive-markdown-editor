@@ -87,7 +87,7 @@ export function currentToken(): google.accounts.oauth2.TokenResponse {
 export async function requestAccess(requiredPesmission: Permissions, userId?: string): Promise<unknown> {
   const tokenClient = await ensureTokenClient(userId)
 
-  function toScope(permission: Permissions): string  {
+  function toScope(permission: Permissions): string {
     switch (permission) {
       case Permissions.INSTALL:
         return SCOPE_INSTALL

@@ -51,13 +51,13 @@ function SourceView(props: Props): React.ReactElement {
         <div className="d-flex flex-row align-items-center justify-content-end">
           {editFileNameEnabled
             ? (
-              <input
-                type="text"
-                defaultValue={fileDetails.name}
-                onBlur={e => commitFileNameChange(e.target.value)}
-                autoFocus
-                className="form-control me-auto"
-              />
+                <input
+                  type="text"
+                  defaultValue={fileDetails.name}
+                  onBlur={e => commitFileNameChange(e.target.value)}
+                  autoFocus
+                  className="form-control me-auto"
+                />
               )
             : (<h5 className="me-auto mb-0" onClick={() => setEditFileNameEnabled(true)}>{fileDetails.name}</h5>)}
           {lastSavedTimestamp != null && (

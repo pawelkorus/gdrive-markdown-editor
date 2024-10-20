@@ -2,10 +2,10 @@ import React, { PropsWithChildren, useCallback, useEffect, useState } from 'reac
 import { Modal, ModalBody, ModalHeader } from 'react-bootstrap'
 import { CommandPaletteItem } from './types'
 
-interface CommandPaletteProps extends PropsWithChildren<{
+type CommandPaletteProps = PropsWithChildren<{
   commands: CommandPaletteItem[]
   onItemSelected?: (commandPalleteItem: CommandPaletteItem) => void
-}> {}
+}>
 
 const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onItemSelected }) => {
   const [isVisible, setIsVisible] = useState(false)
