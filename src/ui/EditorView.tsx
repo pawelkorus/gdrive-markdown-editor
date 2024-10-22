@@ -3,6 +3,7 @@ import { MilkdownEditor, WrapWithProviders } from './milkdown'
 import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import { useDraftFiles, DraftFileDetails } from '../service/draftfile'
+import { useNavigate } from 'react-router-dom'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -163,6 +164,8 @@ function EditorView(props: Props): React.ReactElement {
   )
 }
 
-export default function (props: Props): React.ReactElement {
-  return <WrapWithProviders><EditorView {...props} /></WrapWithProviders>
+export default function (): React.ReactElement {
+  const navigate = useNavigate()
+
+  return <WrapWithProviders><EditorView onCloseClicked={() => navigate('/file')} /></WrapWithProviders>
 }

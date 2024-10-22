@@ -21,6 +21,7 @@ module.exports = (env, argv) => {
       ],
       port: 8080,
       allowedHosts: "all",
+      historyApiFallback: true, // required for react-router
     },
     optimization: {
       splitChunks: {
@@ -99,6 +100,7 @@ module.exports = (env, argv) => {
     output: {
       filename: "[name].bundle.[contenthash].js",
       path: path.resolve(__dirname, "target"),
+      publicPath: '/', // required for react-router
     },
     plugins: [
       new MiniCssExtractPlugin(),

@@ -13,9 +13,11 @@ export enum StateFromGoogleAction {
   Unsupported,
 }
 
-export function parseGoogleState(): StateFromGoogle {
-  const searchParams = new URLSearchParams(window.location.search)
-  const searchParamsState = searchParams.get('state')
+export function parseGoogleState(searchParamsState: string | undefined): StateFromGoogle {
+  if (!searchParamsState) {
+    const searchParams = new URLSearchParams(window.location.search)
+    searchParamsState = searchParams.get('state')
+  }
 
   // https://developers.google.com/drive/api/guides/integrate-open
   const state = searchParamsState ? JSON.parse(searchParamsState) : null
