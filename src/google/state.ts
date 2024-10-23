@@ -9,7 +9,6 @@ export interface StateFromGoogle {
 export enum StateFromGoogleAction {
   New,
   Open,
-  Install,
   Unsupported,
 }
 
@@ -23,7 +22,7 @@ export function parseGoogleState(searchParamsState: string | undefined): StateFr
   const state = searchParamsState ? JSON.parse(searchParamsState) : null
   if (state == null) {
     return {
-      action: StateFromGoogleAction.Install,
+      action: StateFromGoogleAction.Unsupported,
       fileId: '',
       userId: '',
       folderId: undefined,

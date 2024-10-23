@@ -1,26 +1,23 @@
-import React, { StrictMode } from 'react'
+import React, { StrictMode, useState } from 'react'
 import {
   EditorView,
   ViewerView,
-  NotificationView,
   SourceView,
+  ErrorView,
   useGlobalCommands,
 } from './ui'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   loadGapi,
   initializeGapiClient,
   parseGoogleState,
   StateFromGoogleAction,
-  authorizeInstall,
 } from './google'
-import { Button, Spinner } from 'react-bootstrap'
 import { CommandsContextProvider, useCommandManager, useCommands } from './service/command'
 import { CommandPalette } from './ui/commandPalette'
 import { GdriveFileContextProvider } from './service/gdrivefile/GdriveFileContext'
 import { UserContextProvider } from './service/user'
 import { useGdriveFile, useGdriveFileCommands } from './service/gdrivefile'
-import { openMarkdownFileCmd } from './ui/useGlobalCommands'
 import HomeView from './ui/HomeView'
 import {
   createBrowserRouter,
@@ -29,13 +26,13 @@ import {
   useNavigate,
   useSearchParams,
 } from 'react-router-dom'
+import { Spinner } from 'react-bootstrap'
 
 function RootView(): React.ReactElement {
-  const [message, setMessage] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [commands, executeCommand] = useCommands()
-  const [file, loadFile] = useGdriveFile()
+  const [, loadFile] = useGdriveFile()
   const { createFile } = useGdriveFileCommands()
-  const [view, setView] = useState('loading')
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   useGlobalCommands()
@@ -75,71 +72,37 @@ function RootView(): React.ReactElement {
         const googleState = parseGoogleState(searchParams.get('state'))
 
         if (StateFromGoogleAction.Open == googleState.action) {
-          try {
-            await loadFile(googleState.fileId, googleState.userId)
-            navigate(`/file`)
-          }
-          catch (e: unknown) {
-            console.error(e)
-            setNotificationView('Can\'t load file. ' + e)
-          }
+          await loadFile(googleState.fileId, googleState.userId)
+          navigate('/file')
         }
         else if (StateFromGoogleAction.New == googleState.action) {
-          try {
-            createFile({ folderId: googleState.folderId })
-            navigate('/file/edit')
-          }
-          catch (e: unknown) {
-            console.error(e)
-            setNotificationView('Can\'t create file. ' + e)
-          }
-        }
-        else if (StateFromGoogleAction.Install == googleState.action) {
-          try {
-            await authorizeInstall()
-          }
-          catch (e: unknown) {
-            setNotificationView('Can\'t install app into you google drive.' + e)
-          }
+          await createFile({ folderId: googleState.folderId })
+          navigate('/file/edit')
         }
         else {
-          setNotificationView('Unknown action ' + googleState.action)
+          throw new Error('Unknown action ' + googleState.action)
         }
       }
+      setLoading(false)
     }
 
     googleApi()
   }, [])
 
-  useEffect(() => {
-    if (file) {
-      setView('viewer')
-    }
-  }, [file.id])
-
-  const setNotificationView = (message?: string) => {
-    setMessage(message)
-    setView('notification')
-  }
+  if (loading) return (
+    <div className="container-fluid h-100 d-flex">
+      <div className="mx-auto my-auto">
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </Spinner>
+      </div>
+    </div>
+  )
 
   return (
     <>
-      { view === 'loading' && (
-        <div className="container-fluid h-100 d-flex">
-          <div className="mx-auto my-auto">
-            <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
-            </Spinner>
-          </div>
-        </div>
-      ) }
-      { view === 'notification' && (
-        <NotificationView message={message}>
-          <Button onClick={() => executeCommand(openMarkdownFileCmd)}></Button>
-        </NotificationView>
-      ) }
       <Outlet></Outlet>
-      { view !== 'loading' && <CommandPalette commands={commands} onItemSelected={item => executeCommand(item.id)}></CommandPalette> }
+      <CommandPalette commands={commands} onItemSelected={item => executeCommand(item.id)}></CommandPalette>
     </>
   )
 }
@@ -148,6 +111,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <RootView />,
+    ErrorBoundary: ErrorView,
     children: [
       {
         index: true,
