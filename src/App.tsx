@@ -80,7 +80,7 @@ function RootView(): React.ReactElement {
           navigate('/file/edit')
         }
         else {
-          throw new Error('Unknown action ' + googleState.action)
+          navigate('/')
         }
       }
       setLoading(false)
