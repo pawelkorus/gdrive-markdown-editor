@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import TextArea from './textarea/TextArea'
-import { useNavigate } from 'react-router-dom'
+import { useNavigateTo } from '../service/navigate'
 
 type Props = {
   onCloseClicked?: () => void
@@ -83,7 +83,7 @@ function SourceView(props: Props): React.ReactElement {
 }
 
 export default function (): React.ReactElement {
-  const navigate = useNavigate()
+  const { navigateToFileView } = useNavigateTo()
 
-  return <SourceView onCloseClicked={() => navigate('/file')} />
+  return <SourceView onCloseClicked={() => navigateToFileView()} />
 }

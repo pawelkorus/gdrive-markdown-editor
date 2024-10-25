@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { getUserRecentlyModifiedFiles } from '../google'
-import { useGdriveFile } from '../service/gdrivefile'
+import { useNavigateTo } from '../service/navigate'
 
 const InstalledView = (): React.ReactElement => {
-  const [, loadFile] = useGdriveFile()
   const [files, setFiles] = useState<{ id: string, name: string, mimeType: string, viewedByMeTime: string }[]>([])
+  const { navigateToFileEdit, navigateToFileSource, navigateToFileView } = useNavigateTo()
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -15,8 +15,14 @@ const InstalledView = (): React.ReactElement => {
     fetchFiles()
   }, [])
 
-  const handleFileClick = (fileId: string) => {
-    loadFile(fileId)
+  const handleNavigateToFileEdit = (e: React.MouseEvent, fileId: string) => {
+    e.stopPropagation()
+    navigateToFileEdit({ fileId })
+  }
+
+  const handleNavigateToFileSource = (e: React.MouseEvent, fileId: string) => {
+    e.stopPropagation()
+    navigateToFileSource({ fileId })
   }
 
   return (
@@ -26,9 +32,15 @@ const InstalledView = (): React.ReactElement => {
         <div className="list-group">
           {files.map(file => (
             <div key={file.id} className="list-group-item list-group-item-action">
-              <div className="d-flex w-100 justify-content-between" onClick={() => handleFileClick(file.id)}>
-                <h5 className="mb-1">{file.name}</h5>
-                <small>{file.viewedByMeTime}</small>
+              <div className="d-flex w-100 flex-row">
+                <div className="w-100" onClick={() => navigateToFileView({ fileId: file.id })}>
+                  <h5 className="mb-1">{file.name}</h5>
+                  <small>{file.viewedByMeTime}</small>
+                </div>
+                <div className="input-group justify-content-end">
+                  <button className="btn btn-outline-primary" onClick={e => handleNavigateToFileEdit(e, file.id)}>Edit</button>
+                  <button className="btn btn-outline-primary" onClick={e => handleNavigateToFileSource(e, file.id)}>Edit source</button>
+                </div>
               </div>
             </div>
           ))}

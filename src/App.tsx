@@ -1,5 +1,6 @@
 import React, { StrictMode, useState } from 'react'
 import {
+  HomeView,
   EditorView,
   ViewerView,
   SourceView,
@@ -13,54 +14,26 @@ import {
   parseGoogleState,
   StateFromGoogleAction,
 } from './google'
-import { CommandsContextProvider, useCommandManager, useCommands } from './service/command'
+import { CommandsContextProvider, useCommands } from './service/command'
 import { CommandPalette } from './ui/commandPalette'
 import { GdriveFileContextProvider } from './service/gdrivefile/GdriveFileContext'
 import { UserContextProvider } from './service/user'
-import { useGdriveFile, useGdriveFileCommands } from './service/gdrivefile'
-import HomeView from './ui/HomeView'
 import {
   createBrowserRouter,
   Outlet,
   RouterProvider,
-  useNavigate,
   useSearchParams,
 } from 'react-router-dom'
 import { Spinner } from 'react-bootstrap'
+import { FileNewRoute, FileRoute } from './routes'
+import { useNavigateTo } from './service/navigate'
 
 function RootView(): React.ReactElement {
   const [loading, setLoading] = useState(true)
   const [commands, executeCommand] = useCommands()
-  const [, loadFile] = useGdriveFile()
-  const { createFile } = useGdriveFileCommands()
   const [searchParams] = useSearchParams()
-  const navigate = useNavigate()
+  const { navigateToHome, navigateToFileView, navigateToNewFile } = useNavigateTo()
   useGlobalCommands()
-
-  const [registerCommand, unregisterCommand] = useCommandManager()
-  useEffect(() => {
-    const commands = [
-      {
-        id: 'editUsingSourceEditor',
-        name: 'Edit using source editor',
-        execute: () => {
-          navigate('/file/source')
-        },
-      },
-      {
-        id: 'editUsingWyswygEditor',
-        name: 'Edit using WYSWYG editor',
-        execute: () => {
-          navigate('/file/edit')
-        },
-      },
-    ]
-
-    registerCommand(commands)
-    return () => {
-      unregisterCommand(commands)
-    }
-  }, [])
 
   useEffect(() => {
     const googleApi = async function () {
@@ -69,18 +42,16 @@ function RootView(): React.ReactElement {
 
       const stateParam = searchParams.get('state')
       if (stateParam) {
-        const googleState = parseGoogleState(searchParams.get('state'))
+        const googleState = parseGoogleState(stateParam)
 
         if (StateFromGoogleAction.Open == googleState.action) {
-          await loadFile(googleState.fileId, googleState.userId)
-          navigate('/file')
+          navigateToFileView({ fileId: googleState.fileId, userId: googleState.userId })
         }
         else if (StateFromGoogleAction.New == googleState.action) {
-          await createFile({ folderId: googleState.folderId })
-          navigate('/file/edit')
+          navigateToNewFile({ folderId: googleState.folderId })
         }
         else {
-          navigate('/')
+          navigateToHome()
         }
       }
       setLoading(false)
@@ -118,16 +89,26 @@ const router = createBrowserRouter([
         element: <HomeView />,
       },
       {
+        path: 'file/new',
+        element: <FileNewRoute />,
+      },
+      {
         path: 'file',
-        element: <ViewerView />,
-      },
-      {
-        path: 'file/edit',
-        element: <EditorView />,
-      },
-      {
-        path: 'file/source',
-        element: <SourceView />,
+        element: <FileRoute />,
+        children: [
+          {
+            index: true,
+            element: <ViewerView />,
+          },
+          {
+            path: 'edit',
+            element: <EditorView />,
+          },
+          {
+            path: 'source',
+            element: <SourceView />,
+          },
+        ],
       },
     ],
   },
