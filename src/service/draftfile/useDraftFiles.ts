@@ -7,7 +7,7 @@ interface UseDraftFilesAPI {
   selectedDraft: DraftFileDetails | null
   loading: boolean
   error: string | null
-  createDraft: (content: string) => Promise<void>
+  createDraft: (content: string) => Promise<string>
   discardDraft: (draftId: string) => Promise<void>
   loadDraftContent: (draftId: string) => Promise<string>
   saveDraftContent: (draftId: string, content: string) => Promise<void>
@@ -38,7 +38,7 @@ export const useDraftFiles = (origFileDetails: FileDetails): UseDraftFilesAPI =>
     fetchDraftFiles()
   }, [])
 
-  const createDraft = async (content: string): Promise<void> => {
+  const createDraft = async (content: string): Promise<string> => {
     if (selectedDraft) {
       return
     }
@@ -46,6 +46,7 @@ export const useDraftFiles = (origFileDetails: FileDetails): UseDraftFilesAPI =>
     save(fileDetails.id, content)
     const draftFileDetails = { ...fileDetails, isNew: true }
     setSelectedDraft(draftFileDetails)
+    return draftFileDetails.id
   }
 
   const discardDraft = async (draftId: string) => {
@@ -72,19 +73,11 @@ export const useDraftFiles = (origFileDetails: FileDetails): UseDraftFilesAPI =>
   }
 
   const loadDraftContent = async (draftId: string): Promise<string> => {
-    const draft = selectedDraft ? selectedDraft : draftFiles.find(draft => draft.id === draftId)
-    if (!draft) {
-      throw new Error('Draft not found')
-    }
     const fileDetailsWithContent = await loadFile(draftId)
     return fileDetailsWithContent.content
   }
 
   const saveDraftContent = async (draftId: string, content: string): Promise<void> => {
-    const draft = selectedDraft ? selectedDraft : draftFiles.find(draft => draft.id === draftId)
-    if (!draft) {
-      throw new Error('Draft not found')
-    }
     await save(draftId, content)
   }
 

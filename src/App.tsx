@@ -108,15 +108,15 @@ const router = createBrowserRouter([
                 index: true,
                 element: <EditorView />,
               },
-              {
-                path: 'drafts',
-                element: <DraftsView />,
-              },
             ],
           },
           {
             path: 'source',
             element: <SourceView />,
+          },
+          {
+            path: 'drafts',
+            element: <DraftsView />,
           },
         ],
       },
@@ -126,14 +126,14 @@ const router = createBrowserRouter([
 
 export default (): React.ReactElement => {
   return (
-    <StrictMode>
-      <UserContextProvider>
-        <GdriveFileContextProvider>
-          <CommandsContextProvider>
-            <RouterProvider router={router} />
-          </CommandsContextProvider>
-        </GdriveFileContextProvider>
-      </UserContextProvider>
-    </StrictMode>
+    // <StrictMode>
+    <UserContextProvider>
+      <GdriveFileContextProvider>
+        <CommandsContextProvider>
+          <RouterProvider router={router} />
+        </CommandsContextProvider>
+      </GdriveFileContextProvider>
+    </UserContextProvider>
+    // </StrictMode>
   )
 }

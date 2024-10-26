@@ -3,8 +3,9 @@ import { useNavigate as useReactRouterNavigate, useSearchParams } from 'react-ro
 type UseNavigateAPI = {
   navigateToHome: () => void
   navigateToFileView: (params?: NavigateToFileParams) => void
-  navigateToFileEdit: (params?: NavigateToFileParams) => void
+  navigateToFileEdit: (params?: NavigateToEditFileParams) => void
   navigateToFileSource: (params?: NavigateToFileParams) => void
+  navigateToFileDrafts: (params?: NavigateToFileParams) => void
   navigateToNewFile: (params: NavigateToNewFileParams) => void
 }
 
@@ -14,13 +15,17 @@ type NavigateToFileParams = {
   resourceKey?: string
 }
 
+type NavigateToEditFileParams = NavigateToFileParams & {
+  draftId?: string
+}
+
 type NavigateToNewFileParams = {
   folderId: string
 }
 
 type ParamsFromURL = {
   paramsFileView: () => NavigateToFileParams
-  paramsFileEdit: () => NavigateToFileParams
+  paramsFileEdit: () => NavigateToEditFileParams
 }
 
 export function useFileParams(): NavigateToFileParams | undefined {
@@ -47,14 +52,16 @@ export function useParamsFromURL(): ParamsFromURL {
     }
   }
 
-  const paramsFileEdit = (): NavigateToFileParams | undefined => {
+  const paramsFileEdit = (): NavigateToEditFileParams => {
     const fileId = searchParams.get('fileId')
+    if (!fileId) {
+      throw new Error('fileId is required')
+    }
     const userId = searchParams.get('userId')
     const resourceKey = searchParams.get('resourceKey')
+    const draftId = searchParams.get('draftId')
 
-    if (fileId) {
-      return { fileId, userId, resourceKey }
-    }
+    return { fileId, userId, resourceKey, draftId }
   }
 
   return {
@@ -91,10 +98,10 @@ export function useNavigateTo(): UseNavigateAPI {
     navigate(`/file?${searchParams.toString()}`)
   }
 
-  const navigateToFileEdit = (params: NavigateToFileParams | undefined) => {
+  const navigateToFileEdit = (params: NavigateToEditFileParams | undefined) => {
     if (!params) params = paramsFileEdit()
 
-    const { fileId, userId, resourceKey } = params
+    const { fileId, userId, resourceKey, draftId } = params
     const searchParams = new URLSearchParams()
     searchParams.set('fileId', fileId)
 
@@ -103,6 +110,9 @@ export function useNavigateTo(): UseNavigateAPI {
     }
     if (resourceKey) {
       searchParams.set('resourceKey', resourceKey)
+    }
+    if (draftId) {
+      searchParams.set('draftId', draftId)
     }
 
     navigate(`/file/edit?${searchParams.toString()}`)
@@ -125,6 +135,23 @@ export function useNavigateTo(): UseNavigateAPI {
     navigate(`/file/source?${searchParams.toString()}`)
   }
 
+  const navigateToFileDrafts = (params: NavigateToFileParams | undefined) => {
+    if (!params) params = paramsFileView()
+
+    const { fileId, userId, resourceKey } = params
+    const searchParams = new URLSearchParams()
+    searchParams.set('fileId', fileId)
+
+    if (userId) {
+      searchParams.set('userId', userId)
+    }
+    if (resourceKey) {
+      searchParams.set('resourceKey', resourceKey)
+    }
+
+    navigate(`/file/drafts?${searchParams.toString()}`)
+  }
+
   const navigateToNewFile = ({ folderId }: NavigateToNewFileParams) => {
     const searchParams = new URLSearchParams()
     searchParams.set('folderId', folderId)
@@ -137,6 +164,7 @@ export function useNavigateTo(): UseNavigateAPI {
     navigateToFileView,
     navigateToFileEdit,
     navigateToFileSource,
+    navigateToFileDrafts,
     navigateToNewFile,
   }
 }

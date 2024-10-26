@@ -2,8 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { MilkdownEditor, WrapWithProviders } from './milkdown'
 import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
-import { useDraftFiles, DraftFileDetails } from '../service/draftfile'
+import { DraftFileDetails, useDraftFiles } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
+import { useParamsFromURL } from '../service/navigate'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -13,20 +14,21 @@ function EditorView(props: Props): React.ReactElement {
   const [isDirty, setIsDirty] = useState(false)
   const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
   const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
-  const [showDrafts, setShowDrafts] = useState(false)
   const [fileDetails] = useGdriveFile()
   const [initialContent, setInitialContent] = useState(fileDetails.content)
   const [updatedContent, setUpdatedContent] = useState(fileDetails.content)
   const { updateContent: updateGdriveContent, updateFileName } = useGdriveFileCommands()
   const {
     draftFiles,
-    selectedDraft,
+    useDraft,
     createDraft,
     discardDraft,
     loadDraftContent,
     saveDraftContent,
-    useDraft,
   } = useDraftFiles(fileDetails)
+  const { paramsFileEdit } = useParamsFromURL()
+  const [selectedDraftId, setSelectedDraftId] = useState(paramsFileEdit().draftId)
+  const { navigateToFileDrafts } = useNavigateTo()
   useMilkdownCommands()
 
   useEffect(() => {
@@ -41,10 +43,18 @@ function EditorView(props: Props): React.ReactElement {
   }, [updatedContent, isDirty])
 
   useEffect(() => {
-    const createInitialDraft = async () => {
-      await createDraft(updatedContent)
+    const initializeDraft = async () => {
+      if (selectedDraftId) {
+        const content = await loadDraftContent(selectedDraftId)
+        setInitialContent(content)
+      }
+      else {
+        const draftId = await createDraft(updatedContent)
+        setSelectedDraftId(draftId)
+      }
     }
-    createInitialDraft()
+
+    initializeDraft()
   }, [])
 
   const handleContentUpdate = useCallback((markdown: string) => {
@@ -53,14 +63,14 @@ function EditorView(props: Props): React.ReactElement {
   }, [])
 
   function autoSaveAction(newContent: string) {
-    saveDraftContent(selectedDraft.id, newContent)
+    saveDraftContent(selectedDraftId, newContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }
 
   function commitContentChange(newContent: string) {
     updateGdriveContent(newContent)
-    saveDraftContent(selectedDraft.id, newContent)
+    saveDraftContent(selectedDraftId, newContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }
@@ -72,24 +82,29 @@ function EditorView(props: Props): React.ReactElement {
 
   function onCloseClicked() {
     updateGdriveContent(updatedContent)
-    discardDraft(selectedDraft.id)
+    discardDraft(selectedDraftId)
     props.onCloseClicked()
   }
 
   function onDiscardClicked() {
-    discardDraft(selectedDraft.id)
+    discardDraft(selectedDraftId)
     props.onCloseClicked()
   }
 
-  async function onUseSpecificDraftClicked(draftFile: DraftFileDetails) {
-    setShowDrafts(false)
-    await useDraft(draftFile.id)
-    const content = await loadDraftContent(draftFile.id)
+  async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
+    const content = await loadDraftContent(draft.id)
     setInitialContent(content)
+    discardDraft(selectedDraftId)
+    setSelectedDraftId(draft.id)
+    useDraft(draft.id)
   }
 
-  async function onDiscardSelectedDraftClicked(draftFile: DraftFileDetails) {
-    discardDraft(draftFile.id)
+  function onDiscardSelectedDraftClicked(draft: DraftFileDetails) {
+    discardDraft(draft.id)
+  }
+
+  function onShowAllDraftsClicked() {
+    navigateToFileDrafts()
   }
 
   return (
@@ -129,7 +144,7 @@ function EditorView(props: Props): React.ReactElement {
               <div className="input-group" role="alert">
                 <span className="input-group-text">Multiple drafts available:</span>
                 <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use latest</button>
-                <button className="btn btn-outline-primary" onClick={() => setShowDrafts(true)}>Show all</button>
+                <button className="btn btn-outline-primary" onClick={() => onShowAllDraftsClicked()}>Show all</button>
               </div>
             </div>
           )}
@@ -138,28 +153,11 @@ function EditorView(props: Props): React.ReactElement {
           <button className="btn btn-primary ms-1" id="btn-discard" type="button" onClick={onDiscardClicked}>Discard</button>
         </div>
       </div>
-      {showDrafts && (
-        <div className="container-lg mt-4">
-          <div className="row">
-            <div className="list-group">
-              {draftFiles.map(draftFile => (
-                <div key={draftFile.id} className="list-group-item list-group-item-action">
-                  {draftFile.id}
-                  <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFile)}>Use</button>
-                  <button className="btn btn-outline-danger" onClick={() => onDiscardSelectedDraftClicked(draftFile)}>Discard</button>
-                </div>
-              ))}
-            </div>
-          </div>
+      <div className="container-lg mt-4">
+        <div className="row">
+          <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
         </div>
-      )}
-      {!showDrafts && (
-        <div className="container-lg mt-4">
-          <div className="row">
-            <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
-          </div>
-        </div>
-      )}
+      </div>
     </>
   )
 }
