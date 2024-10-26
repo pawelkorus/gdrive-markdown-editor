@@ -27,6 +27,7 @@ import {
 import { Spinner } from 'react-bootstrap'
 import { FileNewRoute, FileRoute } from './routes'
 import { useNavigateTo } from './service/navigate'
+import DraftsView from './ui/DraftsView'
 
 function RootView(): React.ReactElement {
   const [loading, setLoading] = useState(true)
@@ -102,7 +103,16 @@ const router = createBrowserRouter([
           },
           {
             path: 'edit',
-            element: <EditorView />,
+            children: [
+              {
+                index: true,
+                element: <EditorView />,
+              },
+              {
+                path: 'drafts',
+                element: <DraftsView />,
+              },
+            ],
           },
           {
             path: 'source',
