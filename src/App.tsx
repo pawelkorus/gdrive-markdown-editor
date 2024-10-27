@@ -125,7 +125,7 @@ const router = createBrowserRouter([
 ])
 
 export default (): React.ReactElement => {
-  return ( 
+  return (
     <StrictMode>
       <UserContextProvider>
         <GdriveFileContextProvider>

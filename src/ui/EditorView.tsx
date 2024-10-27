@@ -20,7 +20,6 @@ function EditorView(props: Props): React.ReactElement {
   const { updateContent: updateGdriveContent, updateFileName } = useGdriveFileCommands()
   const {
     draftFiles,
-    useDraft,
     createDraft,
     discardDraft,
     loadDraftContent,
@@ -28,7 +27,7 @@ function EditorView(props: Props): React.ReactElement {
   } = useDraftFiles(fileDetails)
   const paramsFileEdit = useFileEditParams()
   const [selectedDraftId, setSelectedDraftId] = useState<string | null>(paramsFileEdit.draftId)
-  const { navigateToFileDrafts } = useNavigateTo()
+  const { navigateToFileDrafts, navigateToFileEdit } = useNavigateTo()
   useMilkdownCommands()
 
   useEffect(() => {
@@ -92,11 +91,7 @@ function EditorView(props: Props): React.ReactElement {
   }
 
   async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
-    const content = await loadDraftContent(draft.id)
-    setInitialContent(content)
-    discardDraft(selectedDraftId)
-    setSelectedDraftId(draft.id)
-    useDraft(draft.id)
+    navigateToFileEdit({ fileId: fileDetails.id, draftId: draft.id })
   }
 
   function onDiscardSelectedDraftClicked(draft: DraftFileDetails) {
