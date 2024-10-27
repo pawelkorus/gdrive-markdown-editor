@@ -4,7 +4,7 @@ import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import { DraftFileDetails, useDraftFiles } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
-import { useParamsFromURL } from '../service/navigate'
+import { useFileEditParams } from '../service/navigate'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -26,8 +26,8 @@ function EditorView(props: Props): React.ReactElement {
     loadDraftContent,
     saveDraftContent,
   } = useDraftFiles(fileDetails)
-  const { paramsFileEdit } = useParamsFromURL()
-  const [selectedDraftId, setSelectedDraftId] = useState(paramsFileEdit().draftId)
+  const paramsFileEdit = useFileEditParams()
+  const [selectedDraftId, setSelectedDraftId] = useState<string | null>(paramsFileEdit.draftId)
   const { navigateToFileDrafts } = useNavigateTo()
   useMilkdownCommands()
 
