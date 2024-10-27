@@ -54,7 +54,7 @@ function EditorView(props: Props): React.ReactElement {
     }
 
     initializeDraft()
-  }, [])
+  }, [paramsFileEdit.draftId])
 
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { findFileInAppDirectory, deleteFileFromAppDirectory, createFileInAppDirectory, loadFile, save } from '../../google'
 import { FileDetails, DraftFileDetails } from './types'
 
@@ -15,6 +15,7 @@ interface UseDraftFilesAPI {
 }
 
 export const useDraftFiles = (origFileDetails: FileDetails): UseDraftFilesAPI => {
+  const creatingRef = useRef<Promise<string> | null>(null)
   const [draftFiles, setDraftFiles] = useState<DraftFileDetails[]>([])
   const [selectedDraft, setSelectedDraft] = useState<DraftFileDetails | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
@@ -39,14 +40,17 @@ export const useDraftFiles = (origFileDetails: FileDetails): UseDraftFilesAPI =>
   }, [])
 
   const createDraft = async (content: string): Promise<string> => {
-    if (selectedDraft) {
-      return
+    if (!creatingRef.current) {
+      creatingRef.current = (async () => {
+        const fileDetails = await createFileInAppDirectory('draft_' + origFileDetails.id, content)
+        save(fileDetails.id, content)
+        const draftFileDetails = { ...fileDetails, isNew: true }
+        setSelectedDraft(draftFileDetails)
+        setDraftFiles(prevDraftFiles => [...prevDraftFiles, draftFileDetails])
+        return draftFileDetails.id
+      })()
     }
-    const fileDetails = await createFileInAppDirectory('draft_' + origFileDetails.id, content)
-    save(fileDetails.id, content)
-    const draftFileDetails = { ...fileDetails, isNew: true }
-    setSelectedDraft(draftFileDetails)
-    return draftFileDetails.id
+    return creatingRef.current
   }
 
   const discardDraft = async (draftId: string) => {
