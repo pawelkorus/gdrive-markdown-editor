@@ -125,15 +125,15 @@ const router = createBrowserRouter([
 ])
 
 export default (): React.ReactElement => {
-  return (
-    // <StrictMode>
-    <UserContextProvider>
-      <GdriveFileContextProvider>
-        <CommandsContextProvider>
-          <RouterProvider router={router} />
-        </CommandsContextProvider>
-      </GdriveFileContextProvider>
-    </UserContextProvider>
-    // </StrictMode>
+  return ( 
+    <StrictMode>
+      <UserContextProvider>
+        <GdriveFileContextProvider>
+          <CommandsContextProvider>
+            <RouterProvider router={router} />
+          </CommandsContextProvider>
+        </GdriveFileContextProvider>
+      </UserContextProvider>
+    </StrictMode>
   )
 }
