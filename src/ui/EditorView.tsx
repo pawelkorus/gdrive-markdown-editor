@@ -5,6 +5,7 @@ import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import { DraftFileDetails, useDraftFiles } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
+import DraftSelector from './editor/DraftSelector'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -19,7 +20,6 @@ function EditorView(props: Props): React.ReactElement {
   const [updatedContent, setUpdatedContent] = useState(fileDetails.content)
   const { updateContent: updateGdriveContent, updateFileName } = useGdriveFileCommands()
   const {
-    draftFiles,
     createDraft,
     discardDraft,
     loadDraftContent,
@@ -27,7 +27,7 @@ function EditorView(props: Props): React.ReactElement {
   } = useDraftFiles(fileDetails)
   const paramsFileEdit = useFileEditParams()
   const [selectedDraftId, setSelectedDraftId] = useState<string | null>(paramsFileEdit.draftId)
-  const { navigateToFileDrafts, navigateToFileEdit } = useNavigateTo()
+  const { navigateToFileEdit } = useNavigateTo()
   useMilkdownCommands()
 
   useEffect(() => {
@@ -90,16 +90,12 @@ function EditorView(props: Props): React.ReactElement {
     props.onCloseClicked()
   }
 
-  async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
+  function onUseSpecificDraftClicked(draft: DraftFileDetails) {
     navigateToFileEdit({ fileId: fileDetails.id, draftId: draft.id })
   }
 
   function onDiscardSelectedDraftClicked(draft: DraftFileDetails) {
     discardDraft(draft.id)
-  }
-
-  function onShowAllDraftsClicked() {
-    navigateToFileDrafts()
   }
 
   return (
@@ -125,24 +121,7 @@ function EditorView(props: Props): React.ReactElement {
               </small>
             </span>
           )}
-          { draftFiles && draftFiles.length == 1 && (
-            <div>
-              <div className="input-group" role="alert">
-                <span className="input-group-text">Draft available:</span>
-                <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use</button>
-                <button className="btn btn-outline-danger" onClick={() => onDiscardSelectedDraftClicked(draftFiles[0])}>Discard</button>
-              </div>
-            </div>
-          )}
-          { draftFiles && draftFiles.length > 1 && (
-            <div>
-              <div className="input-group" role="alert">
-                <span className="input-group-text">Multiple drafts available:</span>
-                <button className="btn btn-outline-primary" onClick={() => onUseSpecificDraftClicked(draftFiles[0])}>Use latest</button>
-                <button className="btn btn-outline-primary" onClick={() => onShowAllDraftsClicked()}>Show all</button>
-              </div>
-            </div>
-          )}
+          <DraftSelector onDraftSelected={onUseSpecificDraftClicked} onDraftDiscarded={onDiscardSelectedDraftClicked} />
           <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={() => commitContentChange(updatedContent)}>Save</button>
           <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={onCloseClicked}>Save & Close</button>
           <button className="btn btn-primary ms-1" id="btn-discard" type="button" onClick={onDiscardClicked}>Discard</button>
