@@ -25,17 +25,26 @@ type NavigateToNewFileParams = {
 
 export function useFileViewParams(): NavigateToFileParams {
   const [searchParams] = useSearchParams()
+  return getFileViewParams(searchParams)
+}
+
+function getFileViewParams(searchParams: URLSearchParams): NavigateToFileParams {
   const fileId = searchParams.get('fileId')
+  if (!fileId) {
+    throw new Error('fileId is required')
+  }
   const userId = searchParams.get('userId')
   const resourceKey = searchParams.get('resourceKey')
 
-  if (fileId) {
-    return { fileId, userId, resourceKey }
-  }
+  return { fileId, userId, resourceKey }
 }
 
 export function useFileEditParams(): NavigateToEditFileParams {
   const [searchParams] = useSearchParams()
+  return getFileEditParams(searchParams)
+}
+
+function getFileEditParams(searchParams: URLSearchParams): NavigateToEditFileParams {
   const fileId = searchParams.get('fileId')
   if (!fileId) {
     throw new Error('fileId is required')
@@ -49,82 +58,81 @@ export function useFileEditParams(): NavigateToEditFileParams {
 
 export function useNavigateTo(): UseNavigateAPI {
   const navigate = useReactRouterNavigate()
-  const paramsFileView = useFileViewParams()
-  const paramsFileEdit = useFileEditParams()
+  const [searchParams] = useSearchParams()
 
   const navigateToHome = () => {
     navigate('/')
   }
 
   const navigateToFileView = (params: NavigateToFileParams | undefined) => {
-    if (!params) params = paramsFileView
+    if (!params) params = getFileViewParams(searchParams)
 
     const { fileId, userId, resourceKey } = params
-    const searchParams = new URLSearchParams()
-    searchParams.set('fileId', fileId)
+    const newSearchParams = new URLSearchParams()
+    newSearchParams.set('fileId', fileId)
 
     if (userId) {
-      searchParams.set('userId', userId)
+      newSearchParams.set('userId', userId)
     }
     if (resourceKey) {
-      searchParams.set('resourceKey', resourceKey)
+      newSearchParams.set('resourceKey', resourceKey)
     }
 
-    navigate(`/file?${searchParams.toString()}`)
+    navigate(`/file?${newSearchParams.toString()}`)
   }
 
   const navigateToFileEdit = (params: NavigateToEditFileParams | undefined) => {
-    if (!params) params = paramsFileEdit
+    if (!params) params = getFileEditParams(searchParams)
 
     const { fileId, userId, resourceKey, draftId } = params
-    const searchParams = new URLSearchParams()
-    searchParams.set('fileId', fileId)
+    const newSearchParams = new URLSearchParams()
+    newSearchParams.set('fileId', fileId)
 
     if (userId) {
-      searchParams.set('userId', userId)
+      newSearchParams.set('userId', userId)
     }
     if (resourceKey) {
-      searchParams.set('resourceKey', resourceKey)
+      newSearchParams.set('resourceKey', resourceKey)
     }
     if (draftId) {
-      searchParams.set('draftId', draftId)
+      newSearchParams.set('draftId', draftId)
     }
 
-    navigate(`/file/edit?${searchParams.toString()}`)
+    navigate(`/file/edit?${newSearchParams.toString()}`)
   }
 
   const navigateToFileSource = (params: NavigateToFileParams | undefined) => {
-    if (!params) params = paramsFileView
+    if (!params) params = getFileViewParams(searchParams)
 
     const { fileId, userId, resourceKey } = params
-    const searchParams = new URLSearchParams()
-    searchParams.set('fileId', fileId)
+    const newSearchParams = new URLSearchParams()
+    newSearchParams.set('fileId', fileId)
 
     if (userId) {
-      searchParams.set('userId', userId)
+      newSearchParams.set('userId', userId)
     }
     if (resourceKey) {
-      searchParams.set('resourceKey', resourceKey)
+      newSearchParams.set('resourceKey', resourceKey)
     }
 
-    navigate(`/file/source?${searchParams.toString()}`)
+    navigate(`/file/source?${newSearchParams.toString()}`)
   }
 
   const navigateToFileDrafts = (params: NavigateToFileParams | undefined) => {
-    if (!params) params = paramsFileView
+    if (!params) params = getFileViewParams(searchParams)
 
     const { fileId, userId, resourceKey } = params
-    const searchParams = new URLSearchParams()
-    searchParams.set('fileId', fileId)
+    const newSearchParams = new URLSearchParams()
+    newSearchParams.set('fileId', fileId)
 
     if (userId) {
-      searchParams.set('userId', userId)
+      newSearchParams.set('userId', userId)
     }
     if (resourceKey) {
-      searchParams.set('resourceKey', resourceKey)
+      newSearchParams.set('resourceKey', resourceKey)
     }
 
-    navigate(`/file/drafts?${searchParams.toString()}`)
+    navigate(`/file/drafts?${newSearchParams.toString()}`)
   }
 
   const navigateToNewFile = ({ folderId }: NavigateToNewFileParams) => {
