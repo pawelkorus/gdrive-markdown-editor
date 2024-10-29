@@ -17,6 +17,7 @@ type NavigateToFileParams = {
 
 type NavigateToEditFileParams = NavigateToFileParams & {
   draftId?: string
+  source?: boolean
 }
 
 type NavigateToNewFileParams = {
@@ -52,8 +53,9 @@ function getFileEditParams(searchParams: URLSearchParams): NavigateToEditFilePar
   const userId = searchParams.get('userId')
   const resourceKey = searchParams.get('resourceKey')
   const draftId = searchParams.get('draftId')
+  const source = searchParams.get('source') === 'true'
 
-  return { fileId, userId, resourceKey, draftId }
+  return { fileId, userId, resourceKey, draftId, source }
 }
 
 export function useNavigateTo(): UseNavigateAPI {
@@ -97,25 +99,15 @@ export function useNavigateTo(): UseNavigateAPI {
     if (draftId) {
       newSearchParams.set('draftId', draftId)
     }
+    if (params.source) {
+      newSearchParams.set('source', 'true')
+    }
 
     navigate(`/file/edit?${newSearchParams.toString()}`)
   }
 
-  const navigateToFileSource = (params: NavigateToFileParams | undefined) => {
-    if (!params) params = getFileViewParams(searchParams)
-
-    const { fileId, userId, resourceKey } = params
-    const newSearchParams = new URLSearchParams()
-    newSearchParams.set('fileId', fileId)
-
-    if (userId) {
-      newSearchParams.set('userId', userId)
-    }
-    if (resourceKey) {
-      newSearchParams.set('resourceKey', resourceKey)
-    }
-
-    navigate(`/file/source?${newSearchParams.toString()}`)
+  const navigateToFileSource = (params: NavigateToEditFileParams | undefined) => {
+    navigateToFileEdit({ ...params, source: true })
   }
 
   const navigateToFileDrafts = (params: NavigateToFileParams | undefined) => {

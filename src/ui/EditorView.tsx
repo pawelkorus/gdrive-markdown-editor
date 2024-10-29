@@ -6,6 +6,7 @@ import { DraftFileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
 import DraftSelector from './editor/DraftSelector'
+import TextArea from './textarea/TextArea'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -95,7 +96,7 @@ function EditorView(props: Props): React.ReactElement {
 
   async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
     await discardDraft()
-    navigateToFileEdit({ fileId: fileDetails.id, draftId: draft.id })
+    navigateToFileEdit({ ...paramsFileEdit, fileId: fileDetails.id, draftId: draft.id })
   }
 
   return (
@@ -129,7 +130,10 @@ function EditorView(props: Props): React.ReactElement {
       </div>
       <div className="container-lg mt-4">
         <div className="row">
-          <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
+          {paramsFileEdit.source && (
+            <TextArea value={initialContent} onChange={handleContentUpdate} />
+          )}
+          {!paramsFileEdit.source && <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />}
         </div>
       </div>
     </>

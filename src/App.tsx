@@ -3,7 +3,6 @@ import {
   HomeView,
   EditorView,
   ViewerView,
-  SourceView,
   ErrorView,
   useGlobalCommands,
 } from './ui'
@@ -109,10 +108,6 @@ const router = createBrowserRouter([
                 element: <EditorView />,
               },
             ],
-          },
-          {
-            path: 'source',
-            element: <SourceView />,
           },
           {
             path: 'drafts',

@@ -1,15 +1,17 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import autosize from 'autosize'
 
-interface TextAreaProps {
+type TextAreaProps = {
   value: string
   onChange?: (value: string) => void
 }
 
 const TextArea: React.FC<TextAreaProps> = ({ value, onChange }) => {
   const ref = useRef<HTMLTextAreaElement>(null)
+  const [textAreaKey, setTextAreaKey] = useState(0)
 
   const resizeTextArea = useCallback(() => {
+    console.log('resizeTextArea')
     const textAreaRef = ref.current
 
     if (textAreaRef) {
@@ -17,8 +19,11 @@ const TextArea: React.FC<TextAreaProps> = ({ value, onChange }) => {
     }
   }, [])
 
-  useEffect(resizeTextArea, [value])
-  useEffect(resizeTextArea, [])
+  useEffect(() => {
+    setTextAreaKey(prev => prev + 1)
+  }, [value])
+
+  useEffect(resizeTextArea, [textAreaKey])
 
   function onTextAreaValueChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     if (onChange) {
@@ -28,6 +33,7 @@ const TextArea: React.FC<TextAreaProps> = ({ value, onChange }) => {
 
   return (
     <textarea
+      key={textAreaKey}
       ref={ref}
       style={{ margin: 0, padding: 0, border: 'none', outline: 'none' }}
       defaultValue={value}
