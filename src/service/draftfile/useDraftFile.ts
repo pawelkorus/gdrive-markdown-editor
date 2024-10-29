@@ -1,41 +1,71 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { FileDetails } from './types'
+import { useGdriveFile } from '../gdrivefile'
+import * as googleApi from '../../google'
 
-interface DraftFileAPI {
-  loadDraft: () => void
-  saveDraft: (content: string) => void
-  discardDraft: () => void
-  useDraft: (newDraftId: string) => void
-}
+export function useDraftFile(draftId: string | undefined) {
+  const [origFileDetails] = useGdriveFile()
+  const creatingRef = useRef<Promise<FileDetails> | null>(null)
+  const [draftDetails, setDraftDetails] = useState<FileDetails | null>(null)
 
-const useDraftFile = (): DraftFileAPI => {
-  const [draftId, setDraftId] = useState<string | null>(null)
+  useEffect(() => {
+    async function initialize() {
+      if (draftId) {
+        const draftDetails = await googleApi.loadFile(draftId)
+        setDraftDetails(draftDetails)
+      }
+      else {
+        const draftDetails = await createNewDraft()
+        setDraftDetails(draftDetails)
+      }
+    }
 
-  const loadDraft = useCallback(() => {
-    // Implement load logic here
-    console.log(`Loading draft file with draftId: ${draftId}`)
-  }, [draftId])
-
-  const saveDraft = useCallback((content: string) => {
-    // Implement save logic here
-    console.log(`Saving draft file with draftId: ${draftId} and content: ${content}`)
-  }, [draftId])
-
-  const discardDraft = useCallback(() => {
-    // Implement discard logic here
-    console.log(`Discarding draft file with draftId: ${draftId}`)
-  }, [draftId])
-
-  const useDraft = useCallback((newDraftId: string) => {
-    setDraftId(newDraftId)
-    console.log(`Changed draftId to: ${newDraftId}`)
+    initialize()
   }, [])
 
+  const select = useCallback(async (newDraftId: string) => {
+    const existingDraftDetails = await googleApi.loadFile(newDraftId)
+    setDraftDetails(existingDraftDetails)
+  }, [])
+
+  const createNewDraft = useCallback(async () => {
+    if (creatingRef.current) {
+      return creatingRef.current
+    }
+
+    creatingRef.current = (async () => {
+      const draftDetails = await googleApi.createFileInAppDirectory('draft_' + origFileDetails.id)
+      await googleApi.save(draftDetails.id, origFileDetails.content)
+      return { ...draftDetails, content: origFileDetails.content }
+    })()
+
+    return creatingRef.current
+  }, [origFileDetails])
+
+  const discard = useCallback(async () => {
+    if (draftDetails) {
+      await googleApi.deleteFileFromAppDirectory(draftDetails.id)
+      setDraftDetails(null)
+    }
+  }, [draftDetails])
+
+  const loadContent = useCallback(async () => {
+    if (!draftDetails) throw new Error('Draft not set')
+
+    return (await googleApi.loadFile(draftDetails.id)).content
+  }, [draftDetails])
+
+  const saveContent = useCallback(async (content: string) => {
+    if (!draftDetails) throw new Error('Draft not set')
+
+    await googleApi.save(draftDetails.id, content)
+  }, [draftDetails])
+
   return {
-    loadDraft,
-    saveDraft,
-    discardDraft,
-    useDraft,
+    draftDetails,
+    select,
+    discard,
+    loadContent,
+    saveContent,
   }
 }
-
-export default useDraftFile

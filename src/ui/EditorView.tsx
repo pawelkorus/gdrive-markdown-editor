@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { MilkdownEditor, WrapWithProviders } from './milkdown'
 import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
-import { DraftFileDetails, useDraftFiles } from '../service/draftfile'
+import { DraftFileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
 import DraftSelector from './editor/DraftSelector'
@@ -12,6 +12,7 @@ export type Props = {
 }
 
 function EditorView(props: Props): React.ReactElement {
+  const paramsFileEdit = useFileEditParams()
   const [isDirty, setIsDirty] = useState(false)
   const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
   const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
@@ -20,13 +21,12 @@ function EditorView(props: Props): React.ReactElement {
   const [updatedContent, setUpdatedContent] = useState(fileDetails.content)
   const { updateContent: updateGdriveContent, updateFileName } = useGdriveFileCommands()
   const {
-    createDraft,
-    discardDraft,
-    loadDraftContent,
-    saveDraftContent,
-  } = useDraftFiles(fileDetails)
-  const paramsFileEdit = useFileEditParams()
-  const [selectedDraftId, setSelectedDraftId] = useState<string | null>(paramsFileEdit.draftId)
+    draftDetails,
+    select: selectDraft,
+    discard: discardDraft,
+    loadContent: loadDraft,
+    saveContent: saveDraft,
+  } = useDraftFile(paramsFileEdit.draftId)
   const { navigateToFileEdit } = useNavigateTo()
   useMilkdownCommands()
 
@@ -42,18 +42,21 @@ function EditorView(props: Props): React.ReactElement {
   }, [updatedContent, isDirty])
 
   useEffect(() => {
-    const initializeDraft = async () => {
-      if (selectedDraftId) {
-        const content = await loadDraftContent(selectedDraftId)
+    const loadDraftContent = async () => {
+      if (draftDetails) {
+        const content = await loadDraft()
         setInitialContent(content)
-      }
-      else {
-        const draftId = await createDraft(updatedContent)
-        setSelectedDraftId(draftId)
+        setUpdatedContent(content)
       }
     }
 
-    initializeDraft()
+    loadDraftContent()
+  }, [draftDetails?.id])
+
+  useEffect(() => {
+    if (paramsFileEdit.draftId) {
+      selectDraft(paramsFileEdit.draftId)
+    }
   }, [paramsFileEdit.draftId])
 
   const handleContentUpdate = useCallback((markdown: string) => {
@@ -62,14 +65,14 @@ function EditorView(props: Props): React.ReactElement {
   }, [])
 
   function autoSaveAction(newContent: string) {
-    saveDraftContent(selectedDraftId, newContent)
+    saveDraft(newContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }
 
   function commitContentChange(newContent: string) {
     updateGdriveContent(newContent)
-    saveDraftContent(selectedDraftId, newContent)
+    saveDraft(newContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }
@@ -79,23 +82,20 @@ function EditorView(props: Props): React.ReactElement {
     setEditFileNameEnabled(false)
   }
 
-  function onCloseClicked() {
-    updateGdriveContent(updatedContent)
-    discardDraft(selectedDraftId)
+  async function onCloseClicked() {
+    await updateGdriveContent(updatedContent)
+    await discardDraft()
     props.onCloseClicked()
   }
 
-  function onDiscardClicked() {
-    discardDraft(selectedDraftId)
+  async function onDiscardClicked() {
+    await discardDraft()
     props.onCloseClicked()
   }
 
-  function onUseSpecificDraftClicked(draft: DraftFileDetails) {
+  async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
+    await discardDraft()
     navigateToFileEdit({ fileId: fileDetails.id, draftId: draft.id })
-  }
-
-  function onDiscardSelectedDraftClicked(draft: DraftFileDetails) {
-    discardDraft(draft.id)
   }
 
   return (
@@ -121,7 +121,7 @@ function EditorView(props: Props): React.ReactElement {
               </small>
             </span>
           )}
-          <DraftSelector onDraftSelected={onUseSpecificDraftClicked} onDraftDiscarded={onDiscardSelectedDraftClicked} />
+          {!paramsFileEdit.draftId && (<DraftSelector onDraftSelected={onUseSpecificDraftClicked} />)}
           <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={() => commitContentChange(updatedContent)}>Save</button>
           <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={onCloseClicked}>Save & Close</button>
           <button className="btn btn-primary ms-1" id="btn-discard" type="button" onClick={onDiscardClicked}>Discard</button>

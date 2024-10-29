@@ -296,7 +296,7 @@ export async function getUserRecentlyModifiedFiles(): Promise<(FileDetails & { v
   }))
 }
 
-export async function createFileInAppDirectory(filename: string, content: string): Promise<FileDetailsWithContent> {
+export async function createFileInAppDirectory(filename: string): Promise<FileDetails> {
   await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA)
 
   console.log('createFileInAppDirectory', filename)
@@ -315,7 +315,6 @@ export async function createFileInAppDirectory(filename: string, content: string
     id: response.result.id!,
     name: response.result.name!,
     mimeType: response.result.mimeType,
-    content: content,
   }
 }
 
