@@ -97,10 +97,8 @@ export default function useMilkdownCommands() {
   ], [callCommand])
 
   useEffect(() => {
-    console.log('register milkdown commands')
     registerCommand(commands)
     return () => {
-      console.log('unregister milkdown commands')
       unregisterCommand(commands)
     }
   }, [commands])

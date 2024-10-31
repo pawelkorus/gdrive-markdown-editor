@@ -32,7 +32,7 @@ function RootView(): React.ReactElement {
   const [loading, setLoading] = useState(true)
   const [commands, executeCommand] = useCommands()
   const [searchParams] = useSearchParams()
-  const { navigateToHome, navigateToFileView, navigateToNewFile } = useNavigateTo()
+  const { navigateToHome, navigateToFileView, navigateToFileNew } = useNavigateTo()
   useGlobalCommands()
 
   useEffect(() => {
@@ -48,7 +48,7 @@ function RootView(): React.ReactElement {
           navigateToFileView({ fileId: googleState.fileId, userId: googleState.userId })
         }
         else if (StateFromGoogleAction.New == googleState.action) {
-          navigateToNewFile({ folderId: googleState.folderId })
+          navigateToFileNew({ folderId: googleState.folderId })
         }
         else {
           navigateToHome()

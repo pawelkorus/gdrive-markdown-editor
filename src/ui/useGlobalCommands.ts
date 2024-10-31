@@ -1,23 +1,22 @@
 import { useEffect, useMemo } from 'react'
 import { Command, useCommandManager } from '../service/command'
 import { showFolderPicker, showMarkdownPicker } from '../google'
-import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
+import { useNavigateTo } from '../service/navigate'
 
 export const openMarkdownFileCmd = 'openMarkdownFile'
 
 export const createMarkdownFileCmd = 'createMarkdownFile'
 
 export default function useGlobalCommands() {
-  const [, loadFile] = useGdriveFile()
-  const { createFile } = useGdriveFileCommands()
   const [registerCommand, unregisterCommand] = useCommandManager()
+  const { navigateToFileView, navigateToFileNew } = useNavigateTo()
   const commands: Command[] = useMemo(() => {
     const openMarkdownFile = {
       id: openMarkdownFileCmd,
       execute: async () => {
         const fileId = await showMarkdownPicker()
         if (fileId) {
-          loadFile(fileId)
+          navigateToFileView({ fileId })
         }
       },
       name: 'Open markdown file',
@@ -28,7 +27,7 @@ export default function useGlobalCommands() {
       execute: async () => {
         const details = await showFolderPicker()
         if (details.id) {
-          createFile({ folderId: details.id })
+          navigateToFileNew({ folderId: details.id })
         }
       },
       name: 'Create markdown file',
