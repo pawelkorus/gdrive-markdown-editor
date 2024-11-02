@@ -1,5 +1,9 @@
 import { useNavigate as useReactRouterNavigate, useSearchParams } from 'react-router-dom'
 
+type ParamsFunction<T> = (params?: T) => T
+
+type Params<T> = T | ParamsFunction<T>
+
 type NavigateToFileParams = {
   fileId: string
   userId?: string
@@ -74,10 +78,10 @@ export function useNavigateTo() {
     navigate(`/file?${newSearchParams.toString()}`)
   }
 
-  const navigateToFileEdit = (params?: NavigateToEditFileParams) => {
-    if (!params) params = getFileEditParams(searchParams)
+  const navigateToFileEdit = (params?: Params<NavigateToEditFileParams>) => {
+    const finalParams = handleParamsHelper(params, getFileEditParams)
 
-    const { fileId, userId, resourceKey, draftId } = params
+    const { fileId, userId, resourceKey, draftId, source } = finalParams
     const newSearchParams = new URLSearchParams()
     newSearchParams.set('fileId', fileId)
 
@@ -90,7 +94,7 @@ export function useNavigateTo() {
     if (draftId) {
       newSearchParams.set('draftId', draftId)
     }
-    if (params.source) {
+    if (source) {
       newSearchParams.set('source', 'true')
     }
 
@@ -124,6 +128,18 @@ export function useNavigateTo() {
     searchParams.set('folderId', folderId)
     const path = `/file/new?${searchParams.toString()}`
     navigate(path)
+  }
+
+  function handleParamsHelper<T>(params: Params<T>, defaults: (p: URLSearchParams) => T): T {
+    if (!params) {
+      return defaults(searchParams)
+    }
+    if (typeof params === 'function') {
+      return (params as ParamsFunction<T>)(defaults(searchParams))
+    }
+    else {
+      return params
+    }
   }
 
   return {

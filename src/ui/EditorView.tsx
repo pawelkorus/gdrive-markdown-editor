@@ -96,7 +96,7 @@ function EditorView(props: Props): React.ReactElement {
 
   async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
     await discardDraft()
-    navigateToFileEdit({ ...paramsFileEdit, fileId: fileDetails.id, draftId: draft.id })
+    navigateToFileEdit(params => ({ ...params, draftId: draft.id }))
   }
 
   return (
