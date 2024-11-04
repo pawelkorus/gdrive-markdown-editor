@@ -21,7 +21,7 @@ export {
 
 export {
   authorizeInstall,
-} from './auth'
+} from './authorization'
 
 export {
   StateFromGoogle,
@@ -30,5 +30,5 @@ export {
 } from './state'
 
 export {
-  CLIENT_ID,
-} from './const'
+  authenticateUser,
+} from './authentication'

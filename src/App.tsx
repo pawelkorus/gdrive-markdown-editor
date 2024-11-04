@@ -1,4 +1,4 @@
-import React, { StrictMode, useState } from 'react'
+import React, { StrictMode, useState, useEffect } from 'react'
 import {
   HomeView,
   EditorView,
@@ -6,9 +6,7 @@ import {
   ErrorView,
   useGlobalCommands,
 } from './ui'
-import { useEffect } from 'react'
 import {
-  loadGapi,
   initializeGapiClient,
   parseGoogleState,
   StateFromGoogleAction,
@@ -16,7 +14,7 @@ import {
 import { CommandsContextProvider, useCommands } from './service/command'
 import { CommandPalette } from './ui/commandPalette'
 import { GdriveFileContextProvider } from './service/gdrivefile/GdriveFileContext'
-import { UserContextProvider } from './service/user'
+import { UserContextProvider, useUser } from './service/user'
 import {
   createBrowserRouter,
   Outlet,
@@ -27,53 +25,58 @@ import { Spinner } from 'react-bootstrap'
 import { FileNewRoute, FileRoute } from './routes'
 import { useNavigateTo } from './service/navigate'
 import DraftsView from './ui/DraftsView'
+import Nav from './ui/nav'
 
 function RootView(): React.ReactElement {
   const [loading, setLoading] = useState(true)
   const [commands, executeCommand] = useCommands()
   const [searchParams] = useSearchParams()
+  const [user] = useUser()
   const { navigateToHome, navigateToFileView, navigateToFileNew } = useNavigateTo()
   useGlobalCommands()
 
   useEffect(() => {
-    const googleApi = async function () {
-      await loadGapi()
-      await initializeGapiClient()
-
-      const stateParam = searchParams.get('state')
-      if (stateParam) {
-        const googleState = parseGoogleState(stateParam)
-
-        if (StateFromGoogleAction.Open == googleState.action) {
-          navigateToFileView({ fileId: googleState.fileId, userId: googleState.userId })
-        }
-        else if (StateFromGoogleAction.New == googleState.action) {
-          navigateToFileNew({ folderId: googleState.folderId })
-        }
-        else {
-          navigateToHome()
-        }
-      }
-      setLoading(false)
-    }
-
-    googleApi()
+    initializeGapiClient()
   }, [])
 
-  if (loading) return (
-    <div className="container-fluid h-100 d-flex">
-      <div className="mx-auto my-auto">
-        <Spinner animation="border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </Spinner>
-      </div>
-    </div>
-  )
+  useEffect(() => {
+    if (!user) return
+    const stateParam = searchParams.get('state')
+
+    if (stateParam) {
+      const googleState = parseGoogleState(stateParam)
+
+      if (StateFromGoogleAction.Open == googleState.action) {
+        navigateToFileView({ fileId: googleState.fileId, userId: googleState.userId })
+      }
+      else if (StateFromGoogleAction.New == googleState.action) {
+        navigateToFileNew({ folderId: googleState.folderId })
+      }
+      else {
+        navigateToHome()
+      }
+    }
+    setLoading(false)
+  }, [user])
 
   return (
     <>
-      <Outlet></Outlet>
-      <CommandPalette commands={commands} onItemSelected={item => executeCommand(item.id)}></CommandPalette>
+      <Nav></Nav>
+      { loading && (
+        <div className="container-fluid h-100 d-flex">
+          <div className="mx-auto my-auto">
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </Spinner>
+          </div>
+        </div>
+      )}
+      { !loading && (
+        <>
+          <Outlet></Outlet>
+          <CommandPalette commands={commands} onItemSelected={item => executeCommand(item.id)}></CommandPalette>
+        </>
+      )}
     </>
   )
 }

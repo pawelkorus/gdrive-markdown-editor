@@ -1,4 +1,5 @@
 import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_FILE_ACCESS, SCOPE_INSTALL } from './const'
+import { ensureGISLibraryLoaded } from './load'
 
 type RequestTokenSuccess = (tokenReponse: google.accounts.oauth2.TokenResponse) => void
 type RequestTokenReject = (error: unknown) => void
@@ -24,10 +25,9 @@ class TokenCallbackResult {
 let waitForTokenResult: TokenCallbackResult
 let latestTokenResponse: google.accounts.oauth2.TokenResponse | undefined = undefined
 let tokenClient: google.accounts.oauth2.TokenClient | undefined = undefined
-let gisLibraryPromise: Promise<void> | undefined
 
 async function ensureTokenClient(loginHint: string | undefined) {
-  await loadGis()
+  await ensureGISLibraryLoaded
   if (!tokenClient) {
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
@@ -49,22 +49,6 @@ async function ensureTokenClient(loginHint: string | undefined) {
   }
 
   return tokenClient
-}
-
-function loadGis() {
-  if (!gisLibraryPromise) {
-    gisLibraryPromise = new Promise((resolve) => {
-      const gisEle = document.createElement('script') as HTMLScriptElement
-      gisEle.defer = true
-      gisEle.src = 'https://accounts.google.com/gsi/client'
-      gisEle.addEventListener('load', () => {
-        resolve()
-      })
-      document.body.appendChild(gisEle)
-    })
-  }
-
-  return gisLibraryPromise
 }
 
 export function authorizeInstall(): Promise<unknown> {

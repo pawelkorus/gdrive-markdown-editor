@@ -1,5 +1,6 @@
 import { API_KEY, DISCOVERY_DOC, CLIENT_ID } from './const'
-import { currentToken, hasPermission, Permissions, requestAccess } from './auth'
+import { currentToken, hasPermission, Permissions, requestAccess } from './authorization'
+import { ensureGAPILibraryLoaded } from './load'
 
 export type FileDetails = {
   id: string
@@ -23,25 +24,21 @@ export enum Errors {
 }
 
 export async function initializeGapiClient() {
+  await loadGapi()
+
   await gapi.client.init({
     apiKey: API_KEY,
     discoveryDocs: [DISCOVERY_DOC],
   })
 }
 
-export function loadGapi() {
-  return new Promise((resolve) => {
-    const apiEle = document.createElement('script') as HTMLScriptElement
-    apiEle.defer = true
-    apiEle.src = 'https://apis.google.com/js/api.js'
-    apiEle.addEventListener('load', () => {
-      Promise.all(
-        [loadGapiClient(), loadPicker()],
-      )
-        .then(() => resolve(true))
-    })
-    document.body.appendChild(apiEle)
-  })
+export async function loadGapi() {
+  await ensureGAPILibraryLoaded
+
+  await Promise.all([
+    loadGapiClient(),
+    loadPicker(),
+  ])
 }
 
 function loadGapiClient(): Promise<boolean> {

@@ -1,4 +1,5 @@
-import React, { PropsWithChildren, createContext, useState } from 'react'
+import React, { PropsWithChildren, createContext, useEffect, useState } from 'react'
+import { authenticateUser } from '../../google'
 
 export type User = {
   id: string
@@ -9,12 +10,10 @@ export type User = {
 
 export type UserContextState = {
   user: User | null
-  setUser: (user: User) => void
 }
 
 export const UserContext = createContext<UserContextState>({
   user: null,
-  setUser: () => { throw Error('CommandsContext not initialized') },
 })
 
 type Props = PropsWithChildren<unknown>
@@ -22,8 +21,17 @@ type Props = PropsWithChildren<unknown>
 export function UserContextProvider(props: Props): React.ReactElement {
   const [user, setUser] = useState<User | null>(null)
 
+  useEffect(() => {
+    async function waitForUser() {
+      const authenticatedUser = await authenticateUser
+      setUser(authenticatedUser)
+    }
+
+    waitForUser()
+  }, [])
+
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user }}>
       {props.children}
     </UserContext.Provider>
   )
