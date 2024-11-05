@@ -26,6 +26,7 @@ import { FileNewRoute, FileRoute } from './routes'
 import { useNavigateTo } from './service/navigate'
 import DraftsView from './ui/DraftsView'
 import Nav from './ui/nav'
+import { MenuProvider } from './service/menu'
 
 function RootView(): React.ReactElement {
   const [loading, setLoading] = useState(true)
@@ -128,7 +129,9 @@ export default (): React.ReactElement => {
       <UserContextProvider>
         <GdriveFileContextProvider>
           <CommandsContextProvider>
-            <RouterProvider router={router} />
+            <MenuProvider>
+              <RouterProvider router={router} />
+            </MenuProvider>
           </CommandsContextProvider>
         </GdriveFileContextProvider>
       </UserContextProvider>
