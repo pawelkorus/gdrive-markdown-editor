@@ -2,11 +2,11 @@ import React, { useEffect } from 'react'
 import { MilkdownEditor, WrapWithProviders } from './milkdown'
 import { useGdriveFile } from '../service/gdrivefile'
 import { useNavigateTo } from '../service/navigate'
-import { useMenu } from '../service/menu'
+import { useMainMenu } from '../service/navbar'
 
 function ViewerView(): React.ReactElement {
   const [fileDetails] = useGdriveFile()
-  const [, setMenuItems] = useMenu()
+  const [, setMenuItems] = useMainMenu()
   const { navigateToFileEdit } = useNavigateTo()
 
   useEffect(() => {

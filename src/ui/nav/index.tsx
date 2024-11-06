@@ -1,10 +1,10 @@
 import React from 'react'
 import { Container, Navbar, Nav, Form, Button } from 'react-bootstrap'
 import GoogleSSO from '../googleSSO'
-import { useMenu } from '../../service/menu'
+import { useMainMenu } from '../../service/navbar'
 
 const CustomNav = (): React.ReactElement => {
-  const [menuItems] = useMenu()
+  const [menuItems] = useMainMenu()
 
   return (
     <Container fluid>
