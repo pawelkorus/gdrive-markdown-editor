@@ -3,3 +3,4 @@ target
 index.typegen.ts
 .run-develop-local.sh
 .hidden
+.idea
