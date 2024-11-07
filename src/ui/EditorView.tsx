@@ -7,8 +7,8 @@ import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
 import DraftSelector from './editor/DraftSelector'
 import TextArea from './textarea/TextArea'
-import { useMainMenu, useMainMenuPanel } from '../service/navbar'
-import { Button } from 'react-bootstrap'
+import { useFilenamePanel, useMainMenuPanel } from '../service/navbar'
+import { Button, Form } from 'react-bootstrap'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -31,8 +31,8 @@ function EditorView(props: Props): React.ReactElement {
     saveContent: saveDraft,
   } = useDraftFile(paramsFileEdit.draftId)
   const { navigateToFileEdit } = useNavigateTo()
-  const [,setMainMenuItems] = useMainMenu()
-  const {addPanel, removePanel} = useMainMenuPanel()
+  const { addPanel, removePanel } = useMainMenuPanel()
+  const { setFilenamePanel, unsetFileNamePanel } = useFilenamePanel()
   useMilkdownCommands()
 
   useEffect(() => {
@@ -65,11 +65,13 @@ function EditorView(props: Props): React.ReactElement {
   }, [paramsFileEdit.draftId])
 
   useEffect(() => {
-    const buttonsPanel = <>
-      <Button className="me-2" variant="primary" onClick={() => commitContentChange(updatedContent)}>Save</Button>
-      <Button className="me-2" variant="primary" onClick={onCloseClicked}>Save & Close</Button>
-      <Button className="me-2" variant="primary" onClick={onDiscardClicked}>Discard</Button>
-    </>
+    const buttonsPanel = (
+      <>
+        <Button className="me-2" variant="primary" onClick={() => commitContentChange(updatedContent)}>Save</Button>
+        <Button className="me-2" variant="primary" onClick={onCloseClicked}>Save & Close</Button>
+        <Button className="me-2" variant="primary" onClick={onDiscardClicked}>Discard</Button>
+      </>
+    )
 
     addPanel(buttonsPanel)
     return () => {
@@ -77,27 +79,38 @@ function EditorView(props: Props): React.ReactElement {
     }
   }, [])
 
-  useEffect(() => {    
-    if(!paramsFileEdit.draftId) {
+  useEffect(() => {
+    const panel = editFileNameEnabled
+      ? (
+          <Form>
+            <input
+              type="text"
+              defaultValue={fileDetails.name}
+              onBlur={e => commitFileNameChange(e.target.value)}
+              autoFocus
+              className="form-control me-auto"
+            />
+          </Form>
+        )
+      : (<h5 className="me-auto mb-0" onClick={() => setEditFileNameEnabled(true)}>{fileDetails.name}</h5>)
+
+    setFilenamePanel(panel)
+
+    return () => {
+      unsetFileNamePanel()
+    }
+  })
+
+  useEffect(() => {
+    if (!paramsFileEdit.draftId) {
       const panel = <DraftSelector onDraftSelected={onUseSpecificDraftClicked} />
-      
+
       addPanel(panel)
       return () => {
         removePanel(panel)
       }
     }
   }, [paramsFileEdit.draftId])
-
-  // useEffect(() => {
-  //   if(!paramsFileEdit.draftId) {
-  //     const panel = <DraftSelector onDraftSelected={onUseSpecificDraftClicked} />
-  //     addPanel(panel)
-
-  //     return () => {
-  //       removePanel(panel)
-  //     }
-  //   }
-  // }, [paramsFileEdit.draftId])
 
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)
@@ -142,17 +155,6 @@ function EditorView(props: Props): React.ReactElement {
     <>
       <div className="container-fluid p-2">
         <div className="d-flex flex-row align-items-center justify-content-end">
-          {editFileNameEnabled
-            ? (
-                <input
-                  type="text"
-                  defaultValue={fileDetails.name}
-                  onBlur={e => commitFileNameChange(e.target.value)}
-                  autoFocus
-                  className="form-control me-auto"
-                />
-              )
-            : (<h5 className="me-auto mb-0" onClick={() => setEditFileNameEnabled(true)}>{fileDetails.name}</h5>)}
           {lastSavedTimestamp != null && (
             <span className="ms-1">
               <small className="text-success">

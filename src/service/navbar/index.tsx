@@ -8,9 +8,11 @@ type MenuItem = {
 
 type NavbarContextType = {
   mainMenuItems: MenuItem[]
-  setMainMenuItems: (items: MenuItem[] | ((prevItems: MenuItem[]) => MenuItem[])) => void
+  setMainMenuItems: React.Dispatch<React.SetStateAction<MenuItem[]>>
   panels: ReactNode[]
-  setPanels: (panels: ReactNode[] | ((prevPanels: ReactNode[]) => ReactNode[])) => void
+  setPanels: React.Dispatch<React.SetStateAction<ReactNode[]>>
+  filenamePanel: ReactNode | null
+  setFilenamePanel: React.Dispatch<React.SetStateAction<ReactNode | null>>
 }
 
 const NavbarContext = createContext<NavbarContextType | undefined>(undefined)
@@ -18,9 +20,10 @@ const NavbarContext = createContext<NavbarContextType | undefined>(undefined)
 export const NavbarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [mainMenuItems, setMainMenuItems] = useState<MenuItem[]>([])
   const [panels, setPanels] = useState<ReactNode[]>([])
+  const [filenamePanel, setFilenamePanel] = useState<ReactNode | null>(null)
 
   return (
-    <NavbarContext.Provider value={{ mainMenuItems, setMainMenuItems, panels, setPanels }}>
+    <NavbarContext.Provider value={{ mainMenuItems, setMainMenuItems, panels, setPanels, filenamePanel, setFilenamePanel }}>
       {children}
     </NavbarContext.Provider>
   )
@@ -41,16 +44,32 @@ type MainMenuPanelContextType = {
   removePanel: (panel: ReactNode) => void
 }
 
-export const useMainMenuPanel = ():MainMenuPanelContextType => {
+export const useMainMenuPanel = (): MainMenuPanelContextType => {
   const context = useContext(NavbarContext)
 
   const addPanel = (panel: ReactNode) => {
-    context.setPanels( (prev:ReactNode[]) => [...prev, panel])
+    context.setPanels((prev: ReactNode[]) => [...prev, panel])
   }
 
   const removePanel = (panel: ReactNode) => {
-    context.setPanels((prev:ReactNode[]) => prev.filter(p => p !== panel))
+    context.setPanels((prev: ReactNode[]) => prev.filter(p => p !== panel))
   }
 
   return { panels: context.panels, addPanel, removePanel }
+}
+
+type FilenamePanelContextType = {
+  filenamePanel: ReactNode | null
+  setFilenamePanel: React.Dispatch<React.SetStateAction<ReactNode>>
+  unsetFileNamePanel: () => void
+}
+
+export const useFilenamePanel = (): FilenamePanelContextType => {
+  const context = useContext(NavbarContext)
+
+  const unsetFileNamePanel = () => {
+    context.setFilenamePanel(null)
+  }
+
+  return { filenamePanel: context.filenamePanel, setFilenamePanel: context.setFilenamePanel, unsetFileNamePanel }
 }

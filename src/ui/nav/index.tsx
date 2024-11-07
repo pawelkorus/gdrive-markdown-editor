@@ -1,18 +1,17 @@
 import React from 'react'
 import { Container, Navbar, Nav, Form, Button } from 'react-bootstrap'
 import GoogleSSO from '../googleSSO'
-import { useMainMenu, useMainMenuPanel } from '../../service/navbar'
+import { useMainMenu, useMainMenuPanel, useFilenamePanel } from '../../service/navbar'
 
 const CustomNav = (): React.ReactElement => {
   const [menuItems] = useMainMenu()
-  const {panels} = useMainMenuPanel()
+  const { panels } = useMainMenuPanel()
+  const { filenamePanel } = useFilenamePanel()
 
   return (
     <Container fluid>
       <Navbar expand="lg">
-        <Navbar.Brand href="#">
-          GdriveMarkdownEditor
-        </Navbar.Brand>
+        { filenamePanel ? filenamePanel : <Navbar.Brand href="#">GdriveMarkdownEditor</Navbar.Brand> }
         <div className="d-flex flex-grow-1 justify-content-end d-lg-none me-2">
           <Navbar.Toggle aria-controls="navbarSupportedContent" />
         </div>
