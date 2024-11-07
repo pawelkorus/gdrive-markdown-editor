@@ -2,6 +2,14 @@
 
 exports[`should render youtube embed iframe 1`] = `
 <body>
+  <script
+    defer=""
+    src="https://accounts.google.com/gsi/client"
+  />
+  <script
+    defer=""
+    src="https://apis.google.com/js/api.js"
+  />
   <div>
     <div
       data-milkdown-root="true"
