@@ -3,7 +3,7 @@ import { useDraftFiles } from '../service/draftfile'
 import { useGdriveFile } from '../service/gdrivefile'
 import { useNavigateTo } from '../service/navigate'
 import { useMainMenuPanel } from '../service/navbar'
-import { Button } from 'react-bootstrap'
+import { Panel, PanelButton } from './nav'
 
 export default function (): React.ReactElement {
   const [fileDetails] = useGdriveFile()
@@ -16,10 +16,10 @@ export default function (): React.ReactElement {
 
   useEffect(() => {
     const panel = (
-      <>
-        <Button className="me-2" variant="primary" onClick={() => navigateToFileView({ fileId: fileDetails.id })}>View</Button>
-        <Button className="me-2" variant="primary" onClick={() => navigateToFileEdit({ fileId: fileDetails.id })}>Edit</Button>
-      </>
+      <Panel>
+        <PanelButton variant="primary" onClick={() => navigateToFileView({ fileId: fileDetails.id })}>View</PanelButton>
+        <PanelButton variant="primary" onClick={() => navigateToFileEdit({ fileId: fileDetails.id })}>Edit</PanelButton>
+      </Panel>
     )
     addPanel(panel)
 

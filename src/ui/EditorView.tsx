@@ -8,7 +8,7 @@ import { useFileEditParams } from '../service/navigate'
 import DraftSelector from './editor/DraftSelector'
 import TextArea from './textarea/TextArea'
 import { useFilenamePanel, useMainMenuPanel } from '../service/navbar'
-import { Button, Form } from 'react-bootstrap'
+import { PanelButton, Panel } from './nav'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -66,11 +66,11 @@ function EditorView(props: Props): React.ReactElement {
 
   useEffect(() => {
     const buttonsPanel = (
-      <>
-        <Button className="me-2" variant="primary" onClick={() => commitContentChange(updatedContent)}>Save</Button>
-        <Button className="me-2" variant="primary" onClick={onCloseClicked}>Save & Close</Button>
-        <Button className="me-2" variant="primary" onClick={onDiscardClicked}>Discard</Button>
-      </>
+      <Panel>
+        <PanelButton variant="primary" onClick={() => commitContentChange(updatedContent)}>Save</PanelButton>
+        <PanelButton variant="primary" onClick={onCloseClicked}>Save & Close</PanelButton>
+        <PanelButton variant="primary" onClick={onDiscardClicked}>Discard</PanelButton>
+      </Panel>
     )
 
     addPanel(buttonsPanel)
@@ -82,7 +82,7 @@ function EditorView(props: Props): React.ReactElement {
   useEffect(() => {
     const panel = editFileNameEnabled
       ? (
-          <Form>
+          <Panel>
             <input
               type="text"
               defaultValue={fileDetails.name}
@@ -90,7 +90,7 @@ function EditorView(props: Props): React.ReactElement {
               autoFocus
               className="form-control me-auto"
             />
-          </Form>
+          </Panel>
         )
       : (<h5 className="me-auto mb-0" onClick={() => setEditFileNameEnabled(true)}>{fileDetails.name}</h5>)
 
