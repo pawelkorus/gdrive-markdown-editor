@@ -2,6 +2,8 @@ import React from 'react'
 import { FileDetails, useDraftFiles } from '../../service/draftfile'
 import { useGdriveFile } from '../../service/gdrivefile'
 import { useNavigateTo } from '../../service/navigate'
+import { Button } from 'react-bootstrap'
+import { Panel } from '../nav'
 
 export type Props = {
   onDraftSelected: (draft: FileDetails) => void
@@ -21,13 +23,13 @@ export default function DraftSelector(props: Props): React.ReactElement {
   }
 
   return (
-    <>
+    <Panel>
       { draftFiles && draftFiles.length == 1 && (
         <div>
           <div className="input-group" role="alert">
             <span className="input-group-text">Draft available:</span>
-            <button className="btn btn-outline-primary" onClick={() => props.onDraftSelected(draftFiles[0])}>Use</button>
-            <button className="btn btn-outline-danger" onClick={() => onDraftDiscarded(draftFiles[0])}>Discard</button>
+            <Button type="button" variant="outline-primary" onClick={() => props.onDraftSelected(draftFiles[0])}>Use</Button>
+            <Button type="button" variant="outline-danger" onClick={() => onDraftDiscarded(draftFiles[0])}>Discard</Button>
           </div>
         </div>
       )}
@@ -35,11 +37,11 @@ export default function DraftSelector(props: Props): React.ReactElement {
         <div>
           <div className="input-group" role="alert">
             <span className="input-group-text">Multiple drafts available:</span>
-            <button className="btn btn-outline-primary" onClick={() => props.onDraftSelected(draftFiles[0])}>Use latest</button>
-            <button className="btn btn-outline-primary" onClick={() => onShowAllDraftsClicked()}>Show all</button>
+            <Button type="button" variant="outline-primary" onClick={() => props.onDraftSelected(draftFiles[0])}>Use latest</Button>
+            <Button type="button" variant="outline-primary" onClick={() => onShowAllDraftsClicked()}>Show all</Button>
           </div>
         </div>
       )}
-    </>
+    </Panel>
   )
 }

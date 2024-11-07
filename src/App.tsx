@@ -25,7 +25,7 @@ import { Spinner } from 'react-bootstrap'
 import { FileNewRoute, FileRoute } from './routes'
 import { useNavigateTo } from './service/navigate'
 import DraftsView from './ui/DraftsView'
-import Nav from './ui/nav'
+import { Nav } from './ui/nav'
 import { NavbarProvider } from './service/navbar'
 
 function RootView(): React.ReactElement {
@@ -41,7 +41,7 @@ function RootView(): React.ReactElement {
   }, [])
 
   useEffect(() => {
-    if (!user) return  
+    if (!user) return
     const stateParam = searchParams.get('state')
 
     if (stateParam) {
