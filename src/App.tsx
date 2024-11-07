@@ -41,7 +41,7 @@ function RootView(): React.ReactElement {
   }, [])
 
   useEffect(() => {
-    if (!user) return
+    if (!user) return  
     const stateParam = searchParams.get('state')
 
     if (stateParam) {

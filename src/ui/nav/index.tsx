@@ -1,10 +1,11 @@
 import React from 'react'
 import { Container, Navbar, Nav, Form, Button } from 'react-bootstrap'
 import GoogleSSO from '../googleSSO'
-import { useMainMenu } from '../../service/navbar'
+import { useMainMenu, useMainMenuPanel } from '../../service/navbar'
 
 const CustomNav = (): React.ReactElement => {
   const [menuItems] = useMainMenu()
+  const {panels} = useMainMenuPanel()
 
   return (
     <Container fluid>
@@ -21,9 +22,14 @@ const CustomNav = (): React.ReactElement => {
         <Navbar.Collapse id="navbarSupportedContent" className="justify-content-end">
           <Nav className="me-auto">
           </Nav>
+          {panels.map((item: React.ReactNode, index: number) => (
+            <Form key={index}>
+              {item}
+            </Form>
+          ))}
           <Form>
             {menuItems.map(item => (
-              <Button key={item.id} onClick={item.action} variant="primary">
+              <Button key={item.id} onClick={item.action} variant="primary" className="me-2">
                 {item.label}
               </Button>
             ))}

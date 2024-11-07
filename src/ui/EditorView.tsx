@@ -7,6 +7,8 @@ import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
 import DraftSelector from './editor/DraftSelector'
 import TextArea from './textarea/TextArea'
+import { useMainMenu, useMainMenuPanel } from '../service/navbar'
+import { Button } from 'react-bootstrap'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -29,6 +31,8 @@ function EditorView(props: Props): React.ReactElement {
     saveContent: saveDraft,
   } = useDraftFile(paramsFileEdit.draftId)
   const { navigateToFileEdit } = useNavigateTo()
+  const [,setMainMenuItems] = useMainMenu()
+  const {addPanel, removePanel} = useMainMenuPanel()
   useMilkdownCommands()
 
   useEffect(() => {
@@ -59,6 +63,41 @@ function EditorView(props: Props): React.ReactElement {
       selectDraft(paramsFileEdit.draftId)
     }
   }, [paramsFileEdit.draftId])
+
+  useEffect(() => {
+    const buttonsPanel = <>
+      <Button className="me-2" variant="primary" onClick={() => commitContentChange(updatedContent)}>Save</Button>
+      <Button className="me-2" variant="primary" onClick={onCloseClicked}>Save & Close</Button>
+      <Button className="me-2" variant="primary" onClick={onDiscardClicked}>Discard</Button>
+    </>
+
+    addPanel(buttonsPanel)
+    return () => {
+      removePanel(buttonsPanel)
+    }
+  }, [])
+
+  useEffect(() => {    
+    if(!paramsFileEdit.draftId) {
+      const panel = <DraftSelector onDraftSelected={onUseSpecificDraftClicked} />
+      
+      addPanel(panel)
+      return () => {
+        removePanel(panel)
+      }
+    }
+  }, [paramsFileEdit.draftId])
+
+  // useEffect(() => {
+  //   if(!paramsFileEdit.draftId) {
+  //     const panel = <DraftSelector onDraftSelected={onUseSpecificDraftClicked} />
+  //     addPanel(panel)
+
+  //     return () => {
+  //       removePanel(panel)
+  //     }
+  //   }
+  // }, [paramsFileEdit.draftId])
 
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)
@@ -122,10 +161,6 @@ function EditorView(props: Props): React.ReactElement {
               </small>
             </span>
           )}
-          {!paramsFileEdit.draftId && (<DraftSelector onDraftSelected={onUseSpecificDraftClicked} />)}
-          <button className="btn btn-primary ms-1" id="btn-save" type="button" onClick={() => commitContentChange(updatedContent)}>Save</button>
-          <button className="btn btn-primary ms-1" id="btn-close" type="button" onClick={onCloseClicked}>Save & Close</button>
-          <button className="btn btn-primary ms-1" id="btn-discard" type="button" onClick={onDiscardClicked}>Discard</button>
         </div>
       </div>
       <div className="container-lg mt-4">
