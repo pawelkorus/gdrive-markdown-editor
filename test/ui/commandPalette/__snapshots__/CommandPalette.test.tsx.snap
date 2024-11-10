@@ -1,9 +1,9 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`command palette does not open after pressing Shift only once 1`] = `
 <body
   class=""
-  style="padding-right: 1024px;"
+  style=""
 >
   <div />
 </body>
@@ -12,7 +12,7 @@ exports[`command palette does not open after pressing Shift only once 1`] = `
 exports[`command palette does not open after pressing Shift only once 2`] = `
 <body
   class=""
-  style="padding-right: 1024px;"
+  style=""
 >
   <div />
 </body>
@@ -21,7 +21,7 @@ exports[`command palette does not open after pressing Shift only once 2`] = `
 exports[`command palette does not open if time between pressing Shift key is too long 1`] = `
 <body
   class=""
-  style="padding-right: 1024px;"
+  style=""
 >
   <div />
 </body>
@@ -30,7 +30,7 @@ exports[`command palette does not open if time between pressing Shift key is too
 exports[`command palette does not open if time between pressing Shift key is too long 2`] = `
 <body
   class=""
-  style="padding-right: 1024px;"
+  style=""
 >
   <div />
 </body>
@@ -109,7 +109,7 @@ exports[`command palette opens after pressing Shift 2 times fast and hides after
 exports[`command palette opens after pressing Shift 2 times fast and hides after pressing Escape 3`] = `
 <body
   class=""
-  style="padding-right: 1024px;"
+  style=""
 >
   <div />
 </body>
@@ -119,7 +119,7 @@ exports[`should filter commands based on input value 1`] = `
 <body
   class="modal-open"
   data-rr-ui-modal-open=""
-  style="padding-right: 2048px;"
+  style="padding-right: 1024px;"
 >
   <div />
   <div
@@ -177,7 +177,7 @@ exports[`should filter commands based on input value 2`] = `
 <body
   class="modal-open"
   data-rr-ui-modal-open=""
-  style="padding-right: 2048px;"
+  style="padding-right: 1024px;"
 >
   <div />
   <div

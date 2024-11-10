@@ -45,6 +45,14 @@ Gdrive expose special scope `https://www.googleapis.com/auth/drive.file` that al
 
 When configuring GDrive UI Integration there is an option to automatically show consent screen after user opens applicatin. This will trigger authentication code flow. After user gives consent browser will be redirected to the application with oauth flow parameters included as query parameters (code, scopes)
 
+### Jest vs Vitest
+
+Jest was replaced with Vitest because of few issues.
+
+It seems that milkdown is distributed as ES module and it was hard to setup jest to support ES modules and not break something else (for example jose library). Jest test were very slow. There was also problem with mocking modules which required using unstable apis.
+
+For Vitest everything just works and is really simple to configure.
+
 ## References
 
 * [Google Authorization library](https://developers.google.com/identity/oauth2/web/guides/overview?hl=en)

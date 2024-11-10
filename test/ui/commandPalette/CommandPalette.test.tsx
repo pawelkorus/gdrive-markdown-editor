@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, fireEvent, screen, waitForElementToBeRemoved, waitFor } from '@testing-library/react'
 import CommandPalette from '../../../src/ui/commandPalette/CommandPalette'
-import { jest } from '@jest/globals'
+import { vi, test, expect } from 'vitest'
 
 function prepareCommands() {
   const commands = [{
@@ -51,14 +51,14 @@ test('command palette does not open after pressing Shift only once', async () =>
 })
 
 test('command palette does not open if time between pressing Shift key is too long', async () => {
-  jest.useFakeTimers()
+  vi.useFakeTimers()
 
   render(<CommandPalette commands={prepareCommands()} />)
 
   expect(document.body).toMatchSnapshot()
 
   fireEvent.keyDown(document, { key: 'Shift' })
-  jest.advanceTimersByTime(1000) // Adjust the time as needed
+  vi.advanceTimersByTime(1000) // Adjust the time as needed
   fireEvent.keyDown(document, { key: 'Shift' })
 
   expect(screen.queryByRole('dialog')).toBeNull()
@@ -66,7 +66,7 @@ test('command palette does not open if time between pressing Shift key is too lo
 })
 
 test('should execute callback after command is selected by keyboard', async () => {
-  const mockOnSelectCallback = jest.fn()
+  const mockOnSelectCallback = vi.fn()
 
   render(<CommandPalette commands={prepareCommands()} onItemSelected={mockOnSelectCallback} />)
 
@@ -80,7 +80,7 @@ test('should execute callback after command is selected by keyboard', async () =
 })
 
 test('should execute callback after command is selected by mouse click', async () => {
-  const mockOnSelectCallback = jest.fn()
+  const mockOnSelectCallback = vi.fn()
 
   render(<CommandPalette commands={prepareCommands()} onItemSelected={mockOnSelectCallback} />)
 
@@ -89,6 +89,7 @@ test('should execute callback after command is selected by mouse click', async (
   fireEvent.mouseDown(screen.getByText('ab'))
 
   expect(mockOnSelectCallback).toHaveBeenCalledWith({ id: 'ab', name: 'ab', execute: expect.any(Function) })
+
   await waitForElementToBeRemoved(() => screen.getByRole('dialog'))
 })
 
