@@ -86,6 +86,10 @@ module.exports = (env, argv) => {
       ],
     },
     resolve: {
+      alias: {
+        "@app": path.resolve(__dirname, "src"),
+      },
+      modules: [path.resolve(__dirname, "src"), "node_modules"],
       extensions: [".tsx", ".ts", ".js", ".scss", ".json", ".css", ".scss"],
       fallback: {
         http: false,

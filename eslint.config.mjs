@@ -38,4 +38,15 @@ export default [{
   languageOptions: {
     parser: tsParser,
   },
+
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [
+          ['@app', './src'],
+        ],
+        extensions: ['.ts', '.js', '.jsx', '.json'],
+      },
+    },
+  },
 }]

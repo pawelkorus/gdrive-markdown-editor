@@ -5,16 +5,16 @@ import {
   ViewerView,
   ErrorView,
   useGlobalCommands,
-} from './ui'
+} from '@app/ui'
 import {
   initializeGapiClient,
   parseGoogleState,
   StateFromGoogleAction,
-} from './google'
-import { CommandsContextProvider, useCommands } from './service/command'
-import { CommandPalette } from './ui/commandPalette'
-import { GdriveFileContextProvider } from './service/gdrivefile/GdriveFileContext'
-import { UserContextProvider, useUser } from './service/user'
+} from '@app/google'
+import { CommandsContextProvider, useCommands } from '@app/service/command'
+import { CommandPalette } from '@app/ui/commandPalette'
+import { GdriveFileContextProvider } from '@app/service/gdrivefile/GdriveFileContext'
+import { UserContextProvider, useUser } from '@app/service/user'
 import {
   createBrowserRouter,
   Outlet,
@@ -22,11 +22,11 @@ import {
   useSearchParams,
 } from 'react-router-dom'
 import { Spinner } from 'react-bootstrap'
-import { FileNewRoute, FileRoute } from './routes'
-import { useNavigateTo } from './service/navigate'
-import DraftsView from './ui/DraftsView'
-import { Nav } from './ui/nav'
-import { NavbarProvider } from './service/navbar'
+import { FileNewRoute, FileRoute } from '@app/routes'
+import { useNavigateTo } from '@app/service/navigate'
+import DraftsView from '@app/ui/DraftsView'
+import { Nav } from '@app/ui/nav'
+import { NavbarProvider } from '@app/service/navbar'
 
 function RootView(): React.ReactElement {
   const [loading, setLoading] = useState(true)

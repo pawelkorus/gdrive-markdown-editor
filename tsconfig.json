@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": "./",
         "outDir": "target/",
         "sourceMap": true,
         "noImplicitAny": true,
@@ -20,7 +21,12 @@
             "es2019",
             "dom"
         ],
-        "jsx": "react"
+        "jsx": "react",
+        "paths": {
+            "@app/*": [
+                "src/*"
+            ]
+        }
     },
     "exclude": [
         "node_modules",
