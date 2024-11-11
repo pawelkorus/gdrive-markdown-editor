@@ -99,7 +99,7 @@ function EditorView(props: Props): React.ReactElement {
     return () => {
       unsetFileNamePanel()
     }
-  })
+  }, [editFileNameEnabled, fileDetails.name])
 
   useEffect(() => {
     if (!paramsFileEdit.draftId) {
