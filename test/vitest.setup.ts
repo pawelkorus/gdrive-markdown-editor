@@ -9,3 +9,7 @@ afterEach(() => {
 afterEach(() => {
   vi.useRealTimers()
 })
+
+afterEach(() => {
+  vi.clearAllMocks()
+})

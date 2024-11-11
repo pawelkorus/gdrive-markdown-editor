@@ -1,0 +1,148 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renders without crashing 1`] = `
+<body>
+  <script
+    defer=""
+    src="https://accounts.google.com/gsi/client"
+  />
+  <script
+    defer=""
+    src="https://apis.google.com/js/api.js"
+  />
+  <div>
+    <form
+      class=""
+    >
+      <div>
+        <div
+          class="input-group"
+          role="alert"
+        >
+          <span
+            class="input-group-text"
+          >
+            Draft available:
+          </span>
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+          >
+            Use
+          </button>
+          <button
+            class="btn btn-outline-danger"
+            type="button"
+          >
+            Discard
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</body>
+`;
+
+exports[`should allow to choose latest draft or navigate to all drafts if multiple drafts are available 1`] = `
+<body>
+  <script
+    defer=""
+    src="https://accounts.google.com/gsi/client"
+  />
+  <script
+    defer=""
+    src="https://apis.google.com/js/api.js"
+  />
+  <div>
+    <form
+      class=""
+    >
+      <div>
+        <div
+          class="input-group"
+          role="alert"
+        >
+          <span
+            class="input-group-text"
+          >
+            Multiple drafts available:
+          </span>
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+          >
+            Use latest
+          </button>
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+          >
+            Show all
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</body>
+`;
+
+exports[`should allow to choose or discard if only one draft is available 1`] = `
+<body>
+  <script
+    defer=""
+    src="https://accounts.google.com/gsi/client"
+  />
+  <script
+    defer=""
+    src="https://apis.google.com/js/api.js"
+  />
+  <div>
+    <form
+      class=""
+    >
+      <div>
+        <div
+          class="input-group"
+          role="alert"
+        >
+          <span
+            class="input-group-text"
+          >
+            Draft available:
+          </span>
+          <button
+            class="btn btn-outline-primary"
+            type="button"
+          >
+            Use
+          </button>
+          <button
+            class="btn btn-outline-danger"
+            type="button"
+          >
+            Discard
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</body>
+`;
+
+exports[`should navigate to all drafts when "Show all" is clicked 1`] = `
+<body>
+  <script
+    defer=""
+    src="https://accounts.google.com/gsi/client"
+  />
+  <script
+    defer=""
+    src="https://apis.google.com/js/api.js"
+  />
+  <div>
+    <pre>
+      {"pathname":"/file/drafts","search":"?fileId=1"}
+    </pre>
+  </div>
+</body>
+`;
