@@ -14,29 +14,27 @@ exports[`renders without crashing 1`] = `
     <form
       class=""
     >
-      <div>
-        <div
-          class="input-group"
-          role="alert"
+      <div
+        class="input-group"
+        role="alert"
+      >
+        <span
+          class="input-group-text"
         >
-          <span
-            class="input-group-text"
-          >
-            Draft available:
-          </span>
-          <button
-            class="btn btn-outline-primary"
-            type="button"
-          >
-            Use
-          </button>
-          <button
-            class="btn btn-outline-danger"
-            type="button"
-          >
-            Discard
-          </button>
-        </div>
+          Draft available:
+        </span>
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+        >
+          Use
+        </button>
+        <button
+          class="btn btn-outline-danger"
+          type="button"
+        >
+          Discard
+        </button>
       </div>
     </form>
   </div>
@@ -57,29 +55,27 @@ exports[`should allow to choose latest draft or navigate to all drafts if multip
     <form
       class=""
     >
-      <div>
-        <div
-          class="input-group"
-          role="alert"
+      <div
+        class="input-group"
+        role="alert"
+      >
+        <span
+          class="input-group-text"
         >
-          <span
-            class="input-group-text"
-          >
-            Multiple drafts available:
-          </span>
-          <button
-            class="btn btn-outline-primary"
-            type="button"
-          >
-            Use latest
-          </button>
-          <button
-            class="btn btn-outline-primary"
-            type="button"
-          >
-            Show all
-          </button>
-        </div>
+          Multiple drafts available:
+        </span>
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+        >
+          Use latest
+        </button>
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+        >
+          Show all
+        </button>
       </div>
     </form>
   </div>
@@ -100,29 +96,27 @@ exports[`should allow to choose or discard if only one draft is available 1`] = 
     <form
       class=""
     >
-      <div>
-        <div
-          class="input-group"
-          role="alert"
+      <div
+        class="input-group"
+        role="alert"
+      >
+        <span
+          class="input-group-text"
         >
-          <span
-            class="input-group-text"
-          >
-            Draft available:
-          </span>
-          <button
-            class="btn btn-outline-primary"
-            type="button"
-          >
-            Use
-          </button>
-          <button
-            class="btn btn-outline-danger"
-            type="button"
-          >
-            Discard
-          </button>
-        </div>
+          Draft available:
+        </span>
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+        >
+          Use
+        </button>
+        <button
+          class="btn btn-outline-danger"
+          type="button"
+        >
+          Discard
+        </button>
       </div>
     </form>
   </div>

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Container, Navbar, Form, Button, Nav } from 'react-bootstrap'
 import { useMainMenu, useMainMenuPanel, useFilenamePanel } from '../../service/navbar'
 import GoogleSSO from '../googleSSO'
@@ -22,9 +22,9 @@ const CustomNav = (): React.ReactElement => {
           <Nav className="me-auto">
           </Nav>
           {panels.map((item: React.ReactNode, index: number) => (
-            <Form key={index}>
+            <Fragment key={index}>
               {item}
-            </Form>
+            </Fragment>
           ))}
           <Form>
             {menuItems.map(item => (
