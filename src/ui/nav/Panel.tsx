@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap'
 
 const Panel: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-    <Form>
+    <Form className="mt-2 float-start">
       {children}
     </Form>
   )

@@ -12,7 +12,7 @@ exports[`renders without crashing 1`] = `
   />
   <div>
     <form
-      class=""
+      class="mt-2 float-start"
     >
       <div
         class="input-group"
@@ -53,7 +53,7 @@ exports[`should allow to choose latest draft or navigate to all drafts if multip
   />
   <div>
     <form
-      class=""
+      class="mt-2 float-start"
     >
       <div
         class="input-group"
@@ -94,7 +94,7 @@ exports[`should allow to choose or discard if only one draft is available 1`] = 
   />
   <div>
     <form
-      class=""
+      class="mt-2 float-start"
     >
       <div
         class="input-group"
