@@ -43,6 +43,7 @@
     "typescript": "5.6.3",
     "vitest": "2.1.4",
     "webpack": "5.96.1",
+    "webpack-bundle-analyzer": "4.10.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "5.1.0"
   },
@@ -57,7 +58,8 @@
     "develop-local": "webpack serve --mode development --env local --config webpack.js",
     "lint": "eslint .",
     "test": "vitest run",
-    "update-deps": "ncu -u"
+    "update-deps": "ncu -u",
+    "analyze-bundle": "webpack --mode production --config webpack.js --profile --json > stats.json && webpack-bundle-analyzer stats.json"
   },
   "dependencies": {
     "@milkdown/kit": "7.5.5",
