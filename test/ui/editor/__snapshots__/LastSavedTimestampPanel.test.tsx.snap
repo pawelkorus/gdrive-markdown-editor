@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renders LastSavedTimestampPanel with timestamp 1`] = `
+<DocumentFragment>
+  <form
+    class="mt-2 float-start"
+  >
+    <span
+      class="ms-1"
+    >
+      <small
+        class="text-success"
+      >
+        Last saved at10/1/2023, 12:34:56 PM
+      </small>
+    </span>
+  </form>
+</DocumentFragment>
+`;
