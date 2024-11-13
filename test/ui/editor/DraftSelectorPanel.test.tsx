@@ -1,11 +1,10 @@
 import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
-import { vi, test, expect } from 'vitest'
+import { vi, test, expect, beforeEach } from 'vitest'
 
-import DraftSelectorPanel from '../../../../src/ui/editor/draftselectorpanel'
+import { DraftSelectorPanel } from '@app/ui/editor'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
-import { useDraftFiles } from '../../../../src/service/draftfile'
-import { beforeEach } from 'node:test'
+import { useDraftFiles } from '@app/service/draftfile'
 
 function ShowLocation() {
   const { pathname, search } = useLocation()
@@ -18,7 +17,7 @@ const fileDetails = {
   mimeType: 'text/plain',
 }
 
-vi.mock('../../../../src/service/draftfile', () => {
+vi.mock('@app/service/draftfile', () => {
   const draftFiles = [{ id: '2', name: 'draft', mimeType: 'text/plain' }]
   const createDraft = vi.fn(() => Promise.resolve('1'))
   const discardDraft = vi.fn(() => Promise.resolve())
@@ -39,7 +38,7 @@ beforeEach(() => {
   mockedUseDraftFiles.draftFiles.splice(0, mockedUseDraftFiles.draftFiles.length, { id: '2', name: 'draft', mimeType: 'text/plain' })
 })
 
-vi.mock('../../../../src/service/gdrivefile', () => {
+vi.mock('@app/service/gdrivefile', () => {
   const loadGdriveFile = vi.fn(() => Promise.resolve())
 
   return {

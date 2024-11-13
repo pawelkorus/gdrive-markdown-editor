@@ -1,9 +1,9 @@
 import React from 'react'
-import { FileDetails, useDraftFiles } from '../../../service/draftfile'
-import { useGdriveFile } from '../../../service/gdrivefile'
-import { useNavigateTo } from '../../../service/navigate'
+import { FileDetails, useDraftFiles } from '@app/service/draftfile'
+import { useGdriveFile } from '@app/service/gdrivefile'
+import { useNavigateTo } from '@app/service/navigate'
 import { Button } from 'react-bootstrap'
-import { Panel } from '../../nav'
+import { Panel } from '@app/ui/nav'
 
 export type Props = {
   onDraftSelected: (draft: FileDetails) => void

@@ -8,5 +8,8 @@ export default defineConfig({
     // 👋 add the line below to add jsdom to vite
     environment: 'jsdom',
     setupFiles: 'test/vitest.setup.ts',
+    alias: {
+      '@app': '/src',
+    },
   },
 })

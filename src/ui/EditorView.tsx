@@ -5,10 +5,10 @@ import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import { DraftFileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
-import DraftSelector from './editor/draftselectorpanel'
 import TextArea from './textarea/TextArea'
 import { useFilenamePanel, useMainMenuPanel } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
+import { LastSavedTimestampPanel, DraftSelectorPanel } from './editor'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -103,7 +103,7 @@ function EditorView(props: Props): React.ReactElement {
 
   useEffect(() => {
     if (!paramsFileEdit.draftId) {
-      const panel = <DraftSelector onDraftSelected={onUseSpecificDraftClicked} />
+      const panel = <DraftSelectorPanel onDraftSelected={onUseSpecificDraftClicked} />
 
       addPanel(panel)
       return () => {
@@ -111,6 +111,17 @@ function EditorView(props: Props): React.ReactElement {
       }
     }
   }, [paramsFileEdit.draftId])
+
+  useEffect(() => {
+    if (!lastSavedTimestamp) return
+
+    const panel = <LastSavedTimestampPanel lastSavedTimestamp={lastSavedTimestamp} />
+
+    addPanel(panel)
+    return () => {
+      removePanel(panel)
+    }
+  }, [lastSavedTimestamp])
 
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)
@@ -154,16 +165,6 @@ function EditorView(props: Props): React.ReactElement {
   return (
     <>
       <div className="container-fluid p-2">
-        <div className="d-flex flex-row align-items-center justify-content-end">
-          {lastSavedTimestamp != null && (
-            <span className="ms-1">
-              <small className="text-success">
-                Last saved at
-                {lastSavedTimestamp.toLocaleString()}
-              </small>
-            </span>
-          )}
-        </div>
       </div>
       <div className="container-lg mt-4">
         <div className="row">
