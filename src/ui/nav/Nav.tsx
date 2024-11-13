@@ -1,10 +1,9 @@
 import React, { Fragment } from 'react'
-import { Container, Navbar, Form, Button, Nav } from 'react-bootstrap'
-import { useMainMenu, useMainMenuPanel, useFilenamePanel } from '../../service/navbar'
+import { Container, Navbar, Form, Nav } from 'react-bootstrap'
+import { useMainMenuPanel, useFilenamePanel } from '../../service/navbar'
 import GoogleSSO from '../googleSSO'
 
 const CustomNav = (): React.ReactElement => {
-  const [menuItems] = useMainMenu()
   const { panels } = useMainMenuPanel()
   const { filenamePanel } = useFilenamePanel()
 
@@ -26,13 +25,6 @@ const CustomNav = (): React.ReactElement => {
               {item}
             </Fragment>
           ))}
-          <Form>
-            {menuItems.map(item => (
-              <Button key={item.id} onClick={item.action} variant="primary" className="me-2">
-                {item.label}
-              </Button>
-            ))}
-          </Form>
         </Navbar.Collapse>
       </Navbar>
     </Container>

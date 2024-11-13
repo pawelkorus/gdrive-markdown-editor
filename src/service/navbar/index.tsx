@@ -1,14 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 
-type MenuItem = {
-  id: string
-  label: string
-  action: () => void
-}
-
 type NavbarContextType = {
-  mainMenuItems: MenuItem[]
-  setMainMenuItems: React.Dispatch<React.SetStateAction<MenuItem[]>>
   panels: ReactNode[]
   setPanels: React.Dispatch<React.SetStateAction<ReactNode[]>>
   filenamePanel: ReactNode | null
@@ -18,24 +10,14 @@ type NavbarContextType = {
 const NavbarContext = createContext<NavbarContextType | undefined>(undefined)
 
 export const NavbarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [mainMenuItems, setMainMenuItems] = useState<MenuItem[]>([])
   const [panels, setPanels] = useState<ReactNode[]>([])
   const [filenamePanel, setFilenamePanel] = useState<ReactNode | null>(null)
 
   return (
-    <NavbarContext.Provider value={{ mainMenuItems, setMainMenuItems, panels, setPanels, filenamePanel, setFilenamePanel }}>
+    <NavbarContext.Provider value={{ panels, setPanels, filenamePanel, setFilenamePanel }}>
       {children}
     </NavbarContext.Provider>
   )
-}
-
-export const useMainMenu = (): [MenuItem[], (items: MenuItem[]) => void] => {
-  const context = useContext(NavbarContext)
-  if (!context) {
-    throw new Error('useMenu must be used within a MenuProvider')
-  }
-
-  return [context.mainMenuItems, context.setMainMenuItems]
 }
 
 type MainMenuPanelContextType = {

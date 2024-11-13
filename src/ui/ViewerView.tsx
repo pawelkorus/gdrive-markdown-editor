@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react'
-import { MilkdownEditor, WrapWithProviders } from './milkdown'
-import { useGdriveFile } from '../service/gdrivefile'
-import { useNavigateTo } from '../service/navigate'
-import { useMainMenu } from '../service/navbar'
+import { MilkdownEditor, WrapWithProviders } from '@app/ui/milkdown'
+import { useGdriveFile } from '@app/service/gdrivefile'
+import { useNavigateTo } from '@app/service/navigate'
+import { Panel, PanelButton } from '@app/ui/nav'
+import { useMainMenuPanel } from '@app/service/navbar'
 
 function ViewerView(): React.ReactElement {
   const [fileDetails] = useGdriveFile()
-  const [, setMenuItems] = useMainMenu()
+  const { addPanel, removePanel } = useMainMenuPanel()
   const { navigateToFileEdit } = useNavigateTo()
 
   useEffect(() => {
-    setMenuItems([{ id: 'edit', label: 'Edit', action: () => navigateToFileEdit() }])
+    const panel = <Panel><PanelButton onClick={() => navigateToFileEdit()}>Edit</PanelButton></Panel>
 
+    addPanel(panel)
     return () => {
-      setMenuItems([])
+      removePanel(panel)
     }
   }, [])
 
