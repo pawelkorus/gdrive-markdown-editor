@@ -9,7 +9,6 @@ import { TextArea } from '@app/ui/textarea'
 import { useFilenamePanel, useMainMenuPanel } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
 import { LastSavedTimestampPanel, DraftSelectorPanel } from './editor'
-import { update } from 'autosize'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -76,12 +75,12 @@ function EditorView(props: Props): React.ReactElement {
     await updateGdriveContent(updatedContent)
     await discardDraft()
     props.onCloseClicked()
-  }, [updatedContent, discardDraft])
+  }, [updatedContent, discardDraft, props.onCloseClicked])
 
   const onDiscardClicked = useCallback(async function onDiscardClicked() {
     await discardDraft()
     props.onCloseClicked()
-  }, [discardDraft])
+  }, [discardDraft, props.onCloseClicked])
 
   useEffect(() => {
     const buttonsPanel = (
