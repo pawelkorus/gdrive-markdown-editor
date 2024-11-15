@@ -9,6 +9,7 @@ import { TextArea } from '@app/ui/textarea'
 import { useFilenamePanel, useMainMenuPanel } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
 import { LastSavedTimestampPanel, DraftSelectorPanel } from './editor'
+import { update } from 'autosize'
 
 export type Props = {
   onCloseClicked?: () => void
@@ -64,10 +65,28 @@ function EditorView(props: Props): React.ReactElement {
     }
   }, [paramsFileEdit.draftId])
 
+  const onCommitContentChange = useCallback(function () {
+    updateGdriveContent(updatedContent)
+    saveDraft(updatedContent)
+    setLastSavedTimestamp(new Date())
+    setIsDirty(false)
+  }, [updatedContent, updateGdriveContent, saveDraft])
+
+  const onCloseClicked = useCallback(async function onCloseClicked() {
+    await updateGdriveContent(updatedContent)
+    await discardDraft()
+    props.onCloseClicked()
+  }, [updatedContent, discardDraft])
+
+  const onDiscardClicked = useCallback(async function onDiscardClicked() {
+    await discardDraft()
+    props.onCloseClicked()
+  }, [discardDraft])
+
   useEffect(() => {
     const buttonsPanel = (
       <Panel>
-        <PanelButton variant="primary" onClick={() => commitContentChange(updatedContent)}>Save</PanelButton>
+        <PanelButton variant="primary" onClick={onCommitContentChange}>Save</PanelButton>
         <PanelButton variant="primary" onClick={onCloseClicked}>Save & Close</PanelButton>
         <PanelButton variant="primary" onClick={onDiscardClicked}>Discard</PanelButton>
       </Panel>
@@ -77,7 +96,7 @@ function EditorView(props: Props): React.ReactElement {
     return () => {
       removePanel(buttonsPanel)
     }
-  }, [])
+  }, [onCloseClicked, onDiscardClicked, onCommitContentChange])
 
   useEffect(() => {
     const panel = editFileNameEnabled
@@ -134,27 +153,9 @@ function EditorView(props: Props): React.ReactElement {
     setIsDirty(false)
   }
 
-  function commitContentChange(newContent: string) {
-    updateGdriveContent(newContent)
-    saveDraft(newContent)
-    setLastSavedTimestamp(new Date())
-    setIsDirty(false)
-  }
-
   function commitFileNameChange(fileName: string) {
     updateFileName(fileName)
     setEditFileNameEnabled(false)
-  }
-
-  async function onCloseClicked() {
-    await updateGdriveContent(updatedContent)
-    await discardDraft()
-    props.onCloseClicked()
-  }
-
-  async function onDiscardClicked() {
-    await discardDraft()
-    props.onCloseClicked()
   }
 
   async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
