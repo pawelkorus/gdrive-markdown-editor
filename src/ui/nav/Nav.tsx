@@ -1,10 +1,10 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import { Container, Navbar, Form } from 'react-bootstrap'
-import { NavbarContext } from '../../service/navbar'
+import { useNavbarSlots } from '@app/service/navbar'
 import GoogleSSO from '../googleSSO'
 
 const CustomNav = (): React.ReactElement => {
-  const { mainMenuSlot, fileNameSlot } = useContext(NavbarContext)
+  const { mainMenuSlot, fileNameSlot } = useNavbarSlots()
 
   return (
     <Container fluid>

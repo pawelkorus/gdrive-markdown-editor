@@ -1,16 +1,16 @@
-import { ReactNode, useContext } from 'react'
-import { NavbarContext } from './index'
+import { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import useNavbarSlots from './useNavbarSlots'
 
 type MainMenuPanelContextType = {
   addPanel: (panel: ReactNode) => React.ReactPortal
 }
 
 const useMainMenuSlot = (): MainMenuPanelContextType => {
-  const context = useContext(NavbarContext)
+  const { mainMenuSlot } = useNavbarSlots()
 
   const addPanel = (panel: ReactNode): React.ReactPortal => {
-    return createPortal(panel, context.mainMenuSlot.current)
+    return createPortal(panel, mainMenuSlot.current)
   }
 
   return { addPanel }
