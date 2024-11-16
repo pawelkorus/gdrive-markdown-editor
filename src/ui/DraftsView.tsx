@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDraftFiles } from '../service/draftfile'
 import { useGdriveFile } from '../service/gdrivefile'
 import { useNavigateTo } from '../service/navigate'
@@ -12,21 +12,7 @@ export default function (): React.ReactElement {
     discardDraft,
   } = useDraftFiles(fileDetails)
   const { navigateToFileEdit, navigateToFileView } = useNavigateTo()
-  const { addPanel, removePanel } = useMainMenuPanel()
-
-  useEffect(() => {
-    const panel = (
-      <Panel>
-        <PanelButton variant="primary" onClick={() => navigateToFileView({ fileId: fileDetails.id })}>View</PanelButton>
-        <PanelButton variant="primary" onClick={() => navigateToFileEdit({ fileId: fileDetails.id })}>Edit</PanelButton>
-      </Panel>
-    )
-    addPanel(panel)
-
-    return () => {
-      removePanel(panel)
-    }
-  })
+  const { addPanel } = useMainMenuPanel()
 
   const onUseDraft = (draftId: string) => {
     navigateToFileEdit({ fileId: fileDetails.id, draftId: draftId })
@@ -38,6 +24,12 @@ export default function (): React.ReactElement {
 
   return (
     <div className="container-lg mt-4">
+      { addPanel(
+        <Panel>
+          <PanelButton variant="primary" onClick={() => navigateToFileView({ fileId: fileDetails.id })}>View</PanelButton>
+          <PanelButton variant="primary" onClick={() => navigateToFileEdit({ fileId: fileDetails.id })}>Edit</PanelButton>
+        </Panel>,
+      ) }
       <div className="row">
         {draftFiles.length === 0 && (
           <div className="alert alert-info" role="alert">

@@ -1,43 +1,39 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useRef } from 'react'
+import { createPortal } from 'react-dom'
 
 type NavbarContextType = {
-  panels: ReactNode[]
-  setPanels: React.Dispatch<React.SetStateAction<ReactNode[]>>
   filenamePanel: ReactNode | null
   setFilenamePanel: React.Dispatch<React.SetStateAction<ReactNode | null>>
+  mainMenuSlot: React.RefObject<HTMLDivElement>
+  fileNameSlot: React.RefObject<HTMLDivElement>
 }
 
-const NavbarContext = createContext<NavbarContextType | undefined>(undefined)
+export const NavbarContext = createContext<NavbarContextType | undefined>(undefined)
 
 export const NavbarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [panels, setPanels] = useState<ReactNode[]>([])
   const [filenamePanel, setFilenamePanel] = useState<ReactNode | null>(null)
+  const mainMenuSlot = useRef<HTMLDivElement>(null)
+  const fileNameSlot = useRef<HTMLDivElement>(null)
 
   return (
-    <NavbarContext.Provider value={{ panels, setPanels, filenamePanel, setFilenamePanel }}>
+    <NavbarContext.Provider value={{ filenamePanel, setFilenamePanel, mainMenuSlot, fileNameSlot }}>
       {children}
     </NavbarContext.Provider>
   )
 }
 
 type MainMenuPanelContextType = {
-  panels: ReactNode[]
-  addPanel: (panel: ReactNode) => void
-  removePanel: (panel: ReactNode) => void
+  addPanel: (panel: ReactNode) => React.ReactPortal
 }
 
 export const useMainMenuPanel = (): MainMenuPanelContextType => {
   const context = useContext(NavbarContext)
 
-  const addPanel = (panel: ReactNode) => {
-    context.setPanels((prev: ReactNode[]) => [...prev, panel])
+  const addPanel = (panel: ReactNode): React.ReactPortal => {
+    return createPortal(panel, context.mainMenuSlot.current)
   }
 
-  const removePanel = (panel: ReactNode) => {
-    context.setPanels((prev: ReactNode[]) => prev.filter(p => p !== panel))
-  }
-
-  return { panels: context.panels, addPanel, removePanel }
+  return { addPanel }
 }
 
 type FilenamePanelContextType = {

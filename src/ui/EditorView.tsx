@@ -31,7 +31,7 @@ function EditorView(props: Props): React.ReactElement {
     saveContent: saveDraft,
   } = useDraftFile(paramsFileEdit.draftId)
   const { navigateToFileEdit } = useNavigateTo()
-  const { addPanel, removePanel } = useMainMenuPanel()
+  const { addPanel: addMainMenuPanel } = useMainMenuPanel()
   const { setFilenamePanel, unsetFileNamePanel } = useFilenamePanel()
   useMilkdownCommands()
 
@@ -83,21 +83,6 @@ function EditorView(props: Props): React.ReactElement {
   }, [discardDraft, props.onCloseClicked])
 
   useEffect(() => {
-    const buttonsPanel = (
-      <Panel>
-        <PanelButton variant="primary" onClick={onCommitContentChange}>Save</PanelButton>
-        <PanelButton variant="primary" onClick={onCloseClicked}>Save & Close</PanelButton>
-        <PanelButton variant="primary" onClick={onDiscardClicked}>Discard</PanelButton>
-      </Panel>
-    )
-
-    addPanel(buttonsPanel)
-    return () => {
-      removePanel(buttonsPanel)
-    }
-  }, [onCloseClicked, onDiscardClicked, onCommitContentChange])
-
-  useEffect(() => {
     const panel = editFileNameEnabled
       ? (
           <Panel>
@@ -118,28 +103,6 @@ function EditorView(props: Props): React.ReactElement {
       unsetFileNamePanel()
     }
   }, [editFileNameEnabled, fileDetails.name])
-
-  useEffect(() => {
-    if (!paramsFileEdit.draftId) {
-      const panel = <DraftSelectorPanel onDraftSelected={onUseSpecificDraftClicked} />
-
-      addPanel(panel)
-      return () => {
-        removePanel(panel)
-      }
-    }
-  }, [paramsFileEdit.draftId])
-
-  useEffect(() => {
-    if (!lastSavedTimestamp) return
-
-    const panel = <LastSavedTimestampPanel lastSavedTimestamp={lastSavedTimestamp} />
-
-    addPanel(panel)
-    return () => {
-      removePanel(panel)
-    }
-  }, [lastSavedTimestamp])
 
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)
@@ -164,8 +127,15 @@ function EditorView(props: Props): React.ReactElement {
 
   return (
     <>
-      <div className="container-fluid p-2">
-      </div>
+      {addMainMenuPanel(
+        <Panel>
+          <PanelButton variant="primary" onClick={onCommitContentChange}>Save</PanelButton>
+          <PanelButton variant="primary" onClick={onCloseClicked}>Save & Close</PanelButton>
+          <PanelButton variant="primary" onClick={onDiscardClicked}>Discard</PanelButton>
+        </Panel>,
+      )}
+      {lastSavedTimestamp && addMainMenuPanel(<LastSavedTimestampPanel lastSavedTimestamp={lastSavedTimestamp} />) }
+      {!paramsFileEdit.draftId && addMainMenuPanel(<DraftSelectorPanel onDraftSelected={onUseSpecificDraftClicked} />)}
       <div className="container-lg mt-4">
         <div className="row">
           {paramsFileEdit.source && (
