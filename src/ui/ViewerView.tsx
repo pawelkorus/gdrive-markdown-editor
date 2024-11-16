@@ -3,11 +3,11 @@ import { MilkdownEditor, WrapWithProviders } from '@app/ui/milkdown'
 import { useGdriveFile } from '@app/service/gdrivefile'
 import { useNavigateTo } from '@app/service/navigate'
 import { Panel, PanelButton } from '@app/ui/nav'
-import { useMainMenuPanel } from '@app/service/navbar'
+import { useMainMenuSlot } from '@app/service/navbar'
 
 function ViewerView(): React.ReactElement {
   const [fileDetails] = useGdriveFile()
-  const { addPanel } = useMainMenuPanel()
+  const { addPanel } = useMainMenuSlot()
   const { navigateToFileEdit } = useNavigateTo()
 
   return (

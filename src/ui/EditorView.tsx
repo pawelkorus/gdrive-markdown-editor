@@ -6,7 +6,7 @@ import { DraftFileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
 import { TextArea } from '@app/ui/textarea'
-import { useFilenamePanel, useMainMenuPanel } from '../service/navbar'
+import { useFileNameSlot, useMainMenuSlot } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
 import { LastSavedTimestampPanel, DraftSelectorPanel } from './editor'
 
@@ -31,8 +31,8 @@ function EditorView(props: Props): React.ReactElement {
     saveContent: saveDraft,
   } = useDraftFile(paramsFileEdit.draftId)
   const { navigateToFileEdit } = useNavigateTo()
-  const { addPanel: addMainMenuPanel } = useMainMenuPanel()
-  const { setFilenamePanel } = useFilenamePanel()
+  const { addPanel: addMainMenuPanel } = useMainMenuSlot()
+  const { setFilenamePanel } = useFileNameSlot()
   useMilkdownCommands()
 
   useEffect(() => {

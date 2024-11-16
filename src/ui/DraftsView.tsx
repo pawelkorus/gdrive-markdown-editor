@@ -2,7 +2,7 @@ import React from 'react'
 import { useDraftFiles } from '../service/draftfile'
 import { useGdriveFile } from '../service/gdrivefile'
 import { useNavigateTo } from '../service/navigate'
-import { useMainMenuPanel } from '../service/navbar'
+import { useMainMenuSlot } from '../service/navbar'
 import { Panel, PanelButton } from './nav'
 
 export default function (): React.ReactElement {
@@ -12,7 +12,7 @@ export default function (): React.ReactElement {
     discardDraft,
   } = useDraftFiles(fileDetails)
   const { navigateToFileEdit, navigateToFileView } = useNavigateTo()
-  const { addPanel } = useMainMenuPanel()
+  const { addPanel } = useMainMenuSlot()
 
   const onUseDraft = (draftId: string) => {
     navigateToFileEdit({ fileId: fileDetails.id, draftId: draftId })
