@@ -11,7 +11,7 @@ const useFileNameSlot = (): UseFileNameSlotAPI => {
 
   const setFileNamePanel = (panel: ReactNode): React.ReactPortal => {
     if (!fileNameSlot.current) {
-      throw new Error('Filename slot not available')
+      throw new Error('Nabar file name slot is not available')
     }
 
     return createPortal(panel, fileNameSlot.current)
