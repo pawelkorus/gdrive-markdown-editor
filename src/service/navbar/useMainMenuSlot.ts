@@ -10,6 +10,10 @@ const useMainMenuSlot = (): MainMenuPanelContextType => {
   const { mainMenuSlot } = useNavbarSlots()
 
   const addPanel = (panel: ReactNode): React.ReactPortal => {
+    if (!mainMenuSlot.current) {
+      throw new Error('Navbar main menu slot is not available')
+    }
+
     return createPortal(panel, mainMenuSlot.current)
   }
 
