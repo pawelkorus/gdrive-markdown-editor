@@ -1,9 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode, useRef } from 'react'
+import React, { createContext, useContext, ReactNode, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 type NavbarContextType = {
-  filenamePanel: ReactNode | null
-  setFilenamePanel: React.Dispatch<React.SetStateAction<ReactNode | null>>
   mainMenuSlot: React.RefObject<HTMLDivElement>
   fileNameSlot: React.RefObject<HTMLDivElement>
 }
@@ -11,12 +9,11 @@ type NavbarContextType = {
 export const NavbarContext = createContext<NavbarContextType | undefined>(undefined)
 
 export const NavbarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [filenamePanel, setFilenamePanel] = useState<ReactNode | null>(null)
   const mainMenuSlot = useRef<HTMLDivElement>(null)
   const fileNameSlot = useRef<HTMLDivElement>(null)
 
   return (
-    <NavbarContext.Provider value={{ filenamePanel, setFilenamePanel, mainMenuSlot, fileNameSlot }}>
+    <NavbarContext.Provider value={{ mainMenuSlot, fileNameSlot }}>
       {children}
     </NavbarContext.Provider>
   )
@@ -37,17 +34,19 @@ export const useMainMenuPanel = (): MainMenuPanelContextType => {
 }
 
 type FilenamePanelContextType = {
-  filenamePanel: ReactNode | null
   setFilenamePanel: React.Dispatch<React.SetStateAction<ReactNode>>
-  unsetFileNamePanel: () => void
 }
 
 export const useFilenamePanel = (): FilenamePanelContextType => {
   const context = useContext(NavbarContext)
 
-  const unsetFileNamePanel = () => {
-    context.setFilenamePanel(null)
+  const setFilenamePanel = (panel: ReactNode): React.ReactPortal => {
+    if (!context.fileNameSlot) {
+      throw new Error('Filename slot not available')
+    }
+
+    return createPortal(panel, context.fileNameSlot.current)
   }
 
-  return { filenamePanel: context.filenamePanel, setFilenamePanel: context.setFilenamePanel, unsetFileNamePanel }
+  return { setFilenamePanel }
 }

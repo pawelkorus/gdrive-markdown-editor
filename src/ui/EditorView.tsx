@@ -32,7 +32,7 @@ function EditorView(props: Props): React.ReactElement {
   } = useDraftFile(paramsFileEdit.draftId)
   const { navigateToFileEdit } = useNavigateTo()
   const { addPanel: addMainMenuPanel } = useMainMenuPanel()
-  const { setFilenamePanel, unsetFileNamePanel } = useFilenamePanel()
+  const { setFilenamePanel } = useFilenamePanel()
   useMilkdownCommands()
 
   useEffect(() => {
@@ -82,28 +82,6 @@ function EditorView(props: Props): React.ReactElement {
     props.onCloseClicked()
   }, [discardDraft, props.onCloseClicked])
 
-  useEffect(() => {
-    const panel = editFileNameEnabled
-      ? (
-          <Panel>
-            <input
-              type="text"
-              defaultValue={fileDetails.name}
-              onBlur={e => commitFileNameChange(e.target.value)}
-              autoFocus
-              className="form-control me-auto"
-            />
-          </Panel>
-        )
-      : (<h5 className="me-auto mb-0" onClick={() => setEditFileNameEnabled(true)}>{fileDetails.name}</h5>)
-
-    setFilenamePanel(panel)
-
-    return () => {
-      unsetFileNamePanel()
-    }
-  }, [editFileNameEnabled, fileDetails.name])
-
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)
     setIsDirty(true)
@@ -127,6 +105,21 @@ function EditorView(props: Props): React.ReactElement {
 
   return (
     <>
+      {setFilenamePanel(
+        editFileNameEnabled
+          ? (
+              <Panel>
+                <input
+                  type="text"
+                  defaultValue={fileDetails.name}
+                  onBlur={e => commitFileNameChange(e.target.value)}
+                  autoFocus
+                  className="form-control me-auto"
+                />
+              </Panel>
+            )
+          : (<h5 className="me-auto mb-0" onClick={() => setEditFileNameEnabled(true)}>{fileDetails.name}</h5>),
+      )}
       {addMainMenuPanel(
         <Panel>
           <PanelButton variant="primary" onClick={onCommitContentChange}>Save</PanelButton>

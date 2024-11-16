@@ -1,17 +1,16 @@
 import React, { useContext } from 'react'
 import { Container, Navbar, Form } from 'react-bootstrap'
-import { useFilenamePanel, NavbarContext } from '../../service/navbar'
+import { NavbarContext } from '../../service/navbar'
 import GoogleSSO from '../googleSSO'
 
 const CustomNav = (): React.ReactElement => {
-  const { filenamePanel } = useFilenamePanel()
   const { mainMenuSlot, fileNameSlot } = useContext(NavbarContext)
 
   return (
     <Container fluid>
       <Navbar expand="lg">
+        <Navbar.Brand href="#">MarkdownEditor</Navbar.Brand>
         <div ref={fileNameSlot}></div>
-        { filenamePanel ? filenamePanel : <Navbar.Brand href="#">GdriveMarkdownEditor</Navbar.Brand> }
         <div className="d-flex flex-grow-1 justify-content-end d-lg-none me-2">
           <Navbar.Toggle aria-controls="navbarSupportedContent" />
         </div>
