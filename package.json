@@ -58,6 +58,7 @@
     "develop-local": "webpack serve --mode development --env local --config webpack.js",
     "lint": "eslint .",
     "test": "vitest run",
+    "test-watch": "vitest",
     "update-deps": "ncu -u",
     "analyze-bundle": "webpack --mode production --config webpack.js --profile --json > stats.json && webpack-bundle-analyzer stats.json"
   },
