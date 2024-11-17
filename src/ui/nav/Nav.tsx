@@ -17,7 +17,7 @@ const CustomNav = (): React.ReactElement => {
         <Form style={{ lineHeight: 1, fontSize: '1.5rem' }} className="ms-0 ms-lg-2 order-lg-last">
           <GoogleSSO style={{ width: '2.5rem', borderRadius: '1.5rem' }}></GoogleSSO>
         </Form>
-        <Navbar.Collapse id="navbarSupportedContent" className="justify-content-end" ref={mainMenuSlot}>
+        <Navbar.Collapse id="navbarSupportedContent" className="justify-content-end mt-2 mt-lg-0" ref={mainMenuSlot}>
         </Navbar.Collapse>
       </Navbar>
     </Container>
