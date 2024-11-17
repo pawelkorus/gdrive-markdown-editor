@@ -263,7 +263,7 @@ export async function getFileMetadata(fileId: string): Promise<FileDetailsWithLi
   await ensurePermissionGranted(Permissions.READ_SELECTED_FILE)
   const response = await gapi.client.drive.files.get({
     fileId: fileId,
-    fields: 'name, mimeType, webViewLink',
+    fields: 'name, mimeType,webViewLink',
   })
   return {
     id: fileId,

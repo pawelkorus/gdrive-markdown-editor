@@ -10,7 +10,7 @@ export function useGdriveFileMetadata(fileId: string): FileDetailsWithLink | nul
       setFileMetadata(metadata)
     }
 
-    fetchFileMetadata()
+    if (fileId) fetchFileMetadata()
   }, [fileId])
 
   return fileMetadata

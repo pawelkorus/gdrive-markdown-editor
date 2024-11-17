@@ -1,19 +1,19 @@
 import React, { useCallback } from 'react'
 import { useNodeViewContext } from '@prosemirror-adapter/react'
-import { useGdriveFileMetadata } from '../../../service/gdrivefiles'
-import { useGdriveFile } from '../../../service/gdrivefile'
+import { useGdriveFileMetadata } from '@app/service/gdrivefiles'
+import { useNavigateTo } from '@app/service/navigate'
 
 export default function (): React.ReactElement {
   const { contentRef, node } = useNodeViewContext()
-  const [, loadFile] = useGdriveFile()
   const fileMetadata = useGdriveFileMetadata(node.attrs.src)
+  const { navigateToFileView } = useNavigateTo()
 
   const handleClick = useCallback((e: React.MouseEvent) => {
     if (fileMetadata && (fileMetadata.mimeType === 'text/markdown' || fileMetadata.name.endsWith('.md'))) {
       e.preventDefault()
-      loadFile(node.attrs.src)
+      navigateToFileView({ fileId: fileMetadata.id })
     }
-  }, [loadFile, fileMetadata, node])
+  }, [fileMetadata, navigateToFileView])
 
   return fileMetadata
     ? (
