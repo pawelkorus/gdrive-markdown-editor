@@ -43,7 +43,7 @@ export default function (): React.ReactElement {
     }
 
     initialize()
-  }, [])
+  }, [fileParams.fileId, fileParams.userId])
 
   if (loading) return (
     <div className="container-fluid h-100 d-flex">
