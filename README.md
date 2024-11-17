@@ -13,17 +13,29 @@ In short this specification introduce following syntax to denote different types
 ## Custom tags
 
 ### Embed file from google drive 
+
+This tag will load file from your google drive and embed it into document as image.
+
 ```
 ::gdrive{src="googleFileId"}
 ```
-This tag will load file from your google drive and embed it into document as image.
+
 
 ### Embed youtube videos
+
+This tag will create embed with youtube video.
 
 ```
 ::youtube{src="videoId"}
 ```
-This tag will create embed with youtube video.
+
+### Link referencing Gdrive file
+
+This tag will insert inline link to the file from gdrive. When link is clicked and referenced file is markdown file (mime type is text/markdown or extension is .md) then it will open in markdown editor. Otherwise it will go to gdrive.
+
+```
+:gdrive-ref[link name]{src="fileId"}
+```
 
 ## Developer notes
 
