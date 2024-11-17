@@ -3,7 +3,7 @@
 exports[`renders LastSavedTimestampPanel with timestamp 1`] = `
 <DocumentFragment>
   <form
-    class="mt-2 float-start"
+    class="float-start"
   >
     <span
       class="ms-1"
