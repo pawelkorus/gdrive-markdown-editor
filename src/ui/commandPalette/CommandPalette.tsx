@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { Modal, ModalBody, ModalHeader } from 'react-bootstrap'
 import { CommandPaletteItem } from './types'
+import { useCommandPalette } from './useCommandPalette'
 
 type CommandPaletteProps = PropsWithChildren<{
   commands: CommandPaletteItem[]
@@ -8,7 +9,7 @@ type CommandPaletteProps = PropsWithChildren<{
 }>
 
 const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onItemSelected }) => {
-  const [isVisible, setIsVisible] = useState(false)
+  const {isVisible, toggleVisibility} = useCommandPalette()
   const [lastShiftTimestamp, setLastShiftTimestamp] = useState(0)
   const [selected, setSelected] = useState(0)
   const [filteredCommands, setFilteredCommands] = useState([])
@@ -40,7 +41,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onI
       if (Date.now() - lastShiftTimestamp < 300) {
         e.preventDefault()
         setLastShiftTimestamp(0)
-        setIsVisible(true)
+        toggleVisibility(true)
       }
       else {
         setLastShiftTimestamp(Date.now())
@@ -49,7 +50,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onI
     }
     if (key === 'Escape' && isVisible) {
       e.preventDefault()
-      setIsVisible(false)
+      toggleVisibility(false)
     }
   }, [selected, isVisible, filteredCommands, lastShiftTimestamp])
 
@@ -72,7 +73,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onI
   }, [onKeyDown])
 
   function handleCommandSelected(item: CommandPaletteItem) {
-    setIsVisible(false)
+    toggleVisibility(false)
     if (onItemSelected) {
       onItemSelected(item)
     }

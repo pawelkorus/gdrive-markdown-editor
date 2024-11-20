@@ -3,14 +3,16 @@ import { Container, Navbar, Form } from 'react-bootstrap'
 import { useNavbarSlots } from '@app/service/navbar'
 import GoogleSSO from '../googleSSO'
 import logo from '@app/assets/logo.png'
+import { useCommandPalette } from '@app/ui/commandPalette'
 
 const CustomNav = (): React.ReactElement => {
   const { mainMenuSlot, fileNameSlot } = useNavbarSlots()
+  const { toggleVisibility } = useCommandPalette()
 
   return (
     <Container fluid>
       <Navbar expand="lg">
-        <Navbar.Brand href="#">
+        <Navbar.Brand href="#" onClick={() => toggleVisibility()}>
           <img src={logo} width="50" height="50" alt="Gdrive Markdown Editor"></img>
         </Navbar.Brand>
         <div ref={fileNameSlot}></div>

@@ -16,6 +16,7 @@ import {
 } from 'react-router-dom'
 import { FileNewRoute, FileRoute } from '@app/routes'
 import { NavbarProvider } from '@app/service/navbar'
+import { CommandPaletteProvider } from '@app/ui/commandPalette'
 
 const router = createBrowserRouter([
   {
@@ -64,9 +65,11 @@ export default (): React.ReactElement => {
       <UserContextProvider>
         <GdriveFileContextProvider>
           <CommandsContextProvider>
-            <NavbarProvider>
-              <RouterProvider router={router} />
-            </NavbarProvider>
+            <CommandPaletteProvider>
+              <NavbarProvider>
+                <RouterProvider router={router} />
+              </NavbarProvider>
+            </CommandPaletteProvider>
           </CommandsContextProvider>
         </GdriveFileContextProvider>
       </UserContextProvider>
