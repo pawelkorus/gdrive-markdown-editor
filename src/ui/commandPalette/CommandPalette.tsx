@@ -37,7 +37,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onI
       return
     }
     if (key === 'Shift' && !isVisible) {
-      if (Date.now() - lastShiftTimestamp < 500) {
+      if (Date.now() - lastShiftTimestamp < 300) {
         e.preventDefault()
         setLastShiftTimestamp(0)
         setIsVisible(true)
