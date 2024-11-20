@@ -2,6 +2,7 @@ import React from 'react'
 import { Container, Navbar, Form } from 'react-bootstrap'
 import { useNavbarSlots } from '@app/service/navbar'
 import GoogleSSO from '../googleSSO'
+import logo from '@app/assets/logo.png'
 
 const CustomNav = (): React.ReactElement => {
   const { mainMenuSlot, fileNameSlot } = useNavbarSlots()
@@ -9,7 +10,9 @@ const CustomNav = (): React.ReactElement => {
   return (
     <Container fluid>
       <Navbar expand="lg">
-        <Navbar.Brand href="#">MarkdownEditor</Navbar.Brand>
+        <Navbar.Brand href="#">
+          <img src={logo} width="50" height="50" alt="Gdrive Markdown Editor"></img>
+        </Navbar.Brand>
         <div ref={fileNameSlot}></div>
         <div className="d-flex flex-grow-1 justify-content-end d-lg-none me-2">
           <Navbar.Toggle aria-controls="navbarSupportedContent" />

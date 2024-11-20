@@ -1,6 +1,7 @@
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const path = require("path");
 
 module.exports = (env, argv) => {
@@ -82,6 +83,9 @@ module.exports = (env, argv) => {
         {
           test: /\.(png)$/,
           type: "asset/resource",
+          generator: {
+            filename: "images/[hash][ext][query]",
+          },
         },
       ],
     },
@@ -114,7 +118,29 @@ module.exports = (env, argv) => {
         chunks: ["index"],
         template: "src/index.html",
         filename: "index.html",
+        inject: true,
       }),
+      new FaviconsWebpackPlugin({
+        logo: './src/assets/favicon.png', // Single source image
+        cache: true,
+        inject: true, // Inject tags into HTML
+        favicons: {
+          appName: 'Gdrive Markdown Editor',
+          // appDescription: 'Gdrive Markdown Editor',
+          // developerName: 'Developer Name',
+          // developerURL: null, // Replace with your website URL if needed
+          background: '#ffffff',
+          theme_color: '#ffffff',
+          icons: {
+            android: true,         // Android homescreen icon
+            appleIcon: true,       // Apple touch icons
+            appleStartup: false,   // Apple startup images
+            favicons: true,        // Standard favicon
+            windows: true,         // Windows 8/10 tile icons
+            yandex: false,         // Yandex browser icons
+          },
+        },
+      }), 
     ],
   };
 };
