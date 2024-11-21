@@ -9,7 +9,7 @@ type CommandPaletteProps = PropsWithChildren<{
 }>
 
 const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onItemSelected }) => {
-  const {isVisible, toggleVisibility} = useCommandPalette()
+  const { isVisible, toggleVisibility } = useCommandPalette()
   const [lastShiftTimestamp, setLastShiftTimestamp] = useState(0)
   const [selected, setSelected] = useState(0)
   const [filteredCommands, setFilteredCommands] = useState([])
