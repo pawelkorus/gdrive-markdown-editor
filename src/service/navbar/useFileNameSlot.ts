@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import useNavbarSlots from './useNavbarSlots'
 
 type UseFileNameSlotAPI = {
-  setFilenamePanel: React.Dispatch<React.SetStateAction<ReactNode>>
+  setFilenamePanel: (panel: ReactNode) => React.ReactPortal
 }
 
 const useFileNameSlot = (): UseFileNameSlotAPI => {
