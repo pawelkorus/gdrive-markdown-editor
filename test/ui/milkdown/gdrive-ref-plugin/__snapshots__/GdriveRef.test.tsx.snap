@@ -50,56 +50,6 @@ exports[`should navigate to file view when clicked and file name extension is md
 </body>
 `;
 
-exports[`should navigate to file view when clicked and markdown file 1`] = `
-<body>
-  <script
-    defer=""
-    src="https://accounts.google.com/gsi/client"
-  />
-  <script
-    defer=""
-    src="https://apis.google.com/js/api.js"
-  />
-  <div>
-    <div
-      data-milkdown-root="true"
-    >
-      <div
-        class="milkdown"
-      >
-        <div
-          class="ProseMirror editor"
-          contenteditable="true"
-          role="textbox"
-          translate="no"
-        >
-          <p>
-            <span
-              data-node-view-root="true"
-            >
-              <a
-                data-src="1"
-                data-type="gdrive-ref"
-                href="http://example.com"
-              >
-                title
-              </a>
-            </span>
-            <img
-              alt=""
-              class="ProseMirror-separator"
-            />
-            <br
-              class="ProseMirror-trailingBreak"
-            />
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
-`;
-
 exports[`should navigate to file view when clicked and mime type is markdown 1`] = `
 <body>
   <script
