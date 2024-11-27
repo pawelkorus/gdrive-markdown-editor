@@ -22,8 +22,12 @@ class TokenCallbackResult {
   }
 }
 
+type TokenResponse = google.accounts.oauth2.TokenResponse & {
+  expiresAt: number
+}
+
 let waitForTokenResult: TokenCallbackResult
-let latestTokenResponse: google.accounts.oauth2.TokenResponse | undefined = undefined
+let latestTokenResponse: TokenResponse | undefined = undefined
 let tokenClient: google.accounts.oauth2.TokenClient | undefined = undefined
 
 async function ensureTokenClient(loginHint: string | undefined) {
@@ -34,7 +38,12 @@ async function ensureTokenClient(loginHint: string | undefined) {
       scope: SCOPE_INSTALL,
       prompt: '',
       callback: async (tokenResponse: google.accounts.oauth2.TokenResponse) => {
-        latestTokenResponse = tokenResponse
+        latestTokenResponse = {
+          ...tokenResponse,
+          expiresAt: (Date.now() + Number(tokenResponse.expires_in) * 1000) - 30000, // 30 seconds before expiration
+        }
+
+        console.log('Token received', latestTokenResponse)
 
         if (!waitForTokenResult) return
 
@@ -97,6 +106,7 @@ export async function requestAccess(requiredPesmission: Permissions, userId?: st
 
 export function hasPermission(permission: Permissions): boolean {
   if (!latestTokenResponse) return false
+  if (latestTokenResponse.expiresAt < Date.now()) return false
 
   switch (permission) {
     case Permissions.SAVE_SELECTED_FILE:
