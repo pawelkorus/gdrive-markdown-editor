@@ -156,8 +156,8 @@ export async function showFolderPicker(): Promise<FolderDetails> {
   })
 }
 
-export async function loadFile(fileId: string, userId?: string): Promise<FileDetailsWithContent> {
-  await ensurePermissionGranted(Permissions.READ_SELECTED_FILE, userId)
+export async function loadFile(fileId: string): Promise<FileDetailsWithContent> {
+  await ensurePermissionGranted(Permissions.READ_SELECTED_FILE)
 
   // https://developers.google.com/drive/api/v3/reference/files
   const results = await Promise.all([
@@ -197,11 +197,10 @@ type CreateFileParams = {
   filename: string
   content: string
   parent: string
-  userId?: string
 }
 
 export async function createFile(params: CreateFileParams): Promise<FileDetailsWithContent> {
-  await ensurePermissionGranted(Permissions.SAVE_SELECTED_FILE, params.userId)
+  await ensurePermissionGranted(Permissions.SAVE_SELECTED_FILE)
 
   const response = await gapi.client.drive.files.create({
     uploadType: 'media',
@@ -249,9 +248,9 @@ export async function updateFileName(fileId: string, filename: string) {
   })
 }
 
-async function ensurePermissionGranted(permission: Permissions, userId?: string) {
+async function ensurePermissionGranted(permission: Permissions) {
   if (!hasPermission(permission)) {
-    await requestAccess(permission, userId)
+    await requestAccess(permission)
   }
 
   if (!hasPermission(permission)) {

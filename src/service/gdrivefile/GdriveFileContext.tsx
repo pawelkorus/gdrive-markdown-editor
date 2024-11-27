@@ -36,8 +36,8 @@ export function GdriveFileContextProvider(props: Props): React.ReactElement {
     content: '',
   })
 
-  const loadFile = useCallback(async (fileId: string, userId?: string) => {
-    const fileDetails = await googleApi.loadFile(fileId, userId)
+  const loadFile = useCallback(async (fileId: string) => {
+    const fileDetails = await googleApi.loadFile(fileId)
     setFileDetails(fileDetails)
   }, [])
 
@@ -56,7 +56,6 @@ export function GdriveFileContextProvider(props: Props): React.ReactElement {
       filename: params.fileName || 'New file',
       content: '# Hello world',
       parent: params.folderId,
-      userId: params.userId,
     })
     setFileDetails(fileDetails)
   }, [])

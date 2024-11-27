@@ -1,3 +1,4 @@
+import { authenticateUser } from './authentication'
 import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_FILE_ACCESS, SCOPE_INSTALL } from './const'
 import { ensureGISLibraryLoaded } from './load'
 
@@ -30,20 +31,22 @@ let waitForTokenResult: TokenCallbackResult
 let latestTokenResponse: TokenResponse | undefined = undefined
 let tokenClient: google.accounts.oauth2.TokenClient | undefined = undefined
 
-async function ensureTokenClient(loginHint: string | undefined) {
+async function ensureTokenClient() {
   await ensureGISLibraryLoaded
   if (!tokenClient) {
+    const user = await authenticateUser
+
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPE_INSTALL,
       prompt: '',
       callback: async (tokenResponse: google.accounts.oauth2.TokenResponse) => {
+        const expiresAt = Date.now() + Number(tokenResponse.expires_in) * 1000
+
         latestTokenResponse = {
           ...tokenResponse,
-          expiresAt: (Date.now() + Number(tokenResponse.expires_in) * 1000) - 30000, // 30 seconds before expiration
+          expiresAt: expiresAt - 30000, // 30 seconds before expiration
         }
-
-        console.log('Token received', latestTokenResponse)
 
         if (!waitForTokenResult) return
 
@@ -53,7 +56,7 @@ async function ensureTokenClient(loginHint: string | undefined) {
 
         waitForTokenResult.resolve(tokenResponse)
       },
-      login_hint: loginHint,
+      login_hint: user.id,
     })
   }
 
@@ -77,8 +80,8 @@ export function currentToken(): google.accounts.oauth2.TokenResponse {
   return latestTokenResponse!
 }
 
-export async function requestAccess(requiredPesmission: Permissions, userId?: string): Promise<unknown> {
-  const tokenClient = await ensureTokenClient(userId)
+export async function requestAccess(requiredPesmission: Permissions): Promise<unknown> {
+  const tokenClient = await ensureTokenClient()
 
   function toScope(permission: Permissions): string {
     switch (permission) {
@@ -94,12 +97,14 @@ export async function requestAccess(requiredPesmission: Permissions, userId?: st
     }
   }
 
+  const user = await authenticateUser
+
   return new Promise((resolve, reject) => {
     waitForTokenResult = new TokenCallbackResult(resolve, reject)
 
     tokenClient.requestAccessToken({
       scope: toScope(requiredPesmission),
-      hint: userId,
+      hint: user.id,
     })
   })
 }
@@ -108,19 +113,23 @@ export function hasPermission(permission: Permissions): boolean {
   if (!latestTokenResponse) return false
   if (latestTokenResponse.expiresAt < Date.now()) return false
 
+  return hasGrantedPermission(latestTokenResponse, permission)
+}
+
+function hasGrantedPermission(token: TokenResponse, permission: Permissions): boolean {
   switch (permission) {
     case Permissions.SAVE_SELECTED_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_FILE_ACCESS)
     case Permissions.READ_SELECTED_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_FILE_ACCESS)
     case Permissions.BROWSE_FILES:
-      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_FILE_ACCESS)
     case Permissions.READ_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_FILE_ACCESS)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_FILE_ACCESS)
     case Permissions.INSTALL:
-      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_INSTALL)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_INSTALL)
     case Permissions.MAINTAIN_APP_DATA:
-      return google.accounts.oauth2.hasGrantedAnyScope(latestTokenResponse, SCOPE_DRIVE_APPDATA)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_APPDATA)
     default:
       return false
   }
