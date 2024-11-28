@@ -87,6 +87,14 @@ function EditorView(props: Props): React.ReactElement {
     setIsDirty(true)
   }, [])
 
+  const onEditSourceClicked = useCallback(() => {
+    navigateToFileEdit(p => ({ ...p, source: true }))
+  }, [])
+
+  const onEditClicked = useCallback(() => {
+    navigateToFileEdit(p => ({ ...p, source: false }))
+  }, [])
+
   function autoSaveAction(newContent: string) {
     saveDraft(newContent)
     setLastSavedTimestamp(new Date())
@@ -122,6 +130,8 @@ function EditorView(props: Props): React.ReactElement {
       )}
       {addMainMenuPanel(
         <Panel>
+          { paramsFileEdit.source && <PanelButton variant="primary" onClick={onEditClicked}>Edit</PanelButton> }
+          { !paramsFileEdit.source && <PanelButton variant="primary" onClick={onEditSourceClicked}>Edit Source</PanelButton> }
           <PanelButton variant="primary" onClick={onCommitContentChange}>Save</PanelButton>
           <PanelButton variant="primary" onClick={onCloseClicked}>Save & Close</PanelButton>
           <PanelButton variant="primary" onClick={onDiscardClicked}>Discard</PanelButton>
