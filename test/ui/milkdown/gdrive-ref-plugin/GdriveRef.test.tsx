@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { PropsWithChildren } from 'react'
 import { render, act } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
-import { MilkdownEditor, WrapWithProviders } from '@app/ui/milkdown'
+import { MilkdownEditor } from '@app/ui/milkdown'
 import { useNavigateTo } from '@app/service/navigate'
 import { useGdriveFileMetadata } from '@app/service/gdrivefiles'
+import { MilkdownProvider } from '@milkdown/react'
+import { ProsemirrorAdapterProvider } from '@prosemirror-adapter/react'
 
 const defaultFileDetails = {
   id: '1',
@@ -119,3 +121,13 @@ test('should not navigate to file view when clicked and not markdown file', asyn
   expect(document.body).toMatchSnapshot()
   expect(navigateToFileView).not.toHaveBeenCalledWith({ fileId: '1' })
 })
+
+const WrapWithProviders: React.FC<PropsWithChildren> = ({ children }) => {
+  return (
+    <MilkdownProvider>
+      <ProsemirrorAdapterProvider>
+        {children}
+      </ProsemirrorAdapterProvider>
+    </MilkdownProvider>
+  )
+}

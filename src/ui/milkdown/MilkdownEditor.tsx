@@ -1,5 +1,6 @@
-import React, { memo } from 'react'
-import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx } from '@milkdown/kit/core'
+import React, { useEffect } from 'react'
+import { Editor, rootCtx, defaultValueCtx, editorViewOptionsCtx, editorViewCtx, parserCtx } from '@milkdown/kit/core'
+import { Slice } from '@milkdown/kit/prose/model'
 import { Milkdown, useEditor } from '@milkdown/react'
 import { commonmark } from '@milkdown/kit/preset/commonmark'
 import { gfm } from '@milkdown/kit/preset/gfm'
@@ -10,6 +11,7 @@ import { useGdriveEmbed } from './gdrive-embed-plugin'
 import { useGdriveRef } from './gdrive-ref-plugin'
 import { remarkPlugins } from './remark-plugin'
 import { useYoutubeEmbed } from './youtube-plugin'
+import WrapWithProviders from './WrapWithProviders'
 
 type MilkdownEditorProps = {
   content: string
@@ -17,12 +19,12 @@ type MilkdownEditorProps = {
   onContentUpdated?: (markdown: string) => void
 }
 
-export default memo(function (props: MilkdownEditorProps) {
+function MilkdownEditor(props: MilkdownEditorProps) {
   const gdriveEmbed = useGdriveEmbed()
   const gdriveRef = useGdriveRef()
   const youtubeEmbed = useYoutubeEmbed()
 
-  useEditor(root =>
+  const { get: editor } = useEditor(root =>
     Editor.make()
       .config((ctx) => {
         ctx.set(rootCtx, root)
@@ -49,7 +51,31 @@ export default memo(function (props: MilkdownEditorProps) {
       .use(gdriveEmbed.plugins)
       .use(gdriveRef.plugins)
       .use(youtubeEmbed.plugins)
-  , [props.content])
+  , [])
+
+  useEffect(() => {
+    if (!editor()) return
+
+    editor().action((ctx) => {
+      const view = ctx.get(editorViewCtx)
+      const parser = ctx.get(parserCtx)
+      const doc = parser(props.content)
+      if (!doc) return
+      const state = view.state
+      view.dispatch(
+        state.tr.replace(
+          0,
+          state.doc.content.size,
+          new Slice(doc.content, 0, 0),
+        ),
+      )
+    })
+  }, [props.content])
 
   return <Milkdown />
-})
+}
+
+export default function (props: MilkdownEditorProps) {
+  // Wrapping needs to happen here because otherwise milkdown editor will persist between renders
+  return <WrapWithProviders><MilkdownEditor {...props} /></WrapWithProviders>
+}

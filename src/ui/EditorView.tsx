@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { MilkdownEditor, WrapWithProviders } from './milkdown'
+import { MilkdownEditor } from './milkdown'
 import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import { DraftFileDetails, useDraftFile } from '../service/draftfile'
@@ -10,11 +10,7 @@ import { useFileNameSlot, useMainMenuSlot } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
 import { LastSavedTimestampPanel, DraftSelectorPanel } from './editor'
 
-export type Props = {
-  onCloseClicked?: () => void
-}
-
-function EditorView(props: Props): React.ReactElement {
+export default function EditorView(): React.ReactElement {
   const paramsFileEdit = useFileEditParams()
   const [isDirty, setIsDirty] = useState(false)
   const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
@@ -30,7 +26,7 @@ function EditorView(props: Props): React.ReactElement {
     loadContent: loadDraft,
     saveContent: saveDraft,
   } = useDraftFile(paramsFileEdit.draftId)
-  const { navigateToFileEdit } = useNavigateTo()
+  const { navigateToFileEdit, navigateToFileView } = useNavigateTo()
   const { addPanel: addMainMenuPanel } = useMainMenuSlot()
   const { setFilenamePanel } = useFileNameSlot()
   useMilkdownCommands()
@@ -74,13 +70,13 @@ function EditorView(props: Props): React.ReactElement {
   const onCloseClicked = useCallback(async function onCloseClicked() {
     await updateGdriveContent(updatedContent)
     await discardDraft()
-    props.onCloseClicked()
-  }, [updatedContent, discardDraft, props.onCloseClicked])
+    exitEditor()
+  }, [updatedContent, discardDraft])
 
   const onDiscardClicked = useCallback(async function onDiscardClicked() {
     await discardDraft()
-    props.onCloseClicked()
-  }, [discardDraft, props.onCloseClicked])
+    exitEditor()
+  }, [discardDraft])
 
   const handleContentUpdate = useCallback((markdown: string) => {
     setUpdatedContent(markdown)
@@ -104,6 +100,10 @@ function EditorView(props: Props): React.ReactElement {
   function commitFileNameChange(fileName: string) {
     updateFileName(fileName)
     setEditFileNameEnabled(false)
+  }
+
+  function exitEditor() {
+    navigateToFileView()
   }
 
   async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
@@ -149,10 +149,4 @@ function EditorView(props: Props): React.ReactElement {
       </div>
     </>
   )
-}
-
-export default function (): React.ReactElement {
-  const { navigateToFileView } = useNavigateTo()
-
-  return <WrapWithProviders><EditorView onCloseClicked={() => navigateToFileView()} /></WrapWithProviders>
 }
