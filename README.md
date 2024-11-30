@@ -65,6 +65,10 @@ It seems that milkdown is distributed as ES module and it was hard to setup jest
 
 For Vitest everything just works and is really simple to configure.
 
+### Set content dynamically in milkdown editor
+
+[See this milkdown Q&A](https://github.com/orgs/Milkdown/discussions/131)
+
 ## References
 
 * [Google Authorization library](https://developers.google.com/identity/oauth2/web/guides/overview?hl=en)
