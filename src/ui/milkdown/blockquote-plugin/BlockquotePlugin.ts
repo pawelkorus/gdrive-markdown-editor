@@ -1,15 +1,14 @@
-import { blockquoteSchema } from '@milkdown/kit/preset/commonmark'
+import { MilkdownPlugin } from '@milkdown/kit/ctx'
+import { blockquoteAttr } from '@milkdown/kit/preset/commonmark'
 
-export const extendedBlockquoteSchema = blockquoteSchema.extendSchema((prev) => {
-  return (ctx) => {
-    const baseSchema = prev(ctx)
-    return {
-      ...baseSchema,
-      toDOM: () => ['blockquote', { class: 'blockquote' }, 0],
-    }
+const extendedAttr: MilkdownPlugin = (ctx) => {
+  return async () => {
+    ctx.set(blockquoteAttr.key, () => {
+      return { class: 'blockquote' }
+    })
   }
-})
+}
 
 export const plugins = [
-  extendedBlockquoteSchema,
-].flat()
+  extendedAttr,
+]
