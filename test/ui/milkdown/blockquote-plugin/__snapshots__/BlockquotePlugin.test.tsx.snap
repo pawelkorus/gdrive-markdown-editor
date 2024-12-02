@@ -1,0 +1,38 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`should render blockquote with additional blockquote class for bootstrap 1`] = `
+<body>
+  <script
+    defer=""
+    src="https://accounts.google.com/gsi/client"
+  />
+  <script
+    defer=""
+    src="https://apis.google.com/js/api.js"
+  />
+  <div>
+    <div
+      data-milkdown-root="true"
+    >
+      <div
+        class="milkdown"
+      >
+        <div
+          class="ProseMirror editor"
+          contenteditable="true"
+          role="textbox"
+          translate="no"
+        >
+          <blockquote
+            class="blockquote"
+          >
+            <p>
+              blockquote
+            </p>
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+`;

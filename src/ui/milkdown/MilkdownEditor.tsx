@@ -11,6 +11,7 @@ import { useGdriveEmbed } from './gdrive-embed-plugin'
 import { useGdriveRef } from './gdrive-ref-plugin'
 import { remarkPlugins } from './remark-plugin'
 import { useYoutubeEmbed } from './youtube-plugin'
+import { plugins as extendedBloquotePlugins } from './blockquote-plugin'
 import WrapWithProviders from './WrapWithProviders'
 
 type MilkdownEditorProps = {
@@ -51,6 +52,7 @@ function MilkdownEditor(props: MilkdownEditorProps) {
       .use(gdriveEmbed.plugins)
       .use(gdriveRef.plugins)
       .use(youtubeEmbed.plugins)
+      .use(extendedBloquotePlugins)
   , [])
 
   useEffect(() => {
