@@ -73,6 +73,12 @@ For Vitest everything just works and is really simple to configure.
 
 It is not very clear what it is the main difference. [See this milkdown Q&A](https://github.com/orgs/Milkdown/discussions/1152) for some additional explanations.
 
+### Patterns for extending Milkdown
+
+#### Just adding some additional html attributes to nodes
+
+For Milkdown provided schemas usually there is an `$nodeAttr` slice defined for schema elements. This slice is then used to take html attributes inside schema `toDOM` function, thus by setting value for this slice inside custom plugin you might influence attributes in final HTML dom node.
+
 ## References
 
 * [Google Authorization library](https://developers.google.com/identity/oauth2/web/guides/overview?hl=en)
