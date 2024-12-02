@@ -69,6 +69,10 @@ For Vitest everything just works and is really simple to configure.
 
 [See this milkdown Q&A](https://github.com/orgs/Milkdown/discussions/131)
 
+### What is the difference between $node and $nodeSchema in Milkdown
+
+It is not very clear what it is the main difference. [See this milkdown Q&A](https://github.com/orgs/Milkdown/discussions/1152) for some additional explanations.
+
 ## References
 
 * [Google Authorization library](https://developers.google.com/identity/oauth2/web/guides/overview?hl=en)
