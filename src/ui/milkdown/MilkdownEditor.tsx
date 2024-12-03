@@ -12,6 +12,7 @@ import { useGdriveRef } from './gdrive-ref-plugin'
 import { remarkPlugins } from './remark-plugin'
 import { useYoutubeEmbed } from './youtube-plugin'
 import { plugins as extendedBloquotePlugins } from './blockquote-plugin'
+import { plugins as extendedInputRulesPlugins } from './extended-input-rules-plugin'
 import WrapWithProviders from './WrapWithProviders'
 
 type MilkdownEditorProps = {
@@ -53,6 +54,7 @@ function MilkdownEditor(props: MilkdownEditorProps) {
       .use(gdriveRef.plugins)
       .use(youtubeEmbed.plugins)
       .use(extendedBloquotePlugins)
+      .use(extendedInputRulesPlugins)
   , [])
 
   useEffect(() => {
