@@ -1,6 +1,7 @@
 export const CLIENT_ID = '413355556847-pd76u4ckm8d8jisjg2fmlamgisejh4nn.apps.googleusercontent.com'
 export const API_KEY = 'AIzaSyCQLy4XRrT2HWbALEcxhSf2rWNoeQvT6bA'
 export const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'
-export const SCOPE_FILE_ACCESS = 'https://www.googleapis.com/auth/drive.file'
+export const SCOPE_DRIVE_FILE = 'https://www.googleapis.com/auth/drive.file'
+export const SCOPE_DRIVE_READONLY = 'https://www.googleapis.com/auth/drive.readonly'
 export const SCOPE_INSTALL = 'https://www.googleapis.com/auth/drive.install'
 export const SCOPE_DRIVE_APPDATA = 'https://www.googleapis.com/auth/drive.appdata'

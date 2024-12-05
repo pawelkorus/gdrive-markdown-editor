@@ -57,6 +57,14 @@ Gdrive expose special scope `https://www.googleapis.com/auth/drive.file` that al
 
 When configuring GDrive UI Integration there is an option to automatically show consent screen after user opens applicatin. This will trigger authentication code flow. After user gives consent browser will be redirected to the application with oauth flow parameters included as query parameters (code, scopes)
 
+### GDrive scopes
+
+Google defines scope `https://www.googleapis.com/auth/drive.file` which gives a limited access to files in google drive. According, to [documentation]{https://developers.google.com/drive/api/guides/api-specific-auth} this scope allows to:
+
+> Create new Drive files, or modify existing files, that you open with an app or that the user shares with an app while using the Google Picker API or the app's file picker.
+
+This means that in some cases it won't give enough permissions. For example it won't allow to load image files that are added to markdown document manually via raw `fileId`, see `::gdrive` custom tag. As cited above it will work only if file was selected via Google Picker API.
+
 ### Jest vs Vitest
 
 Jest was replaced with Vitest because of few issues.

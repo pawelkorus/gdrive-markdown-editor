@@ -1,5 +1,5 @@
 import { authenticateUser } from './authentication'
-import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_FILE_ACCESS, SCOPE_INSTALL } from './const'
+import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_DRIVE_READONLY, SCOPE_DRIVE_FILE, SCOPE_INSTALL } from './const'
 import { ensureGISLibraryLoaded } from './load'
 
 type RequestTokenSuccess = (tokenReponse: google.accounts.oauth2.TokenResponse) => void
@@ -89,9 +89,10 @@ export async function requestAccess(requiredPesmission: Permissions): Promise<un
         return SCOPE_INSTALL
       case Permissions.SAVE_SELECTED_FILE:
       case Permissions.READ_SELECTED_FILE:
+        return SCOPE_DRIVE_FILE
       case Permissions.BROWSE_FILES:
       case Permissions.READ_FILE:
-        return SCOPE_FILE_ACCESS
+        return SCOPE_DRIVE_READONLY
       case Permissions.MAINTAIN_APP_DATA:
         return SCOPE_DRIVE_APPDATA
     }
@@ -119,13 +120,13 @@ export function hasPermission(permission: Permissions): boolean {
 function hasGrantedPermission(token: TokenResponse, permission: Permissions): boolean {
   switch (permission) {
     case Permissions.SAVE_SELECTED_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_FILE_ACCESS)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_FILE)
     case Permissions.READ_SELECTED_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_FILE_ACCESS)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_FILE)
     case Permissions.BROWSE_FILES:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_FILE_ACCESS)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_READONLY)
     case Permissions.READ_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_FILE_ACCESS)
+      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_READONLY)
     case Permissions.INSTALL:
       return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_INSTALL)
     case Permissions.MAINTAIN_APP_DATA:
