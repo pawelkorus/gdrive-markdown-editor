@@ -23,8 +23,12 @@ export enum Errors {
   PERMISSION_DENIED = 'PERMISSION_DENIED',
 }
 
+export type About = {
+  appInstalled: boolean
+}
+
 export async function initializeGapiClient() {
-  await loadGapi()
+  await Promise.all([loadGapiClient, loadPicker])
 
   await gapi.client.init({
     apiKey: API_KEY,
@@ -32,36 +36,27 @@ export async function initializeGapiClient() {
   })
 }
 
-export async function loadGapi() {
-  await ensureGAPILibraryLoaded
-
-  await Promise.all([
-    loadGapiClient(),
-    loadPicker(),
-  ])
-}
-
-function loadGapiClient(): Promise<boolean> {
-  return new Promise((resolve, reject) => {
+const loadGapiClient = new Promise<void>((resolve, reject) => {
+  ensureGAPILibraryLoaded.then(() => {
     gapi.load('client', {
-      callback: () => resolve(true),
+      callback: () => resolve(),
       onerror: (err: unknown) => reject('Failed to load gapi client. ' + err),
       timeout: 15000,
       ontimeout: () => reject('Timeout when loading gapi client'),
     })
   })
-}
+})
 
-function loadPicker(): Promise<boolean> {
-  return new Promise((resolve, reject) => {
+const loadPicker = new Promise<void>((resolve, reject) => {
+  ensureGAPILibraryLoaded.then(() => {
     gapi.load('picker', {
-      callback: () => resolve(true),
+      callback: () => resolve(),
       onerror: (err: unknown) => reject('Failed to load picker. ' + err),
       timeout: 15000,
       ontimeout: () => reject('Timeout when loading picker'),
     })
   })
-}
+})
 
 export async function showPicker(): Promise<string> {
   await ensurePermissionGranted(Permissions.BROWSE_FILES)
@@ -339,4 +334,16 @@ export async function deleteFileFromAppDirectory(fileId: string): Promise<void> 
   await gapi.client.drive.files.delete({
     fileId: fileId,
   })
+}
+
+export async function about(): Promise<About> {
+  await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA)
+
+  const response = await gapi.client.drive.about.get({
+    fields: 'appInstalled',
+  })
+
+  return {
+    appInstalled: response.result.appInstalled!,
+  }
 }

@@ -18,27 +18,31 @@ export default function RootView(): React.ReactElement {
   useGlobalCommands()
 
   useEffect(() => {
-    initializeGapiClient()
-  }, [])
-
-  useEffect(() => {
     if (!user) return
-    const stateParam = searchParams.get('state')
 
-    if (stateParam) {
-      const googleState = parseGoogleState(stateParam)
+    async function initialize() {
+      await initializeGapiClient()
 
-      if (StateFromGoogleAction.Open == googleState.action) {
-        navigateToFileView({ fileId: googleState.fileId, userId: googleState.userId })
+      const stateParam = searchParams.get('state')
+
+      if (stateParam) {
+        const googleState = parseGoogleState(stateParam)
+
+        if (StateFromGoogleAction.Open == googleState.action) {
+          navigateToFileView({ fileId: googleState.fileId, userId: googleState.userId })
+        }
+        else if (StateFromGoogleAction.New == googleState.action) {
+          navigateToFileNew({ folderId: googleState.folderId })
+        }
+        else {
+          navigateToHome()
+        }
       }
-      else if (StateFromGoogleAction.New == googleState.action) {
-        navigateToFileNew({ folderId: googleState.folderId })
-      }
-      else {
-        navigateToHome()
-      }
+
+      setLoading(false)
     }
-    setLoading(false)
+
+    initialize()
   }, [user])
 
   return (

@@ -7,7 +7,6 @@ export {
   createFile,
   loadBinaryFile,
   loadFile,
-  loadGapi,
   initializeGapiClient,
   getFileMetadata,
   getUserRecentlyModifiedFiles,
