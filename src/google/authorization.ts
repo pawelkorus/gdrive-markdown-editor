@@ -34,8 +34,6 @@ let tokenClient: google.accounts.oauth2.TokenClient | undefined = undefined
 async function ensureTokenClient() {
   await ensureGISLibraryLoaded
   if (!tokenClient) {
-    const user = await authenticateUser
-
     tokenClient = google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
       scope: SCOPE_INSTALL,
@@ -56,7 +54,6 @@ async function ensureTokenClient() {
 
         waitForTokenResult.resolve(tokenResponse)
       },
-      login_hint: user.id,
     })
   }
 
