@@ -1,6 +1,6 @@
 import { API_KEY, DISCOVERY_DOC, CLIENT_ID } from './const'
 import { currentToken, hasPermission, Permissions, requestAccess } from './authorization'
-import { ensureGAPILibraryLoaded } from './load'
+import { loadGapiClient, loadPicker } from './load'
 
 export type FileDetails = {
   id: string
@@ -35,28 +35,6 @@ export async function initializeGapiClient() {
     discoveryDocs: [DISCOVERY_DOC],
   })
 }
-
-const loadGapiClient = new Promise<void>((resolve, reject) => {
-  ensureGAPILibraryLoaded.then(() => {
-    gapi.load('client', {
-      callback: () => resolve(),
-      onerror: (err: unknown) => reject('Failed to load gapi client. ' + err),
-      timeout: 15000,
-      ontimeout: () => reject('Timeout when loading gapi client'),
-    })
-  })
-})
-
-const loadPicker = new Promise<void>((resolve, reject) => {
-  ensureGAPILibraryLoaded.then(() => {
-    gapi.load('picker', {
-      callback: () => resolve(),
-      onerror: (err: unknown) => reject('Failed to load picker. ' + err),
-      timeout: 15000,
-      ontimeout: () => reject('Timeout when loading picker'),
-    })
-  })
-})
 
 export async function showPicker(): Promise<string> {
   await ensurePermissionGranted(Permissions.BROWSE_FILES)
