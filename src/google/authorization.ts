@@ -1,3 +1,4 @@
+import { Errors } from './types'
 import { authenticateUser } from './authentication'
 import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_DRIVE_READONLY, SCOPE_DRIVE_FILE, SCOPE_INSTALL } from './const'
 import { ensureGISLibraryLoaded } from './load'
@@ -58,6 +59,16 @@ async function ensureTokenClient() {
   }
 
   return tokenClient
+}
+
+export async function ensurePermissionGranted(permission: Permissions) {
+  if (!hasPermission(permission)) {
+    await requestAccess(permission)
+  }
+
+  if (!hasPermission(permission)) {
+    throw new Error(Errors.PERMISSION_DENIED)
+  }
 }
 
 export function authorizeInstall(): Promise<unknown> {

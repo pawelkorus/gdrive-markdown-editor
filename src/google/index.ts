@@ -1,7 +1,4 @@
 export {
-  showFolderPicker,
-  showMarkdownPicker,
-  showPicker,
   save,
   updateFileName,
   createFile,
@@ -19,6 +16,12 @@ export {
   FileDetailsWithLink,
   About,
 } from './api'
+
+export {
+  showFolderPicker,
+  showMarkdownPicker,
+  showPicker,
+} from './picker'
 
 export {
   authorizeInstall,
