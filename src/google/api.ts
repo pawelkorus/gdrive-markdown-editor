@@ -28,7 +28,7 @@ export type About = {
 }
 
 export async function initializeGapiClient() {
-  await Promise.all([loadGapiClient, loadPicker])
+  await loadGapiClient
 
   await gapi.client.init({
     apiKey: API_KEY,
@@ -37,6 +37,7 @@ export async function initializeGapiClient() {
 }
 
 export async function showPicker(): Promise<string> {
+  await loadPicker
   await ensurePermissionGranted(Permissions.BROWSE_FILES)
 
   return new Promise((resolve, reject) => {
@@ -67,6 +68,7 @@ export async function showPicker(): Promise<string> {
 }
 
 export async function showMarkdownPicker(): Promise<string> {
+  await loadPicker
   await ensurePermissionGranted(Permissions.BROWSE_FILES)
 
   return new Promise((resolve, reject) => {
@@ -94,6 +96,7 @@ export async function showMarkdownPicker(): Promise<string> {
 }
 
 export async function showFolderPicker(): Promise<FolderDetails> {
+  await loadPicker
   await ensurePermissionGranted(Permissions.BROWSE_FILES)
 
   return new Promise<FolderDetails>((resolve, reject) => {
