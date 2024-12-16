@@ -13,9 +13,11 @@ export {
   createFileInAppDirectory,
   deleteFileFromAppDirectory,
   findFileInAppDirectory,
+  about,
   FileDetails,
   FileDetailsWithContent,
   FileDetailsWithLink,
+  About,
 } from './api'
 
 export {
