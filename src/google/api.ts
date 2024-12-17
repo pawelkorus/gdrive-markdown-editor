@@ -160,8 +160,6 @@ export async function getUserRecentlyModifiedFiles(): Promise<(FileDetails & { v
 export async function createFileInAppDirectory(filename: string): Promise<FileDetails> {
   await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA)
 
-  console.log('createFileInAppDirectory', filename)
-
   const appFolderId = 'appDataFolder' // Special alias for the app-specific folder
 
   const response = await gapi.client.drive.files.create({
@@ -207,7 +205,7 @@ export async function deleteFileFromAppDirectory(fileId: string): Promise<void> 
 }
 
 export async function about(): Promise<About> {
-  await ensurePermissionGranted(Permissions.MAINTAIN_APP_DATA)
+  await ensurePermissionGranted(Permissions.READ_ABOUT)
 
   const response = await gapi.client.drive.about.get({
     fields: 'appInstalled',

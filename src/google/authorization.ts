@@ -1,9 +1,9 @@
 import { Errors } from './types'
 import { authenticateUser } from './authentication'
-import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_DRIVE_READONLY, SCOPE_DRIVE_FILE, SCOPE_INSTALL } from './const'
+import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_DRIVE_READONLY, SCOPE_DRIVE_FILE, SCOPE_INSTALL, SCOPE_DRIVE, SCOPE_DRIVE_METADATA, SCOPE_DRIVE_PHOTOS_READONLY, SCOPE_DRIVE_METADATA_READONLY } from './const'
 import { ensureGISLibraryLoaded } from './load'
 
-type RequestTokenSuccess = (tokenReponse: google.accounts.oauth2.TokenResponse) => void
+type RequestTokenSuccess = (tokenReponse: TokenResponse) => void
 type RequestTokenReject = (error: unknown) => void
 
 class TokenCallbackResult {
@@ -15,7 +15,7 @@ class TokenCallbackResult {
     this.e = e
   }
 
-  public resolve(tokenReponse: google.accounts.oauth2.TokenResponse) {
+  public resolve(tokenReponse: TokenResponse) {
     this.r(tokenReponse)
   }
 
@@ -28,9 +28,10 @@ type TokenResponse = google.accounts.oauth2.TokenResponse & {
   expiresAt: number
 }
 
-let waitForTokenResult: TokenCallbackResult
-let latestTokenResponse: TokenResponse | undefined = undefined
-let tokenClient: google.accounts.oauth2.TokenClient | undefined = undefined
+const waitForTokenResult: TokenCallbackResult[] = []
+let currentPermissionRequest: Promise<void> = Promise.resolve()
+let latestTokenResponse: TokenResponse | null = null
+let tokenClient: google.accounts.oauth2.TokenClient | null = null
 
 async function ensureTokenClient() {
   await ensureGISLibraryLoaded
@@ -50,10 +51,10 @@ async function ensureTokenClient() {
         if (!waitForTokenResult) return
 
         if (tokenResponse.error !== undefined) {
-          waitForTokenResult.reject(tokenResponse.error)
+          waitForTokenResult.shift().reject(tokenResponse.error)
         }
 
-        waitForTokenResult.resolve(tokenResponse)
+        waitForTokenResult.shift().resolve(latestTokenResponse)
       },
     })
   }
@@ -62,13 +63,24 @@ async function ensureTokenClient() {
 }
 
 export async function ensurePermissionGranted(permission: Permissions) {
-  if (!hasPermission(permission)) {
-    await requestAccess(permission)
+  function prepareRequestAccess(permission: Permissions) {
+    return requestAccess(permission)
+      .then(() => {
+        if (!hasPermission(permission)) {
+          throw new Error(Errors.PERMISSION_DENIED)
+        }
+      })
   }
 
-  if (!hasPermission(permission)) {
-    throw new Error(Errors.PERMISSION_DENIED)
-  }
+  currentPermissionRequest = currentPermissionRequest
+    .then(() => {
+      if (hasPermission(permission)) return
+      return prepareRequestAccess(permission)
+    }, () => {
+      return prepareRequestAccess(permission)
+    })
+
+  return currentPermissionRequest
 }
 
 export function authorizeInstall(): Promise<unknown> {
@@ -81,35 +93,24 @@ export enum Permissions {
   READ_SELECTED_FILE = 'READ_SELECTED_FILE',
   BROWSE_FILES = 'BROWSE_FILES',
   READ_FILE = 'READ_FILE',
+  READ_FILE_METADATA = 'READ_FILE_METADATA',
   MAINTAIN_APP_DATA = 'MAINTAIN_APP_DATA',
+  READ_ABOUT = 'READ_ABOUT',
 }
 
 export function currentToken(): google.accounts.oauth2.TokenResponse {
   return latestTokenResponse!
 }
 
-export async function requestAccess(requiredPesmission: Permissions): Promise<unknown> {
+export async function requestAccess(requiredPesmission: Permissions): Promise<void> {
   const tokenClient = await ensureTokenClient()
-
-  function toScope(permission: Permissions): string {
-    switch (permission) {
-      case Permissions.INSTALL:
-        return SCOPE_INSTALL
-      case Permissions.SAVE_SELECTED_FILE:
-      case Permissions.READ_SELECTED_FILE:
-        return SCOPE_DRIVE_FILE
-      case Permissions.BROWSE_FILES:
-      case Permissions.READ_FILE:
-        return SCOPE_DRIVE_READONLY
-      case Permissions.MAINTAIN_APP_DATA:
-        return SCOPE_DRIVE_APPDATA
-    }
-  }
 
   const user = await authenticateUser
 
-  return new Promise((resolve, reject) => {
-    waitForTokenResult = new TokenCallbackResult(resolve, reject)
+  return new Promise<void>((resolve, reject) => {
+    waitForTokenResult.push(new TokenCallbackResult(() => {
+      resolve()
+    }, reject))
 
     tokenClient.requestAccessToken({
       scope: toScope(requiredPesmission),
@@ -128,18 +129,64 @@ export function hasPermission(permission: Permissions): boolean {
 function hasGrantedPermission(token: TokenResponse, permission: Permissions): boolean {
   switch (permission) {
     case Permissions.SAVE_SELECTED_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_FILE)
+      return google.accounts.oauth2.hasGrantedAnyScope(token,
+        SCOPE_DRIVE,
+        SCOPE_DRIVE_FILE,
+      )
     case Permissions.READ_SELECTED_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_FILE)
+      return google.accounts.oauth2.hasGrantedAnyScope(token,
+        SCOPE_DRIVE,
+        SCOPE_DRIVE_READONLY,
+        SCOPE_DRIVE_FILE,
+      )
     case Permissions.BROWSE_FILES:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_READONLY)
+      return google.accounts.oauth2.hasGrantedAnyScope(token,
+        SCOPE_DRIVE,
+        SCOPE_DRIVE_READONLY,
+      )
     case Permissions.READ_FILE:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_READONLY)
+      return google.accounts.oauth2.hasGrantedAnyScope(token,
+        SCOPE_DRIVE,
+        SCOPE_DRIVE_READONLY,
+      )
     case Permissions.INSTALL:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_INSTALL)
+      return google.accounts.oauth2.hasGrantedAnyScope(token,
+        SCOPE_INSTALL,
+      )
     case Permissions.MAINTAIN_APP_DATA:
-      return google.accounts.oauth2.hasGrantedAnyScope(token, SCOPE_DRIVE_APPDATA)
+      return google.accounts.oauth2.hasGrantedAnyScope(token,
+        SCOPE_DRIVE_APPDATA,
+      )
+    case Permissions.READ_ABOUT:
+      return google.accounts.oauth2.hasGrantedAnyScope(token,
+        SCOPE_DRIVE,
+        SCOPE_DRIVE_APPDATA,
+        SCOPE_DRIVE_FILE,
+        SCOPE_DRIVE_METADATA,
+        SCOPE_DRIVE_METADATA_READONLY,
+        SCOPE_DRIVE_PHOTOS_READONLY,
+        SCOPE_DRIVE_READONLY,
+      )
     default:
       return false
+  }
+}
+
+function toScope(permission: Permissions): string {
+  switch (permission) {
+    case Permissions.INSTALL:
+      return SCOPE_INSTALL
+    case Permissions.SAVE_SELECTED_FILE:
+      return SCOPE_DRIVE_FILE
+    case Permissions.READ_SELECTED_FILE:
+    case Permissions.BROWSE_FILES:
+    case Permissions.READ_FILE:
+      return SCOPE_DRIVE_READONLY
+    case Permissions.READ_FILE_METADATA:
+      return SCOPE_DRIVE_METADATA_READONLY
+    case Permissions.MAINTAIN_APP_DATA:
+      return SCOPE_DRIVE_APPDATA
+    case Permissions.READ_ABOUT:
+      return SCOPE_DRIVE_APPDATA
   }
 }

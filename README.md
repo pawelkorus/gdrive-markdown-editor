@@ -39,6 +39,10 @@ This tag will insert inline link to the file from gdrive. When link is clicked a
 
 ## Developer notes
 
+### Check all scopes that will be requested by this app
+
+See `toScope` method in `src/google/authorization.ts`.
+
 ### Google Authentication & Authorization
 
 Google made process of authentication and authorization separate. To authenticate you can use one of the buttons documented here: https://developers.google.com/identity/gsi/web/guides/overview
