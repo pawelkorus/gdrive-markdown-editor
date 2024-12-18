@@ -66,7 +66,7 @@ export async function ensurePermissionGranted(permission: Permissions) {
   function prepareRequestAccess(permission: Permissions) {
     return requestAccess(permission)
       .then(() => {
-        if (!hasPermission(permission)) {
+        if (hasPermission(permission) != PermissionCheckResult.GRANTED) {
           throw new Error(Errors.PERMISSION_DENIED)
         }
       })
@@ -74,7 +74,7 @@ export async function ensurePermissionGranted(permission: Permissions) {
 
   currentPermissionRequest = currentPermissionRequest
     .then(() => {
-      if (hasPermission(permission)) return
+      if (hasPermission(permission) == PermissionCheckResult.GRANTED) return
       return prepareRequestAccess(permission)
     }, () => {
       return prepareRequestAccess(permission)
@@ -98,6 +98,13 @@ export enum Permissions {
   READ_ABOUT = 'READ_ABOUT',
 }
 
+export enum PermissionCheckResult {
+  GRANTED = 'GRANTED',
+  NOT_GRANTED = 'NOT_GRANTED',
+  PENDING = 'PENDING',
+  EXPIRED = 'EXPIRED',
+}
+
 export function currentToken(): google.accounts.oauth2.TokenResponse {
   return latestTokenResponse!
 }
@@ -119,11 +126,11 @@ export async function requestAccess(requiredPesmission: Permissions): Promise<vo
   })
 }
 
-export function hasPermission(permission: Permissions): boolean {
-  if (!latestTokenResponse) return false
-  if (latestTokenResponse.expiresAt < Date.now()) return false
+export function hasPermission(permission: Permissions): PermissionCheckResult {
+  if (!latestTokenResponse) return PermissionCheckResult.PENDING
+  if (latestTokenResponse.expiresAt < Date.now()) return PermissionCheckResult.EXPIRED
 
-  return hasGrantedPermission(latestTokenResponse, permission)
+  return hasGrantedPermission(latestTokenResponse, permission) ? PermissionCheckResult.GRANTED : PermissionCheckResult.NOT_GRANTED
 }
 
 function hasGrantedPermission(token: TokenResponse, permission: Permissions): boolean {

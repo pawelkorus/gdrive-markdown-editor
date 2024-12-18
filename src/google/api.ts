@@ -203,15 +203,3 @@ export async function deleteFileFromAppDirectory(fileId: string): Promise<void> 
     fileId: fileId,
   })
 }
-
-export async function about(): Promise<About> {
-  await ensurePermissionGranted(Permissions.READ_ABOUT)
-
-  const response = await gapi.client.drive.about.get({
-    fields: 'appInstalled',
-  })
-
-  return {
-    appInstalled: response.result.appInstalled!,
-  }
-}

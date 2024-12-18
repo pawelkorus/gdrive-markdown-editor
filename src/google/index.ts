@@ -10,7 +10,6 @@ export {
   createFileInAppDirectory,
   deleteFileFromAppDirectory,
   findFileInAppDirectory,
-  about,
   FileDetails,
   FileDetailsWithContent,
   FileDetailsWithLink,

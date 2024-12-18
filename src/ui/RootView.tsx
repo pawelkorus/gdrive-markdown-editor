@@ -8,6 +8,7 @@ import { useNavigateTo } from '@app/service/navigate'
 import { useUser } from '@app/service/user'
 import useGlobalCommands from './useGlobalCommands'
 import { initializeGapiClient, parseGoogleState, StateFromGoogleAction } from '@app/google'
+import IntegrationCheck from '@app/ui/components/IntegrationCheck'
 
 export default function RootView(): React.ReactElement {
   const [loading, setLoading] = useState(true)
@@ -61,6 +62,7 @@ export default function RootView(): React.ReactElement {
         <>
           <Outlet></Outlet>
           <CommandPalette commands={commands} onItemSelected={item => executeCommand(item.id)}></CommandPalette>
+          <IntegrationCheck></IntegrationCheck>
         </>
       )}
     </>
