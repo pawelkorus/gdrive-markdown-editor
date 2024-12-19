@@ -8,6 +8,7 @@ import { TextArea } from '@app/ui/textarea'
 import { useFileNameSlot, useMainMenuSlot } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
 import { LastSavedTimestampPanel, DraftSelectorPanel } from './editor'
+import EditorCommands from './editor/EditorCommands'
 
 export default function EditorView(): React.ReactElement {
   const paramsFileEdit = useFileEditParams()
@@ -142,7 +143,11 @@ export default function EditorView(): React.ReactElement {
           {paramsFileEdit.source && (
             <TextArea value={initialContent} onChange={handleContentUpdate} />
           )}
-          {!paramsFileEdit.source && <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />}
+          {!paramsFileEdit.source && (
+            <EditorCommands>
+              <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
+            </EditorCommands>
+          )}
         </div>
       </div>
     </>
