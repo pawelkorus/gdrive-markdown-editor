@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { MilkdownEditor } from './milkdown'
-import useMilkdownCommands from './milkdown/useMilkdownCommands'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import { DraftFileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
@@ -29,7 +28,6 @@ export default function EditorView(): React.ReactElement {
   const { navigateToFileEdit, navigateToFileView } = useNavigateTo()
   const { addPanel: addMainMenuPanel } = useMainMenuSlot()
   const { setFilenamePanel } = useFileNameSlot()
-  useMilkdownCommands()
 
   useEffect(() => {
     if (isDirty) {

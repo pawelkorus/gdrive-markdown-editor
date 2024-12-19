@@ -14,6 +14,7 @@ import { useYoutubeEmbed } from './youtube-plugin'
 import { plugins as extendedBloquotePlugins } from './blockquote-plugin'
 import { plugins as extendedInputRulesPlugins } from './extended-input-rules-plugin'
 import WrapWithProviders from './WrapWithProviders'
+import useMilkdownCommands from './useMilkdownCommands'
 
 type MilkdownEditorProps = {
   content: string
@@ -25,6 +26,7 @@ function MilkdownEditor(props: MilkdownEditorProps) {
   const gdriveEmbed = useGdriveEmbed()
   const gdriveRef = useGdriveRef()
   const youtubeEmbed = useYoutubeEmbed()
+  useMilkdownCommands()
 
   const { get: editor } = useEditor(root =>
     Editor.make()
