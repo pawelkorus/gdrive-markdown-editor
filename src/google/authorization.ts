@@ -1,34 +1,10 @@
-import { Errors } from './types'
+import { Errors, TokenResponse } from './types'
 import { authenticateUser } from './authentication'
 import { CLIENT_ID, SCOPE_DRIVE_APPDATA, SCOPE_DRIVE_READONLY, SCOPE_DRIVE_FILE, SCOPE_INSTALL, SCOPE_DRIVE, SCOPE_DRIVE_METADATA, SCOPE_DRIVE_PHOTOS_READONLY, SCOPE_DRIVE_METADATA_READONLY } from './const'
 import { ensureGISLibraryLoaded } from './load'
+import { TokenResponseListener, TokenResponseNotifier } from './TokenResponseNotifier'
 
-type RequestTokenSuccess = (tokenReponse: TokenResponse) => void
-type RequestTokenReject = (error: unknown) => void
-
-class TokenCallbackResult {
-  private r: RequestTokenSuccess
-  private e: RequestTokenReject
-
-  constructor(r: RequestTokenSuccess, e: RequestTokenReject) {
-    this.r = r
-    this.e = e
-  }
-
-  public resolve(tokenReponse: TokenResponse) {
-    this.r(tokenReponse)
-  }
-
-  public reject(error: unknown) {
-    this.e(error)
-  }
-}
-
-type TokenResponse = google.accounts.oauth2.TokenResponse & {
-  expiresAt: number
-}
-
-const waitForTokenResult: TokenCallbackResult[] = []
+const tokenNotifier = new TokenResponseNotifier()
 let currentPermissionRequest: Promise<void> = Promise.resolve()
 let latestTokenResponse: TokenResponse | null = null
 let tokenClient: google.accounts.oauth2.TokenClient | null = null
@@ -41,20 +17,18 @@ async function ensureTokenClient() {
       scope: SCOPE_INSTALL,
       prompt: '',
       callback: async (tokenResponse: google.accounts.oauth2.TokenResponse) => {
-        const expiresAt = Date.now() + Number(tokenResponse.expires_in) * 1000
+        const expiresAt = tokenResponse.expires_in ? Date.now() + Number(tokenResponse.expires_in) * 1000 : 0
 
-        latestTokenResponse = {
+        const tokenResponseWithExpiration = {
           ...tokenResponse,
           expiresAt: expiresAt - 30000, // 30 seconds before expiration
         }
 
-        if (!waitForTokenResult) return
-
-        if (tokenResponse.error !== undefined) {
-          waitForTokenResult.shift().reject(tokenResponse.error)
+        if (!tokenResponseWithExpiration.error) {
+          latestTokenResponse = tokenResponseWithExpiration
         }
 
-        waitForTokenResult.shift().resolve(latestTokenResponse)
+        tokenNotifier.notify(tokenResponseWithExpiration)
       },
     })
   }
@@ -63,23 +37,31 @@ async function ensureTokenClient() {
 }
 
 export async function ensurePermissionGranted(permission: Permissions) {
-  function prepareRequestAccess(permission: Permissions) {
-    return requestAccess(permission)
-      .then(() => {
-        if (hasPermission(permission) != PermissionCheckResult.GRANTED) {
-          throw new Error(Errors.PERMISSION_DENIED)
+  if (hasPermission(permission) == PermissionCheckResult.GRANTED)
+    return currentPermissionRequest
+
+  const result = new Promise<void>((resolve, reject) => {
+    const listener: TokenResponseListener = (token) => {
+      tokenNotifier.removeListener(listener)
+      if (!token.error) {
+        if (hasGrantedPermission(token, permission)) {
+          resolve()
         }
-      })
-  }
+        else {
+          reject(new Error(Errors.PERMISSION_DENIED))
+        }
+      }
+      else {
+        reject(token.error)
+      }
+    }
 
-  currentPermissionRequest = currentPermissionRequest
-    .then(() => {
-      if (hasPermission(permission) == PermissionCheckResult.GRANTED) return
-      return prepareRequestAccess(permission)
-    }, () => {
-      return prepareRequestAccess(permission)
-    })
+    tokenNotifier.addListener(listener)
 
+    requestAccess(permission)
+  })
+
+  currentPermissionRequest = currentPermissionRequest.then(() => result)
   return currentPermissionRequest
 }
 
@@ -109,20 +91,14 @@ export function currentToken(): google.accounts.oauth2.TokenResponse {
   return latestTokenResponse!
 }
 
-export async function requestAccess(requiredPesmission: Permissions): Promise<void> {
+export async function requestAccess(requiredPesmission: Permissions) {
   const tokenClient = await ensureTokenClient()
 
   const user = await authenticateUser
 
-  return new Promise<void>((resolve, reject) => {
-    waitForTokenResult.push(new TokenCallbackResult(() => {
-      resolve()
-    }, reject))
-
-    tokenClient.requestAccessToken({
-      scope: toScope(requiredPesmission),
-      hint: user.id,
-    })
+  tokenClient.requestAccessToken({
+    scope: toScope(requiredPesmission),
+    hint: user.id,
   })
 }
 
