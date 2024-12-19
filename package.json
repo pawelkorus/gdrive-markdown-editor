@@ -18,8 +18,8 @@
     "@types/react-dom": "18.3.1",
     "@types/react-test-renderer": "18.3.1",
     "@types/showdown": "2.0.6",
-    "@typescript-eslint/eslint-plugin": "8.18.0",
-    "@typescript-eslint/parser": "8.18.0",
+    "@typescript-eslint/eslint-plugin": "8.18.1",
+    "@typescript-eslint/parser": "8.18.1",
     "@vitejs/plugin-react": "4.3.4",
     "clean-webpack-plugin": "4.0.0",
     "cross-env": "7.0.3",
@@ -64,16 +64,16 @@
     "analyze-bundle": "webpack --mode production --config webpack.js --profile --json > stats.json && webpack-bundle-analyzer stats.json"
   },
   "dependencies": {
-    "@milkdown/kit": "7.5.5",
-    "@milkdown/react": "7.5.0",
-    "@prosemirror-adapter/react": "0.2.6",
+    "@milkdown/kit": "7.5.9",
+    "@milkdown/react": "7.5.9",
+    "@prosemirror-adapter/react": "0.4.0",
     "autosize": "6.0.1",
     "bootstrap": "5.3.3",
-    "html-react-parser": "5.2.0",
+    "html-react-parser": "5.2.1",
     "jose": "5.9.6",
     "prosemirror-view": "1.37.1",
     "react": "18.3.1",
-    "react-bootstrap": "2.10.6",
+    "react-bootstrap": "2.10.7",
     "react-router-dom": "7.0.2",
     "remark-directive": "3.0.0"
   }
