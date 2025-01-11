@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { JSONTree } from 'react-json-tree'
+// temporary disable until it supports react 19
+// import { JSONTree } from 'react-json-tree'
 import { usePluginViewContext } from '@prosemirror-adapter/react'
 
 const twilight = {
@@ -23,7 +24,7 @@ const twilight = {
 }
 
 export default function (): React.ReactElement {
-  const [editorState, setEditorState] = useState()
+  const [, setEditorState] = useState()
   const { view, prevState } = usePluginViewContext()
 
   useEffect(() => {
@@ -33,10 +34,10 @@ export default function (): React.ReactElement {
 
   return (
     <div>
-      <JSONTree
+      {/* <JSONTree
         data={editorState}
         theme={twilight}
-      />
+      /> */}
     </div>
   )
 }
