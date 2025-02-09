@@ -9,8 +9,8 @@ export default function (): React.ReactElement {
   const { navigateToFileView } = useNavigateTo()
 
   const handleClick = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
     if (fileMetadata && (fileMetadata.mimeType === 'text/markdown' || fileMetadata.name.endsWith('.md'))) {
-      e.preventDefault()
       navigateToFileView({ fileId: fileMetadata.id })
     }
   }, [fileMetadata, navigateToFileView])
