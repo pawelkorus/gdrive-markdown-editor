@@ -78,6 +78,7 @@ export enum Permissions {
   READ_FILE_METADATA = 'READ_FILE_METADATA',
   MAINTAIN_APP_DATA = 'MAINTAIN_APP_DATA',
   READ_ABOUT = 'READ_ABOUT',
+  MAINTAIN_ALL_FILES = 'MAINTAIN_ALL_FILES',
 }
 
 export enum PermissionCheckResult {
@@ -150,6 +151,10 @@ function hasGrantedPermission(token: TokenResponse, permission: Permissions): bo
         SCOPE_DRIVE_PHOTOS_READONLY,
         SCOPE_DRIVE_READONLY,
       )
+    case Permissions.MAINTAIN_ALL_FILES:
+      return google.accounts.oauth2.hasGrantedAnyScope(token,
+        SCOPE_DRIVE,
+      )
     default:
       return false
   }
@@ -171,5 +176,7 @@ function toScope(permission: Permissions): string {
       return SCOPE_DRIVE_APPDATA
     case Permissions.READ_ABOUT:
       return SCOPE_DRIVE_APPDATA
+    case Permissions.MAINTAIN_ALL_FILES:
+      return SCOPE_DRIVE
   }
 }

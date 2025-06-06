@@ -9,6 +9,7 @@ import { useFileNameSlot, useMainMenuSlot } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
 import { LastSavedTimestampPanel, DraftSelectorPanel } from './editor'
 import EditorCommands from './editor/EditorCommands'
+import { uploadFileToDrive } from '../google'
 
 export default function EditorView(): React.ReactElement {
   const paramsFileEdit = useFileEditParams()
@@ -18,7 +19,7 @@ export default function EditorView(): React.ReactElement {
   const [fileDetails] = useGdriveFile()
   const [initialContent, setInitialContent] = useState(fileDetails.content)
   const [updatedContent, setUpdatedContent] = useState(fileDetails.content)
-  const { updateContent: updateGdriveContent, updateFileName } = useGdriveFileCommands()
+  const { updateContent: updateGdriveContent, updateFileName,  } = useGdriveFileCommands()
   const {
     draftDetails,
     select: selectDraft,
@@ -110,6 +111,26 @@ export default function EditorView(): React.ReactElement {
     navigateToFileEdit(params => ({ ...params, draftId: draft.id }))
   }
 
+  const handleFileDrop = useCallback(
+    async (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+
+      const files = event.dataTransfer.files
+      if (files.length > 0) {
+        const file = files[0]
+        const parentId = fileDetails.folderId // Assuming fileDetails contains the parent directory ID
+
+        try {
+          const uploadedFile = await uploadFileToDrive(file, parentId)
+          console.log('File uploaded successfully:', uploadedFile)
+        } catch (error) {
+          console.error('Error uploading file:', error)
+        }
+      }
+    },
+    [uploadFileToDrive, fileDetails],
+  )
+
   return (
     <>
       {setFilenamePanel(
@@ -149,6 +170,13 @@ export default function EditorView(): React.ReactElement {
             </EditorCommands>
           )}
         </div>
+      </div>
+      <div
+        className="editor-view"
+        onDragOver={(event) => event.preventDefault()}
+        onDrop={handleFileDrop}
+      >
+        {/* Existing EditorView content */}
       </div>
     </>
   )
