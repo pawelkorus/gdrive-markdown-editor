@@ -10,6 +10,7 @@ export {
   createFileInAppDirectory,
   deleteFileFromAppDirectory,
   findFileInAppDirectory,
+  uploadFileToDrive,
   FileDetails,
   FileDetailsWithContent,
   FileDetailsWithLink,

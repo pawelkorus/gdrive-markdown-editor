@@ -203,3 +203,56 @@ export async function deleteFileFromAppDirectory(fileId: string): Promise<void> 
     fileId: fileId,
   })
 }
+
+export async function uploadFileToDrive(file: File, parentId: string): Promise<FileDetails> {
+  await ensurePermissionGranted(Permissions.SAVE_SELECTED_FILE)
+
+  const metadata = {
+    name: file.name,
+    mimeType: file.type,
+    parents: [parentId],
+  }
+
+  const boundary = '-------314159265358979323846'
+  const delimiter = "\r\n--" + boundary + "\r\n"
+  const close_delim = "\r\n--" + boundary + "--"
+
+  const reader = new FileReader()
+  const fileContent = await new Promise<string>((resolve, reject) => {
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsArrayBuffer(file)
+  })
+
+  const multipartRequestBody =
+    delimiter +
+    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+    JSON.stringify(metadata) +
+    delimiter +
+    'Content-Type: ' + file.type + '\r\n' +
+    'Content-Transfer-Encoding: base64\r\n' +
+    '\r\n' +
+    btoa(fileContent) +
+    close_delim
+
+  // Calculate content length in bytes
+  const encoder = new TextEncoder()
+  const contentLength = encoder.encode(multipartRequestBody).length
+
+  const response = await gapi.client.request({
+    path: '/upload/drive/v3/files',
+    method: 'POST',
+    params: { uploadType: 'multipart' },
+    headers: {
+      'Content-Type': 'multipart/related; boundary="' + boundary + '"',
+      'Content-Length': contentLength.toString(),
+    },
+    body: multipartRequestBody,
+  })
+
+  return {
+    id: response.result.id!,
+    name: response.result.name!,
+    mimeType: response.result.mimeType,
+  }
+}
