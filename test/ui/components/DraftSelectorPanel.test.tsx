@@ -2,7 +2,7 @@ import React from 'react'
 import { fireEvent, render, screen } from '@testing-library/react'
 import { vi, test, expect, beforeEach } from 'vitest'
 
-import { DraftSelectorPanel } from '@app/ui/editor'
+import { DraftSelectorPanel } from '@app/ui/components'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { useDraftFiles } from '@app/service/draftfile'
 

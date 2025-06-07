@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import { test, expect } from 'vitest'
-import { LastSavedTimestampPanel } from '@app/ui/editor'
+import { LastSavedTimestampPanel } from '@app/ui/components'
 
 test('renders LastSavedTimestampPanel with timestamp', () => {
   const timestamp = '2023-10-01T12:34:56Z'
