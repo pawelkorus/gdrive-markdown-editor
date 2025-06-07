@@ -10,6 +10,7 @@ export default defineConfig({
     setupFiles: 'test/vitest.setup.ts',
     alias: {
       '@app': '/src',
+      '@test': '/test'
     },
   },
 })

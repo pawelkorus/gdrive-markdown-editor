@@ -24,7 +24,10 @@
         "jsx": "react",
         "paths": {
             "@app/*": [
-                "src/*"
+              "src/*"
+            ],
+            "@test/*": [
+              "test/*"
             ]
         }
     },

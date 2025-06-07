@@ -165,9 +165,7 @@ export default function EditorView(): React.ReactElement {
             <TextArea value={initialContent} onChange={handleContentUpdate} />
           )}
           {!paramsFileEdit.source && (
-            <EditorCommands>
-              <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
-            </EditorCommands>
+            <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
           )}
         </div>
       </div>

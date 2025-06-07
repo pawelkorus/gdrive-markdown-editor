@@ -1,11 +1,9 @@
-import React, { PropsWithChildren } from 'react'
+import React from 'react'
 import { render, act } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
-import { MilkdownEditor } from '@app/ui/milkdown'
 import { useNavigateTo } from '@app/service/navigate'
 import { useGdriveFileMetadata } from '@app/service/gdrivefiles'
-import { MilkdownProvider } from '@milkdown/react'
-import { ProsemirrorAdapterProvider } from '@prosemirror-adapter/react'
+import { TestMilkdownEditor } from '@test/test-utils'
 
 const defaultFileDetails = {
   id: '1',
@@ -35,7 +33,7 @@ vi.mock('@app/service/navigate', () => {
 test('should render gdrive ref without alt title', async () => {
   const SAMPLE_CONTENT = `:gdrive-ref{src="${defaultFileDetails.id}"}`
   const container = await act(async () => {
-    const { container } = render(<WrapWithProviders><MilkdownEditor content={SAMPLE_CONTENT} /></WrapWithProviders>)
+    const { container } = render(<TestMilkdownEditor content={SAMPLE_CONTENT}/>)
 
     await new Promise<HTMLElement>(r => setTimeout(r, 100))
     return container
@@ -52,7 +50,7 @@ test('should render gdrive ref with alt title', async () => {
   const SAMPLE_LABEL = 'sample label'
   const SAMPLE_CONTENT = `:gdrive-ref[${SAMPLE_LABEL}]{src="${defaultFileDetails.id}"}`
   const container = await act(async () => {
-    const { container } = render(<WrapWithProviders><MilkdownEditor content={SAMPLE_CONTENT} /></WrapWithProviders>)
+    const { container } = render(<TestMilkdownEditor content={SAMPLE_CONTENT}/>)
 
     await new Promise<HTMLElement>(r => setTimeout(r, 100))
     return container
@@ -69,7 +67,7 @@ test('should navigate to file view when clicked and mime type is markdown', asyn
   const { navigateToFileView } = useNavigateTo()
   const SAMPLE_CONTENT = `:gdrive-ref{src="${defaultFileDetails.id}"}`
   const container = await act(async () => {
-    const { container } = render(<WrapWithProviders><MilkdownEditor content={SAMPLE_CONTENT} /></WrapWithProviders>)
+    const { container } = render(<TestMilkdownEditor content={SAMPLE_CONTENT}/>)
 
     await new Promise<HTMLElement>(r => setTimeout(r, 100))
     return container
@@ -89,7 +87,7 @@ test('should navigate to file view when clicked and file name extension is md', 
 
   const SAMPLE_CONTENT = `:gdrive-ref{src="${defaultFileDetails.id}"}`
   const container = await act(async () => {
-    const { container } = render(<WrapWithProviders><MilkdownEditor content={SAMPLE_CONTENT} /></WrapWithProviders>)
+    const { container } = render(<TestMilkdownEditor content={SAMPLE_CONTENT}/>)
 
     await new Promise<HTMLElement>(r => setTimeout(r, 100))
     return container
@@ -109,7 +107,7 @@ test('should not navigate to file view when clicked and not markdown file', asyn
 
   const SAMPLE_CONTENT = `:gdrive-ref{src="${defaultFileDetails.id}"}`
   const container = await act(async () => {
-    const { container } = render(<WrapWithProviders><MilkdownEditor content={SAMPLE_CONTENT} /></WrapWithProviders>)
+    const { container } = render(<TestMilkdownEditor content={SAMPLE_CONTENT}/>)
 
     await new Promise<HTMLElement>(r => setTimeout(r, 100))
     return container
@@ -122,12 +120,4 @@ test('should not navigate to file view when clicked and not markdown file', asyn
   expect(navigateToFileView).not.toHaveBeenCalledWith({ fileId: '1' })
 })
 
-const WrapWithProviders: React.FC<PropsWithChildren> = ({ children }) => {
-  return (
-    <MilkdownProvider>
-      <ProsemirrorAdapterProvider>
-        {children}
-      </ProsemirrorAdapterProvider>
-    </MilkdownProvider>
-  )
-}
+

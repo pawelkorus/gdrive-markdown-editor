@@ -1,14 +1,12 @@
-import { MilkdownEditor } from '@app/ui/milkdown'
-import { MilkdownProvider } from '@milkdown/react'
-import { ProsemirrorAdapterProvider } from '@prosemirror-adapter/react'
 import { act, render } from '@testing-library/react'
-import React, { PropsWithChildren } from 'react'
+import React from 'react'
 import { expect, test } from 'vitest'
+import { TestMilkdownEditor } from '@test/test-utils'
 
 test('should render blockquote with additional blockquote class for bootstrap', async () => {
   const SAMPLE_CONTENT = `> blockquote`
   const container = await act(async () => {
-    const { container } = render(<WrapWithProviders><MilkdownEditor content={SAMPLE_CONTENT} /></WrapWithProviders>)
+    const { container } = render(<TestMilkdownEditor content={SAMPLE_CONTENT} />)
 
     await new Promise<HTMLElement>(r => setTimeout(r, 100))
     return container
@@ -18,13 +16,3 @@ test('should render blockquote with additional blockquote class for bootstrap', 
   expect(blockquoteElement).toHaveClass('blockquote')
   expect(document.body).toMatchSnapshot()
 })
-
-const WrapWithProviders: React.FC<PropsWithChildren> = ({ children }) => {
-  return (
-    <MilkdownProvider>
-      <ProsemirrorAdapterProvider>
-        {children}
-      </ProsemirrorAdapterProvider>
-    </MilkdownProvider>
-  )
-}
