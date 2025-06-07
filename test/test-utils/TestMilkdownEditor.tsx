@@ -1,6 +1,6 @@
 import React from 'react'
 import { CommandsContextProvider } from "@app/service/command"
-import { MilkdownEditor } from "@app/ui/milkdown"
+import { MilkdownEditor } from "@app/ui/milkdown-editor"
 import { MilkdownProvider } from "@milkdown/react"
 import { ProsemirrorAdapterProvider } from "@prosemirror-adapter/react"
 import { PropsWithChildren } from "react"

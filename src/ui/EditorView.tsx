@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { MilkdownEditor } from './milkdown'
+import { MilkdownEditor } from './milkdown-editor'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import { DraftFileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'

@@ -9,11 +9,11 @@ import {
   toggleStrongCommand,
   wrapInBlockquoteCommand,
 } from '@milkdown/kit/preset/commonmark'
-import { gdriveCommand } from '@app/ui/milkdown/gdrive-embed-plugin'
+import { gdriveCommand } from '@app/ui/milkdown-editor/gdrive-embed-plugin'
 import { commandsCtx } from '@milkdown/kit/core'
 import type { $Command } from '@milkdown/kit/utils'
 import { useCallback, useEffect, useMemo } from 'react'
-import { useGdriveRefCommands } from '@app/ui/milkdown/gdrive-ref-plugin'
+import { useGdriveRefCommands } from '@app/ui/milkdown-editor/gdrive-ref-plugin'
 
 export default function useMilkdownCommands() {
   const [loading, getInstance] = useInstance()

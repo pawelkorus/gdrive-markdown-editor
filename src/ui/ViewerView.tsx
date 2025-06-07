@@ -1,5 +1,5 @@
 import React from 'react'
-import { MilkdownEditor } from '@app/ui/milkdown'
+import { MilkdownEditor } from '@app/ui/milkdown-editor'
 import { useGdriveFile } from '@app/service/gdrivefile'
 import { useNavigateTo } from '@app/service/navigate'
 import { Panel, PanelButton } from '@app/ui/nav'
