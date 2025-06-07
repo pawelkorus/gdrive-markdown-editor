@@ -14,6 +14,7 @@ import { useYoutubeEmbed } from './youtube-plugin'
 import { plugins as extendedBloquotePlugins } from './blockquote-plugin'
 import { plugins as extendedInputRulesPlugins } from './extended-input-rules-plugin'
 import WrapWithProviders from './WrapWithProviders'
+import EditorCommands from '../editor/EditorCommands'
 
 type MilkdownEditorProps = {
   content: string
@@ -81,5 +82,11 @@ function MilkdownEditor(props: MilkdownEditorProps) {
 
 export default function (props: MilkdownEditorProps) {
   // Wrapping needs to happen here because otherwise milkdown editor will persist between renders
-  return <WrapWithProviders><MilkdownEditor {...props} /></WrapWithProviders>
+  return ( <EditorCommands>
+      <WrapWithProviders>
+        <MilkdownEditor {...props} />
+      </WrapWithProviders>
+    </EditorCommands>
+  )
+
 }
