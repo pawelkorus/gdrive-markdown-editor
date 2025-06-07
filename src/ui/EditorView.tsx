@@ -4,11 +4,11 @@ import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
 import { DraftFileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
-import { TextArea } from '@app/ui/textarea'
 import { useFileNameSlot, useMainMenuSlot } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
 import { LastSavedTimestampPanel, DraftSelectorPanel } from './components'
 import { uploadFileToDrive } from '../google'
+import SourceEditor from './source-editor/SourceEditor'
 
 export default function EditorView(): React.ReactElement {
   const paramsFileEdit = useFileEditParams()
@@ -161,7 +161,7 @@ export default function EditorView(): React.ReactElement {
       <div className="container-lg mt-4">
         <div className="row">
           {paramsFileEdit.source && (
-            <TextArea value={initialContent} onChange={handleContentUpdate} />
+            <SourceEditor value={initialContent} onChange={handleContentUpdate} />
           )}
           {!paramsFileEdit.source && (
             <MilkdownEditor content={initialContent} onContentUpdated={handleContentUpdate} />
