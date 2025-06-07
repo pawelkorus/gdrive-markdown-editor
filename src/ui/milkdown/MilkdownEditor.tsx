@@ -14,7 +14,7 @@ import { useYoutubeEmbed } from './youtube-plugin'
 import { plugins as extendedBloquotePlugins } from './blockquote-plugin'
 import { plugins as extendedInputRulesPlugins } from './extended-input-rules-plugin'
 import WrapWithProviders from './WrapWithProviders'
-import EditorCommands from '../editor/EditorCommands'
+import EditorCommands from './EditorCommands'
 
 type MilkdownEditorProps = {
   content: string

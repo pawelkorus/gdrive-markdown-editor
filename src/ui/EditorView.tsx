@@ -7,8 +7,7 @@ import { useFileEditParams } from '../service/navigate'
 import { TextArea } from '@app/ui/textarea'
 import { useFileNameSlot, useMainMenuSlot } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
-import { LastSavedTimestampPanel, DraftSelectorPanel } from './editor'
-import EditorCommands from './editor/EditorCommands'
+import { LastSavedTimestampPanel, DraftSelectorPanel } from './components'
 import { uploadFileToDrive } from '../google'
 
 export default function EditorView(): React.ReactElement {
