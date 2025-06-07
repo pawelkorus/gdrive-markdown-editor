@@ -6,6 +6,7 @@ export type FileDetails = {
   id: string
   name: string
   mimeType: string | undefined
+  folderId?: string // Added folderId property
 }
 
 export type FolderDetails = FileDetails
@@ -38,7 +39,7 @@ export async function loadFile(fileId: string): Promise<FileDetailsWithContent> 
   const results = await Promise.all([
     gapi.client.drive.files.get({
       fileId: fileId,
-      fields: 'id,name,mimeType,fileExtension',
+      fields: 'id,name,mimeType,fileExtension,parents', // Added parents field
     }),
     gapi.client.drive.files.get({
       fileId: fileId,
@@ -54,6 +55,7 @@ export async function loadFile(fileId: string): Promise<FileDetailsWithContent> 
     name: metadataResponse.result.name!,
     mimeType: metadataResponse.result.mimeType,
     content: response.body,
+    folderId: metadataResponse.result.parents?.[0], // Retrieve folderId
   }
 }
 
@@ -127,13 +129,14 @@ export async function getFileMetadata(fileId: string): Promise<FileDetailsWithLi
   await ensurePermissionGranted(Permissions.READ_SELECTED_FILE)
   const response = await gapi.client.drive.files.get({
     fileId: fileId,
-    fields: 'name, mimeType,webViewLink',
+    fields: 'name, mimeType,webViewLink,parents', // Added parents field
   })
   return {
     id: fileId,
     name: response.result.name!,
     mimeType: response.result.mimeType,
     url: response.result.webViewLink!,
+    folderId: response.result.parents?.[0], // Retrieve folderId
   }
 }
 
@@ -174,6 +177,7 @@ export async function createFileInAppDirectory(filename: string): Promise<FileDe
     id: response.result.id!,
     name: response.result.name!,
     mimeType: response.result.mimeType,
+    folderId: response.result.parents?.[0], // Retrieve folderId from response
   }
 }
 
@@ -205,7 +209,7 @@ export async function deleteFileFromAppDirectory(fileId: string): Promise<void> 
 }
 
 export async function uploadFileToDrive(file: File, parentId: string): Promise<FileDetails> {
-  await ensurePermissionGranted(Permissions.SAVE_SELECTED_FILE)
+  await ensurePermissionGranted(Permissions.MAINTAIN_ALL_FILES)
 
   const metadata = {
     name: file.name,

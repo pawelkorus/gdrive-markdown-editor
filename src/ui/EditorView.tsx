@@ -169,13 +169,6 @@ export default function EditorView(): React.ReactElement {
           )}
         </div>
       </div>
-      <div
-        className="editor-view"
-        onDragOver={(event) => event.preventDefault()}
-        onDrop={handleFileDrop}
-      >
-        {/* Existing EditorView content */}
-      </div>
     </>
   )
 }
