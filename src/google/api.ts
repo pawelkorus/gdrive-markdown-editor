@@ -222,8 +222,8 @@ export async function uploadFileToDrive(file: File, parentId: string): Promise<F
   const close_delim = "\r\n--" + boundary + "--"
 
   const reader = new FileReader()
-  const fileContent = await new Promise<string>((resolve, reject) => {
-    reader.onload = () => resolve(reader.result as string)
+  const fileContent = await new Promise<ArrayBuffer>((resolve, reject) => {
+    reader.onload = () => resolve(reader.result as ArrayBuffer)
     reader.onerror = reject
     reader.readAsArrayBuffer(file)
   })
@@ -236,7 +236,7 @@ export async function uploadFileToDrive(file: File, parentId: string): Promise<F
     'Content-Type: ' + file.type + '\r\n' +
     'Content-Transfer-Encoding: base64\r\n' +
     '\r\n' +
-    btoa(fileContent) +
+    btoa(String.fromCharCode(...new Uint8Array(fileContent))) +
     close_delim
 
   // Calculate content length in bytes

@@ -110,26 +110,6 @@ export default function EditorView(): React.ReactElement {
     navigateToFileEdit(params => ({ ...params, draftId: draft.id }))
   }
 
-  const handleFileDrop = useCallback(
-    async (event: React.DragEvent<HTMLDivElement>) => {
-      event.preventDefault()
-
-      const files = event.dataTransfer.files
-      if (files.length > 0) {
-        const file = files[0]
-        const parentId = fileDetails.folderId // Assuming fileDetails contains the parent directory ID
-
-        try {
-          const uploadedFile = await uploadFileToDrive(file, parentId)
-          console.log('File uploaded successfully:', uploadedFile)
-        } catch (error) {
-          console.error('Error uploading file:', error)
-        }
-      }
-    },
-    [uploadFileToDrive, fileDetails],
-  )
-
   return (
     <>
       {setFilenamePanel(
