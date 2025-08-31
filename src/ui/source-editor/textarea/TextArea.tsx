@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react'
 import autosize from 'autosize'
 
 type TextAreaProps = {
@@ -6,16 +6,19 @@ type TextAreaProps = {
   onChange?: (value: string) => void
 }
 
-const TextArea: React.FC<TextAreaProps> = ({ value, onChange }) => {
-  const ref = useRef<HTMLTextAreaElement>(null)
+export type TextAreaHandle = {
+  insertText: (text: string) => void
+}
+
+const TextArea = forwardRef<TextAreaHandle, TextAreaProps>(({ value, onChange }, ref) => {
+  const textAreaRef = useRef<HTMLTextAreaElement>(null)
   const [textAreaKey, setTextAreaKey] = useState(0)
 
   const resizeTextArea = useCallback(() => {
-    console.log('resizeTextArea')
-    const textAreaRef = ref.current
+    const textAreaRefCurrent = textAreaRef.current
 
-    if (textAreaRef) {
-      autosize(textAreaRef)
+    if (textAreaRefCurrent) {
+      autosize(textAreaRefCurrent)
     }
   }, [])
 
@@ -31,17 +34,34 @@ const TextArea: React.FC<TextAreaProps> = ({ value, onChange }) => {
     }
   }
 
+  useImperativeHandle(ref, () => ({
+    insertText: (text: string) => {
+      if (textAreaRef.current) {
+        const start = textAreaRef.current.selectionStart
+        const end = textAreaRef.current.selectionEnd
+        const currentValue = textAreaRef.current.value
+
+        textAreaRef.current.value = currentValue.slice(0, start) + text + currentValue.slice(end)
+        textAreaRef.current.selectionStart = textAreaRef.current.selectionEnd = start + text.length
+
+        if (onChange) {
+          onChange(textAreaRef.current.value)
+        }
+      }
+    },
+  }))
+
   return (
     <textarea
       key={textAreaKey}
-      ref={ref}
-      style={{ margin: 0, padding: 0, border: 'none', outline: 'none' }}
+      ref={textAreaRef}
+      style={{ margin: 0, border: 'none', outline: 'none' }}
       defaultValue={value}
       onChange={onTextAreaValueChange}
       rows={0}
       onInput={resizeTextArea}
     />
   )
-}
+})
 
 export default TextArea
