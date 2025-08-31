@@ -55,7 +55,7 @@ const TextArea = forwardRef<TextAreaHandle, TextAreaProps>(({ value, onChange },
     <textarea
       key={textAreaKey}
       ref={textAreaRef}
-      style={{ margin: 0, border: 'none', outline: 'none' }}
+      style={{ margin: 0, border: 'none', outline: 'none', width: '100%' }}
       defaultValue={value}
       onChange={onTextAreaValueChange}
       rows={0}
