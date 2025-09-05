@@ -15,7 +15,7 @@
             "gapi",
             "gapi.client.drive-v3",
             "google.accounts",
-            "google.picker"
+            "google.picker",
         ],
         "lib": [
             "es2019",
