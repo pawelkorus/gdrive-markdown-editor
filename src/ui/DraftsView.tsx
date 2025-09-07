@@ -18,8 +18,8 @@ export default function (): React.ReactElement {
     navigateToFileEdit({ fileId: fileDetails.id, draftId: draftId })
   }
 
-  const onDiscardDraft = (draftId: string) => {
-    discardDraft(draftId)
+  const onDiscardDraft = async (draftId: string) => {
+    await discardDraft(draftId)
   }
 
   return (
@@ -42,7 +42,7 @@ export default function (): React.ReactElement {
               <div key={draftFile.id} className="list-group-item list-group-item-action">
                 {draftFile.id}
                 <button className="btn btn-outline-primary" onClick={() => onUseDraft(draftFile.id)}>Use</button>
-                <button className="btn btn-outline-danger" onClick={() => onDiscardDraft(draftFile.id)}>Discard</button>
+                <button className="btn btn-outline-danger" onClick={ () => { void onDiscardDraft(draftFile.id) }}>Discard</button>
               </div>
             ))}
           </div>

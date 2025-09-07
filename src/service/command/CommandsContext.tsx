@@ -3,7 +3,7 @@ import { Command } from './Command'
 
 type CommandsRegistry = Record<string, Command>
 
-export type CommandsContextState = {
+export interface CommandsContextState {
   commands: Command[]
   registerCommand: (command: Command | Command[]) => void
   unregisterCommand: (command: Command | Command[]) => void

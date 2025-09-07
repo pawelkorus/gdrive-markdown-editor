@@ -29,7 +29,7 @@ const SourceEditor: React.FC<SourceEditorProps> = (props) => {
     [uploadFileToDrive, fileDetails],
   )
 
-  return <div onDrop={handleFileDrop}>
+  return <div onDrop={(event) => { void handleFileDrop(event) }}>
     <TextArea {...props} ref={textAreaRef} />
   </div>
 }

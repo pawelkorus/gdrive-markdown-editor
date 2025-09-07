@@ -2,7 +2,7 @@ import { MilkdownPlugin } from '@milkdown/kit/ctx'
 import { blockquoteAttr } from '@milkdown/kit/preset/commonmark'
 
 const extendedAttr: MilkdownPlugin = (ctx) => {
-  return async () => {
+  return () => {
     ctx.set(blockquoteAttr.key, () => {
       return { class: 'blockquote' }
     })

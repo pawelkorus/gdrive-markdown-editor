@@ -16,7 +16,7 @@ async function ensureTokenClient() {
       client_id: CLIENT_ID,
       scope: SCOPE_INSTALL,
       prompt: '',
-      callback: async (tokenResponse: google.accounts.oauth2.TokenResponse) => {
+      callback: (tokenResponse: google.accounts.oauth2.TokenResponse) => {
         const expiresAt = tokenResponse.expires_in ? Date.now() + Number(tokenResponse.expires_in) * 1000 : 0
 
         const tokenResponseWithExpiration = {
@@ -52,13 +52,13 @@ export async function ensurePermissionGranted(permission: Permissions) {
         }
       }
       else {
-        reject(token.error)
+        reject(new Error(token.error))
       }
     }
 
     tokenNotifier.addListener(listener)
 
-    requestAccess(permission)
+    void requestAccess(permission)
   })
 
   currentPermissionRequest = currentPermissionRequest.then(() => result)
@@ -89,7 +89,7 @@ export enum PermissionCheckResult {
 }
 
 export function currentToken(): google.accounts.oauth2.TokenResponse {
-  return latestTokenResponse!
+  return latestTokenResponse
 }
 
 export async function requestAccess(requiredPesmission: Permissions) {

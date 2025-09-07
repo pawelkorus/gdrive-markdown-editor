@@ -5,7 +5,7 @@ import { useNavigateTo } from '@app/service/navigate'
 import { Button } from 'react-bootstrap'
 import { Panel } from '@app/ui/nav'
 
-export type Props = {
+export interface Props {
   onDraftSelected: (draft: FileDetails) => void
 }
 
@@ -18,8 +18,8 @@ export default function DraftSelector(props: Props): React.ReactElement {
     navigateToFileDrafts()
   }
 
-  function onDraftDiscarded(draft: FileDetails) {
-    discardDraft(draft.id)
+  async function onDraftDiscarded(draft: FileDetails) {
+    await discardDraft(draft.id)
   }
 
   return (
@@ -28,7 +28,7 @@ export default function DraftSelector(props: Props): React.ReactElement {
         <div className="input-group" role="alert">
           <span className="input-group-text">Draft available:</span>
           <Button type="button" variant="outline-primary" onClick={() => props.onDraftSelected(draftFiles[0])}>Use</Button>
-          <Button type="button" variant="outline-danger" onClick={() => onDraftDiscarded(draftFiles[0])}>Discard</Button>
+          <Button type="button" variant="outline-danger" onClick={() => { void onDraftDiscarded(draftFiles[0]) }}>Discard</Button>
         </div>
       )}
       { draftFiles && draftFiles.length > 1 && (

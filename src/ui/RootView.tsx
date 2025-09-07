@@ -43,7 +43,7 @@ export default function RootView(): React.ReactElement {
       setLoading(false)
     }
 
-    initialize()
+    void initialize()
   }, [user])
 
   return (

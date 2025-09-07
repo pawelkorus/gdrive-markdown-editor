@@ -14,10 +14,10 @@ export default function (): React.ReactElement {
   useEffect(() => {
     const createNewFile = async () => {
       const folderId = searchParams.get('folderId')
-      createFile({ folderId })
+      await createFile({ folderId })
     }
 
-    createNewFile()
+    void createNewFile()
   }, [])
 
   useEffect(() => {

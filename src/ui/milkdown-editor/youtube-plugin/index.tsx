@@ -58,7 +58,7 @@ export const youtubeNode = $node('youtube', () => ({
     runner: (state, node) => {
       state.addNode('leafDirective', undefined, undefined, {
         name: 'youtube',
-        attributes: { src: node.attrs.src },
+        attributes: { src: node.attrs.src as string },
       })
     },
   },

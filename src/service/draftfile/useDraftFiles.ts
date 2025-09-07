@@ -21,18 +21,22 @@ export const useDraftFiles = (origFileDetails: FileDetails) => {
         setDraftFiles(response.map(file => ({ ...file, isNew: false })))
       }
       catch (err) {
-        setError(err.message)
+        if(err instanceof Error) {
+          setError(err.message)
+        } else {
+          setError(JSON.stringify(err))
+        }
       }
       finally {
         setLoading(false)
       }
     }
 
-    fetchDraftFiles()
+    void fetchDraftFiles()
   }, [])
 
   const createDraft = async (content: string): Promise<string> => {
-    if (!creatingRef.current) {
+    if (creatingRef.current === null) {
       creatingRef.current = (async () => {
         const fileDetails = await createFileInAppDirectory('draft_' + origFileDetails.id)
         await save(fileDetails.id, content)

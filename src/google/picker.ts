@@ -21,13 +21,13 @@ export async function showPicker(): Promise<string> {
       .setAppId(CLIENT_ID)
       .setDeveloperKey(API_KEY)
       .setCallback((res: google.picker.ResponseObject) => {
-        if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+        if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED as string) {
           const doc = res[google.picker.Response.DOCUMENTS][0]
           const fileId = doc[google.picker.Document.ID]
           resolve(fileId)
         }
-        else if (res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
-          reject('no pick')
+        else if (res[google.picker.Response.ACTION] == google.picker.Action.CANCEL as string) {
+          reject(new Error('no pick'))
         }
       })
       .build()
@@ -49,13 +49,13 @@ export async function showMarkdownPicker(): Promise<string> {
       .setDeveloperKey(API_KEY)
       .setAppId(CLIENT_ID)
       .setCallback((res: google.picker.ResponseObject) => {
-        if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+        if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED as string) {
           const doc = res[google.picker.Response.DOCUMENTS][0]
           const fileId = doc[google.picker.Document.ID]
           resolve(fileId)
         }
-        else if (res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
-          reject(Errors.NO_FILE_SELECTED)
+        else if (res[google.picker.Response.ACTION] == google.picker.Action.CANCEL as string) {
+          reject(new Error(Errors.NO_FILE_SELECTED))
         }
       })
       .build()
@@ -80,7 +80,7 @@ export async function showFolderPicker(): Promise<FolderDetails> {
       .setDeveloperKey(API_KEY)
       .setAppId(CLIENT_ID)
       .setCallback((res: google.picker.ResponseObject) => {
-        if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+        if (res[google.picker.Response.ACTION] == google.picker.Action.PICKED as string) {
           const doc = res[google.picker.Response.DOCUMENTS][0]
           const fileId = doc[google.picker.Document.ID]
           const name = doc[google.picker.Document.NAME]
@@ -91,8 +91,8 @@ export async function showFolderPicker(): Promise<FolderDetails> {
             mimeType: mimeType,
           })
         }
-        else if (res[google.picker.Response.ACTION] == google.picker.Action.CANCEL) {
-          reject(Errors.NO_FILE_SELECTED)
+        else if (res[google.picker.Response.ACTION] == google.picker.Action.CANCEL as string) {
+          reject(new Error(Errors.NO_FILE_SELECTED))
         }
       })
       .build()

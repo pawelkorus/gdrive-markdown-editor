@@ -3,13 +3,13 @@ import * as googleApi from '../../google'
 
 export type FileDetails = googleApi.FileDetailsWithContent
 
-export type CreateFileParams = {
+export interface CreateFileParams {
   folderId: string
   userId?: string
   fileName?: string
 }
 
-export type GdriveFileContextState = {
+export interface GdriveFileContextState {
   fileDetails: FileDetails
   loadFile: (fileId: string, userId?: string) => Promise<void>
   createFile: (params: CreateFileParams) => Promise<void>

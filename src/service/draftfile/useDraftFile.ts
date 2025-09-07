@@ -20,7 +20,7 @@ export function useDraftFile(draftId: string | undefined) {
       }
     }
 
-    initialize()
+    void initialize()
   }, [])
 
   const select = useCallback(async (newDraftId: string) => {
@@ -29,7 +29,7 @@ export function useDraftFile(draftId: string | undefined) {
   }, [])
 
   const createNewDraft = useCallback(async () => {
-    if (creatingRef.current) {
+    if (creatingRef.current !== null) {
       return creatingRef.current
     }
 

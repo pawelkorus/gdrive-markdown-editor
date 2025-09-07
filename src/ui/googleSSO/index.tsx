@@ -1,7 +1,7 @@
 import React from 'react'
 import { useUser } from '../../service/user'
 
-type Props = {
+interface Props {
   className?: string
   style?: React.CSSProperties
 }

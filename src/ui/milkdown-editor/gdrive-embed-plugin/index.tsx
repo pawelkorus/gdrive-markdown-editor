@@ -52,7 +52,7 @@ export const gdriveNode = $node('gdrive', () => ({
     runner: (state, node) => {
       state.addNode('leafDirective', undefined, undefined, {
         name: 'gdrive',
-        attributes: { src: node.attrs.src },
+        attributes: { src: node.attrs.src as string },
       })
     },
   },
@@ -85,6 +85,8 @@ function executeGdriveCommand(ctx: Ctx): Cmd<unknown> {
       if (dispatch) {
         showPicker().then((fileId) => {
           dispatch(state.tr.replaceSelectionWith(gdriveNode.type(ctx).create({ src: fileId })))
+        }).catch(err => {
+          console.error(err)
         })
       }
       return true

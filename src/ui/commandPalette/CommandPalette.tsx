@@ -12,7 +12,7 @@ const CommandPalette: React.FC<CommandPaletteProps> = ({ commands, children, onI
   const { isVisible, toggleVisibility } = useCommandPalette()
   const [lastShiftTimestamp, setLastShiftTimestamp] = useState(0)
   const [selected, setSelected] = useState(0)
-  const [filteredCommands, setFilteredCommands] = useState([])
+  const [filteredCommands, setFilteredCommands] = useState<CommandPaletteItem[]>([])
   const filterInputRef = React.createRef<HTMLInputElement>()
 
   const onKeyDown = useCallback((e: KeyboardEvent) => {

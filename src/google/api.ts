@@ -2,7 +2,7 @@ import { API_KEY, DISCOVERY_DOC } from './const'
 import { ensurePermissionGranted, Permissions } from './authorization'
 import { loadGapiClient } from './load'
 
-export type FileDetails = {
+export interface FileDetails {
   id: string
   name: string
   mimeType: string | undefined
@@ -19,7 +19,7 @@ export type FileDetailsWithLink = FileDetails & {
   url: string
 }
 
-export type About = {
+export interface About {
   appInstalled: boolean
 }
 
@@ -52,7 +52,7 @@ export async function loadFile(fileId: string): Promise<FileDetailsWithContent> 
 
   return {
     id: fileId,
-    name: metadataResponse.result.name!,
+    name: metadataResponse.result.name,
     mimeType: metadataResponse.result.mimeType,
     content: response.body,
     folderId: metadataResponse.result.parents?.[0], // Retrieve folderId
@@ -70,7 +70,7 @@ export async function loadBinaryFile(fileId: string): Promise<string> {
   return btoa(response.body)
 }
 
-type CreateFileParams = {
+interface CreateFileParams {
   filename: string
   content: string
   parent: string
@@ -90,8 +90,8 @@ export async function createFile(params: CreateFileParams): Promise<FileDetailsW
   })
 
   return {
-    id: response.result.id!,
-    name: response.result.name!,
+    id: response.result.id,
+    name: response.result.name,
     mimeType: response.result.mimeType,
     content: params.content,
   }
@@ -133,9 +133,9 @@ export async function getFileMetadata(fileId: string): Promise<FileDetailsWithLi
   })
   return {
     id: fileId,
-    name: response.result.name!,
+    name: response.result.name,
     mimeType: response.result.mimeType,
-    url: response.result.webViewLink!,
+    url: response.result.webViewLink,
     folderId: response.result.parents?.[0], // Retrieve folderId
   }
 }
@@ -153,10 +153,10 @@ export async function getUserRecentlyModifiedFiles(): Promise<(FileDetails & { v
   const files = response.result.files || []
 
   return files.map(file => ({
-    id: file.id!,
-    name: file.name!,
-    mimeType: file.mimeType!,
-    viewedByMeTime: file.viewedByMeTime!,
+    id: file.id,
+    name: file.name,
+    mimeType: file.mimeType,
+    viewedByMeTime: file.viewedByMeTime,
   }))
 }
 
@@ -174,8 +174,8 @@ export async function createFileInAppDirectory(filename: string): Promise<FileDe
   })
 
   return {
-    id: response.result.id!,
-    name: response.result.name!,
+    id: response.result.id,
+    name: response.result.name,
     mimeType: response.result.mimeType,
     folderId: response.result.parents?.[0], // Retrieve folderId from response
   }
@@ -194,8 +194,8 @@ export async function findFileInAppDirectory(filename: string): Promise<FileDeta
   const files = response.result.files || []
   console.log(files)
   return files.map(file => ({
-    id: file.id!,
-    name: file.name!,
+    id: file.id,
+    name: file.name,
     mimeType: file.mimeType,
   }))
 }
@@ -254,9 +254,11 @@ export async function uploadFileToDrive(file: File, parentId: string): Promise<F
     body: multipartRequestBody,
   })
 
+  const responseResult = response.result as gapi.client.drive.File
+
   return {
-    id: response.result.id!,
-    name: response.result.name!,
-    mimeType: response.result.mimeType,
+    id: responseResult.id,
+    name: responseResult.name,
+    mimeType: responseResult.mimeType,
   }
 }

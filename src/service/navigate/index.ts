@@ -4,7 +4,7 @@ type ParamsFunction<T> = (params?: T) => T
 
 type Params<T> = T | ParamsFunction<T>
 
-type NavigateToFileParams = {
+interface NavigateToFileParams {
   fileId: string
   userId?: string
   resourceKey?: string
@@ -15,7 +15,7 @@ type NavigateToEditFileParams = NavigateToFileParams & {
   source?: boolean
 }
 
-type NavigateToNewFileParams = {
+interface NavigateToNewFileParams {
   folderId: string
 }
 
@@ -58,7 +58,7 @@ export function useNavigateTo() {
   const [searchParams] = useSearchParams()
 
   const navigateToHome = () => {
-    navigate('/')
+    void navigate('/')
   }
 
   const navigateToFileView = (params?: NavigateToFileParams) => {
@@ -75,7 +75,7 @@ export function useNavigateTo() {
       newSearchParams.set('resourceKey', resourceKey)
     }
 
-    navigate(`/file?${newSearchParams.toString()}`)
+    void navigate(`/file?${newSearchParams.toString()}`)
   }
 
   const navigateToFileEdit = (params?: Params<NavigateToEditFileParams>) => {
@@ -98,7 +98,7 @@ export function useNavigateTo() {
       newSearchParams.set('source', 'true')
     }
 
-    navigate(`/file/edit?${newSearchParams.toString()}`)
+    void navigate(`/file/edit?${newSearchParams.toString()}`)
   }
 
   const navigateToFileSource = (params?: NavigateToEditFileParams) => {
@@ -120,14 +120,14 @@ export function useNavigateTo() {
       newSearchParams.set('resourceKey', resourceKey)
     }
 
-    navigate(`/file/drafts?${newSearchParams.toString()}`)
+    void navigate(`/file/drafts?${newSearchParams.toString()}`)
   }
 
   const navigateToFileNew = ({ folderId }: NavigateToNewFileParams) => {
     const searchParams = new URLSearchParams()
     searchParams.set('folderId', folderId)
     const path = `/file/new?${searchParams.toString()}`
-    navigate(path)
+    void navigate(path)
   }
 
   function handleParamsHelper<T>(params: Params<T>, defaults: (p: URLSearchParams) => T): T {

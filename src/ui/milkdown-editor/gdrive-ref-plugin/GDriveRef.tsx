@@ -5,7 +5,7 @@ import { useNavigateTo } from '@app/service/navigate'
 
 export default function (): React.ReactElement {
   const { contentRef, node } = useNodeViewContext()
-  const fileMetadata = useGdriveFileMetadata(node.attrs.src)
+  const fileMetadata = useGdriveFileMetadata(node.attrs.src as string)
   const { navigateToFileView } = useNavigateTo()
 
   const handleClick = useCallback((e: React.MouseEvent) => {
@@ -17,7 +17,7 @@ export default function (): React.ReactElement {
 
   return fileMetadata
     ? (
-        <a data-type="gdrive-ref" data-src={node.attrs.src} href={fileMetadata.url} ref={contentRef} onClick={handleClick}>
+        <a data-type="gdrive-ref" data-src={node.attrs.src as string} href={fileMetadata.url} ref={contentRef} onClick={handleClick}>
           {node.attrs.label || fileMetadata.name}
         </a>
       )

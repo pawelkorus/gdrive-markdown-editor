@@ -42,7 +42,7 @@ export default function (): React.ReactElement {
       setLoading(false)
     }
 
-    initialize()
+    void initialize()
   }, [fileParams.fileId, fileParams.userId])
 
   if (loading) return (

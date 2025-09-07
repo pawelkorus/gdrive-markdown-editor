@@ -49,7 +49,7 @@ vi.mock('@app/service/gdrivefile', () => {
 })
 
 test('renders without crashing', () => {
-  render(<MemoryRouter><DraftSelectorPanel onDraftSelected={() => {}} /></MemoryRouter>)
+  render(<MemoryRouter><DraftSelectorPanel onDraftSelected={() => { /* do nothing */ }}/></MemoryRouter>)
 
   expect(document.body).toMatchSnapshot()
 })

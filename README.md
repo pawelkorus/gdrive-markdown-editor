@@ -91,6 +91,10 @@ It is not very clear what it is the main difference. [See this milkdown Q&A](htt
 
 For Milkdown provided schemas usually there is an `$nodeAttr` slice defined for schema elements. This slice is then used to take html attributes inside schema `toDOM` function, thus by setting value for this slice inside custom plugin you might influence attributes in final HTML dom node.
 
+### Dependencies
+
+Jiti package is required to support typescript eslint config files
+
 ## References
 
 * [Google Authorization library](https://developers.google.com/identity/oauth2/web/guides/overview?hl=en)

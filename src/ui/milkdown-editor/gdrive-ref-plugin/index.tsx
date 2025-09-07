@@ -49,9 +49,9 @@ const node = $node('gdrive-ref', () => ({
       state.addNode('textDirective', undefined, undefined, {
         name: 'gdrive-ref',
         attributes: {
-          src: node.attrs.src,
+          src: node.attrs.src as string,
         },
-        children: [{ type: 'text', value: node.attrs.label }],
+        children: [{ type: 'text', value: node.attrs.label as string }],
       })
     },
   },
@@ -66,9 +66,11 @@ function executeReferenceGdriveFileCommand(ctx: Ctx): Cmd<unknown> {
   return () => {
     return (state: EditorState, dispatch?: (tr: Transaction) => void): boolean => {
       if (dispatch) {
-        showPicker().then((fileId) => {
+        showPicker()
+        .then((fileId) => {
           dispatch(state.tr.replaceSelectionWith(node.type(ctx).create({ src: fileId })))
         })
+        .catch(err => console.error(err))
       }
       return true
     }

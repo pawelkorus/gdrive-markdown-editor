@@ -16,7 +16,7 @@ import { plugins as extendedInputRulesPlugins } from './extended-input-rules-plu
 import WrapWithProviders from './WrapWithProviders'
 import EditorCommands from './EditorCommands'
 
-type MilkdownEditorProps = {
+interface MilkdownEditorProps {
   content: string
   readonly?: boolean
   onContentUpdated?: (markdown: string) => void

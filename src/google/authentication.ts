@@ -2,7 +2,7 @@ import * as jose from 'jose'
 import { CLIENT_ID } from './const'
 import { ensureGISLibraryLoaded } from './load'
 
-type User = {
+interface User {
   id: string
   name: string
   email: string
@@ -24,7 +24,7 @@ export const authenticateUser = new Promise<User>((resolve) => {
   ensureGISLibraryLoaded.then(() => {
     google.accounts.id.initialize({
       client_id: CLIENT_ID,
-      callback: handleAuthentication,
+      callback: (response) => { void handleAuthentication(response) },
       itp_support: true,
       auto_select: true,
       use_fedcm_for_prompt: true,
@@ -32,6 +32,7 @@ export const authenticateUser = new Promise<User>((resolve) => {
 
     google.accounts.id.prompt()
   })
+  .catch(err => console.error(err))
 })
 
 const decodeJwtResponse = async (token: string) => {

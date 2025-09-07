@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useImperativeHandle, useRef, useState, forwardRef } from 'react'
 import autosize from 'autosize'
 
-type TextAreaProps = {
+interface TextAreaProps {
   value: string
   onChange?: (value: string) => void
 }
 
-export type TextAreaHandle = {
+export interface TextAreaHandle {
   insertText: (text: string) => void
 }
 

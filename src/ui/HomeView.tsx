@@ -12,7 +12,7 @@ const InstalledView = (): React.ReactElement => {
       setFiles(files)
     }
 
-    fetchFiles()
+    void fetchFiles()
   }, [])
 
   const handleNavigateToFileEdit = (e: React.MouseEvent, fileId: string) => {

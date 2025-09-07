@@ -21,7 +21,7 @@ export default function (): React.ReactElement {
       <Toast.Body>
         Application is not installed in your Google Drive. Would you like to install it?
         <div className="mt-2 pt-2 border-top">
-          <Button variant="primary" size="sm" className="me-1" onClick={handleInstall}>Install</Button>
+          <Button variant="primary" size="sm" className="me-1" onClick={() => { void handleInstall() }}>Install</Button>
           <Button variant="secondary" size="sm" data-bs-dismiss="toast" className="me-1" onClick={() => setDismissed(true)}>No, thanks!</Button>
         </div>
       </Toast.Body>

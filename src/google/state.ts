@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 export interface StateFromGoogle {
   action: StateFromGoogleAction
   fileId: string | undefined
@@ -39,7 +41,7 @@ export function parseGoogleState(searchParamsState: string | undefined): StateFr
 
   switch (action) {
     case StateFromGoogleAction.Open: {
-      const fileIds = state['ids'] as Array<string>
+      const fileIds = state['ids'] as string[]
       if (action == StateFromGoogleAction.Open && fileIds.length != 1) throw Error('Invalid state parameter: to many file ids')
 
       return {

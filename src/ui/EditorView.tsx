@@ -1,19 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { MilkdownEditor } from './milkdown-editor'
 import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
-import { DraftFileDetails, useDraftFile } from '../service/draftfile'
+import { FileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
 import { useFileNameSlot, useMainMenuSlot } from '../service/navbar'
 import { PanelButton, Panel } from './nav'
 import { LastSavedTimestampPanel, DraftSelectorPanel } from './components'
-import { uploadFileToDrive } from '../google'
 import SourceEditor from './source-editor/SourceEditor'
 
 export default function EditorView(): React.ReactElement {
   const paramsFileEdit = useFileEditParams()
   const [isDirty, setIsDirty] = useState(false)
-  const [lastSavedTimestamp, setLastSavedTimestamp] = useState(null)
+  const [lastSavedTimestamp, setLastSavedTimestamp] = useState<Date>(null)
   const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
   const [fileDetails] = useGdriveFile()
   const [initialContent, setInitialContent] = useState(fileDetails.content)
@@ -33,7 +32,7 @@ export default function EditorView(): React.ReactElement {
   useEffect(() => {
     if (isDirty) {
       const interval = setInterval(() => {
-        if (isDirty) autoSaveAction(updatedContent)
+        if (isDirty) void autoSaveAction(updatedContent)
       }, 2000)
       return () => {
         clearInterval(interval)
@@ -50,18 +49,18 @@ export default function EditorView(): React.ReactElement {
       }
     }
 
-    loadDraftContent()
+    void loadDraftContent()
   }, [draftDetails?.id])
 
   useEffect(() => {
     if (paramsFileEdit.draftId) {
-      selectDraft(paramsFileEdit.draftId)
+      void selectDraft(paramsFileEdit.draftId)
     }
   }, [paramsFileEdit.draftId])
 
   const onCommitContentChange = useCallback(function () {
-    updateGdriveContent(updatedContent)
-    saveDraft(updatedContent)
+    void updateGdriveContent(updatedContent)
+    void saveDraft(updatedContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }, [updatedContent, updateGdriveContent, saveDraft])
@@ -90,14 +89,14 @@ export default function EditorView(): React.ReactElement {
     navigateToFileEdit(p => ({ ...p, source: false }))
   }, [])
 
-  function autoSaveAction(newContent: string) {
-    saveDraft(newContent)
+  async function autoSaveAction(newContent: string) {
+    await saveDraft(newContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
   }
 
-  function commitFileNameChange(fileName: string) {
-    updateFileName(fileName)
+  async function commitFileNameChange(fileName: string) {
+    await updateFileName(fileName)
     setEditFileNameEnabled(false)
   }
 
@@ -105,7 +104,7 @@ export default function EditorView(): React.ReactElement {
     navigateToFileView()
   }
 
-  async function onUseSpecificDraftClicked(draft: DraftFileDetails) {
+  async function onUseSpecificDraftClicked(draft: FileDetails) {
     await discardDraft()
     navigateToFileEdit(params => ({ ...params, draftId: draft.id }))
   }
@@ -119,7 +118,7 @@ export default function EditorView(): React.ReactElement {
                 <input
                   type="text"
                   defaultValue={fileDetails.name}
-                  onBlur={e => commitFileNameChange(e.target.value)}
+                  onBlur={e => { void commitFileNameChange(e.target.value) }}
                   autoFocus
                   className="form-control me-auto"
                 />
@@ -132,12 +131,12 @@ export default function EditorView(): React.ReactElement {
           { paramsFileEdit.source && <PanelButton variant="primary" onClick={onEditClicked}>Edit</PanelButton> }
           { !paramsFileEdit.source && <PanelButton variant="primary" onClick={onEditSourceClicked}>Edit Source</PanelButton> }
           <PanelButton variant="primary" onClick={onCommitContentChange}>Save</PanelButton>
-          <PanelButton variant="primary" onClick={onCloseClicked}>Save & Close</PanelButton>
-          <PanelButton variant="primary" onClick={onDiscardClicked}>Discard</PanelButton>
+          <PanelButton variant="primary" onClick={() => { void onCloseClicked() }}>Save & Close</PanelButton>
+          <PanelButton variant="primary" onClick={() => { void onDiscardClicked () }}>Discard</PanelButton>
         </Panel>,
       )}
       {lastSavedTimestamp && addMainMenuPanel(<LastSavedTimestampPanel lastSavedTimestamp={lastSavedTimestamp} />) }
-      {!paramsFileEdit.draftId && addMainMenuPanel(<DraftSelectorPanel onDraftSelected={onUseSpecificDraftClicked} />)}
+      {!paramsFileEdit.draftId && addMainMenuPanel(<DraftSelectorPanel onDraftSelected={(draft) => { void onUseSpecificDraftClicked(draft) }} />)}
       <div className="container-lg mt-4">
         <div className="row">
           {paramsFileEdit.source && (

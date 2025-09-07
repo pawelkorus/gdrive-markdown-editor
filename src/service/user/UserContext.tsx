@@ -1,14 +1,14 @@
 import React, { PropsWithChildren, createContext, useEffect, useState } from 'react'
 import { authenticateUser } from '../../google'
 
-export type User = {
+export interface User {
   id: string
   name: string
   email: string
   avatarUrl: string
 }
 
-export type UserContextState = {
+export interface UserContextState {
   user: User | null
 }
 
@@ -27,7 +27,7 @@ export function UserContextProvider(props: Props): React.ReactElement {
       setUser(authenticatedUser)
     }
 
-    waitForUser()
+    void waitForUser()
   }, [])
 
   return (

@@ -2,7 +2,7 @@ import { createPortal } from 'react-dom'
 import useNotificationSlots from './useNotificationSlots'
 import { ReactNode } from 'react'
 
-type MainMenuPanelContextType = {
+interface MainMenuPanelContextType {
   addNotification: (notification: ReactNode) => React.ReactPortal
 }
 

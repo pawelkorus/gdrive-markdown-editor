@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import useNavbarSlots from './useNavbarSlots'
 
-type UseFileNameSlotAPI = {
+interface UseFileNameSlotAPI {
   setFilenamePanel: (panel: ReactNode) => React.ReactPortal
 }
 

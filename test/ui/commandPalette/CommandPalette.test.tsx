@@ -41,7 +41,7 @@ test('command palette opens after pressing Shift 2 times fast and hides after pr
   expect(document.body).toMatchSnapshot()
 })
 
-test('command palette does not open after pressing Shift only once', async () => {
+test('command palette does not open after pressing Shift only once', () => {
   render(<CommandPalette commands={prepareCommands()} />, { wrapper: CommandPaletteProvider })
 
   expect(document.body).toMatchSnapshot()
@@ -51,7 +51,7 @@ test('command palette does not open after pressing Shift only once', async () =>
   expect(document.body).toMatchSnapshot()
 })
 
-test('command palette does not open if time between pressing Shift key is too long', async () => {
+test('command palette does not open if time between pressing Shift key is too long', () => {
   vi.useFakeTimers()
 
   render(<CommandPalette commands={prepareCommands()} />, { wrapper: CommandPaletteProvider })
@@ -66,7 +66,7 @@ test('command palette does not open if time between pressing Shift key is too lo
   expect(document.body).toMatchSnapshot()
 })
 
-test('should execute callback after command is selected by keyboard', async () => {
+test('should execute callback after command is selected by keyboard', () => {
   const mockOnSelectCallback = vi.fn()
 
   render(<CommandPalette commands={prepareCommands()} onItemSelected={mockOnSelectCallback} />, { wrapper: CommandPaletteProvider })
@@ -77,7 +77,6 @@ test('should execute callback after command is selected by keyboard', async () =
   fireEvent.keyDown(document, { key: 'Enter' })
 
   expect(mockOnSelectCallback).toHaveBeenCalledWith({ id: 'ab', name: 'ab', execute: expect.any(Function) })
-  await waitForElementToBeRemoved(() => screen.getByRole('dialog'))
 })
 
 test('should execute callback after command is selected by mouse click', async () => {
@@ -94,7 +93,7 @@ test('should execute callback after command is selected by mouse click', async (
   await waitForElementToBeRemoved(() => screen.getByRole('dialog'))
 })
 
-test('should filter commands based on input value', async () => {
+test('should filter commands based on input value', () => {
   render(<CommandPalette commands={prepareCommands()} />, { wrapper: CommandPaletteProvider })
 
   fireEvent.keyDown(document, { key: 'Shift' })

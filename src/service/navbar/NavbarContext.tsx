@@ -1,6 +1,6 @@
 import React, { createContext, ReactNode, useRef } from 'react'
 
-type NavbarContextState = {
+interface NavbarContextState {
   mainMenuSlot: React.RefObject<HTMLDivElement>
   fileNameSlot: React.RefObject<HTMLDivElement>
 }
