@@ -71,7 +71,7 @@
     "bootstrap": "5.3.8",
     "html-react-parser": "5.2.6",
     "jose": "6.1.0",
-    "prosemirror-view": "1.40.1",
+    "prosemirror-view": "1.41.0",
     "react": "19.1.1",
     "react-bootstrap": "2.10.10",
     "react-dom": "19.1.1",
