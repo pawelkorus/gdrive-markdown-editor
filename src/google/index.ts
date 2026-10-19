@@ -11,10 +11,10 @@ export {
   deleteFileFromAppDirectory,
   findFileInAppDirectory,
   uploadFileToDrive,
-  FileDetails,
-  FileDetailsWithContent,
-  FileDetailsWithLink,
-  About,
+  type FileDetails,
+  type FileDetailsWithContent,
+  type FileDetailsWithLink,
+  type About,
 } from './api'
 
 export {
@@ -28,7 +28,7 @@ export {
 } from './authorization'
 
 export {
-  StateFromGoogle,
+  type StateFromGoogle,
   StateFromGoogleAction,
   parseGoogleState,
 } from './state'

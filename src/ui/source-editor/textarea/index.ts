@@ -1,2 +1,2 @@
 export { default as TextArea } from './TextArea'
-export { TextAreaHandle } from './TextArea'
+export type { TextAreaHandle } from './TextArea'

@@ -2,6 +2,7 @@
     "compilerOptions": {
         "baseUrl": "./",
         "strict": false,
+        "isolatedModules": true,
         "ignoreDeprecations": "6.0",
         "outDir": "target/",
         "sourceMap": true,
