@@ -43,13 +43,13 @@
     "build-prod": "vite build",
     "build-debug": "vite build --mode development --minify false",
     "develop": "vite",
+    "develop-prod": "vite",
+    "develop-debug": "vite",
+    "develop-local": "vite",
     "lint": "eslint .",
     "test": "vitest run",
     "test-watch": "vitest",
-    "update-deps": "ncu -u",
-    "develop-prod": "vite",
-    "develop-debug": "vite",
-    "develop-local": "vite"
+    "update-deps": "ncu -u"
   },
   "dependencies": {
     "@milkdown/kit": "7.22.3",
