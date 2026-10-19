@@ -49,7 +49,7 @@
     "webpack-dev-server": "6.1.0"
   },
   "engines": {
-    "node": ">20.0.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "build-prod": "webpack --mode production --config webpack.js",
