@@ -24,6 +24,10 @@ exports[`should navigate to file view when clicked and file name extension is md
           translate="no"
         >
           <p>
+            <img
+              alt=""
+              class="ProseMirror-separator"
+            />
             <span
               data-node-view-root="true"
             >
@@ -44,6 +48,10 @@ exports[`should navigate to file view when clicked and file name extension is md
             />
           </p>
         </div>
+        <div
+          class="milkdown-drop-indicator"
+          style="position: fixed; pointer-events: none; display: none; top: 0px; left: 0px;"
+        />
       </div>
     </div>
   </div>
@@ -74,6 +82,10 @@ exports[`should navigate to file view when clicked and mime type is markdown 1`]
           translate="no"
         >
           <p>
+            <img
+              alt=""
+              class="ProseMirror-separator"
+            />
             <span
               data-node-view-root="true"
             >
@@ -94,6 +106,10 @@ exports[`should navigate to file view when clicked and mime type is markdown 1`]
             />
           </p>
         </div>
+        <div
+          class="milkdown-drop-indicator"
+          style="position: fixed; pointer-events: none; display: none; top: 0px; left: 0px;"
+        />
       </div>
     </div>
   </div>
@@ -124,6 +140,10 @@ exports[`should not navigate to file view when clicked and not markdown file 1`]
           translate="no"
         >
           <p>
+            <img
+              alt=""
+              class="ProseMirror-separator"
+            />
             <span
               data-node-view-root="true"
             >
@@ -144,6 +164,10 @@ exports[`should not navigate to file view when clicked and not markdown file 1`]
             />
           </p>
         </div>
+        <div
+          class="milkdown-drop-indicator"
+          style="position: fixed; pointer-events: none; display: none; top: 0px; left: 0px;"
+        />
       </div>
     </div>
   </div>
@@ -174,6 +198,10 @@ exports[`should render gdrive ref with alt title 1`] = `
           translate="no"
         >
           <p>
+            <img
+              alt=""
+              class="ProseMirror-separator"
+            />
             <span
               data-node-view-root="true"
             >
@@ -194,6 +222,10 @@ exports[`should render gdrive ref with alt title 1`] = `
             />
           </p>
         </div>
+        <div
+          class="milkdown-drop-indicator"
+          style="position: fixed; pointer-events: none; display: none; top: 0px; left: 0px;"
+        />
       </div>
     </div>
   </div>
@@ -224,6 +256,10 @@ exports[`should render gdrive ref without alt title 1`] = `
           translate="no"
         >
           <p>
+            <img
+              alt=""
+              class="ProseMirror-separator"
+            />
             <span
               data-node-view-root="true"
             >
@@ -244,6 +280,10 @@ exports[`should render gdrive ref without alt title 1`] = `
             />
           </p>
         </div>
+        <div
+          class="milkdown-drop-indicator"
+          style="position: fixed; pointer-events: none; display: none; top: 0px; left: 0px;"
+        />
       </div>
     </div>
   </div>

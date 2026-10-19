@@ -31,6 +31,10 @@ exports[`should render blockquote with additional blockquote class for bootstrap
             </p>
           </blockquote>
         </div>
+        <div
+          class="milkdown-drop-indicator"
+          style="position: fixed; pointer-events: none; display: none; top: 0px; left: 0px;"
+        />
       </div>
     </div>
   </div>

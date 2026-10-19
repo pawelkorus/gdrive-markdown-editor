@@ -37,6 +37,10 @@ exports[`should render youtube embed iframe 1`] = `
             </p>
           </div>
         </div>
+        <div
+          class="milkdown-drop-indicator"
+          style="position: fixed; pointer-events: none; display: none; top: 0px; left: 0px;"
+        />
       </div>
     </div>
   </div>

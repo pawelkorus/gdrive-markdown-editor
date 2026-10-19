@@ -46,7 +46,7 @@ exports[`command palette opens after pressing Shift 2 times fast and hides after
 <body
   class="modal-open"
   data-rr-ui-modal-open=""
-  style="padding-right: 1024px;"
+  style="overflow: hidden; padding-right: 1024px;"
 >
   <div />
   <div
@@ -119,7 +119,7 @@ exports[`should filter commands based on input value 1`] = `
 <body
   class="modal-open"
   data-rr-ui-modal-open=""
-  style="padding-right: 1024px;"
+  style="overflow: hidden; padding-right: 1024px;"
 >
   <div />
   <div
@@ -177,7 +177,7 @@ exports[`should filter commands based on input value 2`] = `
 <body
   class="modal-open"
   data-rr-ui-modal-open=""
-  style="padding-right: 1024px;"
+  style="overflow: hidden; padding-right: 1024px;"
 >
   <div />
   <div
