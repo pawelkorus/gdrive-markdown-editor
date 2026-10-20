@@ -9,7 +9,7 @@ export interface CreateFileParams {
   fileName?: string
 }
 
-export interface GdriveFileContextState {
+export interface FileContextState {
   fileDetails: FileDetails
   loadFile: (fileId: string, userId?: string) => Promise<void>
   createFile: (params: CreateFileParams) => Promise<void>
@@ -18,17 +18,17 @@ export interface GdriveFileContextState {
 }
 
 // Create the context
-export const GdriveFileContext = React.createContext<GdriveFileContextState>({
+export const FileContext = React.createContext<FileContextState>({
   fileDetails: undefined,
-  loadFile: () => { throw Error('GdriveFileContext not initialized') },
-  createFile: () => { throw Error('GdriveFileContext not initialized') },
-  updateContent: () => { throw Error('GdriveFileContext not initialized') },
-  updateFileName: () => { throw Error('GdriveFileContext not initialized') },
+  loadFile: () => { throw Error('FileContext not initialized') },
+  createFile: () => { throw Error('FileContext not initialized') },
+  updateContent: () => { throw Error('FileContext not initialized') },
+  updateFileName: () => { throw Error('FileContext not initialized') },
 })
 
 type Props = PropsWithChildren<object>
 
-export function GdriveFileContextProvider(props: Props): React.ReactElement {
+export function FileContextProvider(props: Props): React.ReactElement {
   const [fileDetails, setFileDetails] = useState<FileDetails>({
     id: undefined,
     name: '',
@@ -69,8 +69,8 @@ export function GdriveFileContextProvider(props: Props): React.ReactElement {
   }
 
   return (
-    <GdriveFileContext.Provider value={value}>
+    <FileContext.Provider value={value}>
       {props.children}
-    </GdriveFileContext.Provider>
+    </FileContext.Provider>
   )
 }

@@ -38,12 +38,12 @@ beforeEach(() => {
   mockedUseDraftFiles.draftFiles.splice(0, mockedUseDraftFiles.draftFiles.length, { id: '2', name: 'draft', mimeType: 'text/plain' })
 })
 
-vi.mock('@app/service/gdrivefile', () => {
-  const loadGdriveFile = vi.fn(() => Promise.resolve())
+vi.mock('@app/service/file', () => {
+  const loadFile = vi.fn(() => Promise.resolve())
 
   return {
-    useGdriveFile: vi.fn(() => {
-      return [fileDetails, loadGdriveFile]
+    useFile: vi.fn(() => {
+      return [fileDetails, loadFile]
     }),
   }
 })

@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from 'react'
-import { useGdriveFileCommands, useGdriveFile } from '../service/gdrivefile'
+import { useFileCommands, useFile } from '../service/file'
 import { useSearchParams } from 'react-router-dom'
 import { Spinner } from 'react-bootstrap'
 import { useNavigateTo } from '../service/navigate'
 
 export default function (): React.ReactElement {
-  const { createFile } = useGdriveFileCommands()
-  const [gdriveFile] = useGdriveFile()
-  const gdriveFileId = useRef(gdriveFile?.id)
+  const { createFile } = useFileCommands()
+  const [file] = useFile()
+  const fileId = useRef(file?.id)
   const [searchParams] = useSearchParams()
   const { navigateToFileEdit } = useNavigateTo()
 
@@ -21,10 +21,10 @@ export default function (): React.ReactElement {
   }, [])
 
   useEffect(() => {
-    if (gdriveFile?.id != gdriveFileId.current) {
-      navigateToFileEdit({ fileId: gdriveFile.id })
+    if (file?.id != fileId.current) {
+      navigateToFileEdit({ fileId: file.id })
     }
-  }, [gdriveFile])
+  }, [file])
 
   return (
     <div className="container-fluid h-100 d-flex">

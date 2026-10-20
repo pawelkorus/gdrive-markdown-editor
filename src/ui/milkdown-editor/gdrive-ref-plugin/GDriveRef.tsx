@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react'
 import { useNodeViewContext } from '@prosemirror-adapter/react'
-import { useGdriveFileMetadata } from '@app/service/gdrivefiles'
+import { useFileMetadata } from '@app/service/files'
 import { useNavigateTo } from '@app/service/navigate'
 
 export default function (): React.ReactElement {
   const { contentRef, node } = useNodeViewContext()
-  const fileMetadata = useGdriveFileMetadata(node.attrs.src as string)
+  const fileMetadata = useFileMetadata(node.attrs.src as string)
   const { navigateToFileView } = useNavigateTo()
 
   const handleClick = useCallback((e: React.MouseEvent) => {

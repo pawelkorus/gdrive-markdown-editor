@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { useGdriveFile } from '../service/gdrivefile'
+import { useFile } from '../service/file'
 import { useCommandManager } from '../service/command'
 import { useNavigateTo, useFileViewParams } from '../service/navigate'
 import { Spinner } from 'react-bootstrap'
@@ -8,7 +8,7 @@ import { Spinner } from 'react-bootstrap'
 export default function (): React.ReactElement {
   const [loading, setLoading] = useState(true)
   const fileParams = useFileViewParams()
-  const [, loadFile] = useGdriveFile()
+  const [, loadFile] = useFile()
   const [registerCommand, unregisterCommand] = useCommandManager()
   const { navigateToFileEdit, navigateToFileSource } = useNavigateTo()
 

@@ -1,12 +1,12 @@
 import React from 'react'
 import { useDraftFiles } from '../service/draftfile'
-import { useGdriveFile } from '../service/gdrivefile'
+import { useFile } from '../service/file'
 import { useNavigateTo } from '../service/navigate'
 import { useMainMenuSlot } from '../service/navbar'
 import { Panel, PanelButton } from './nav'
 
 export default function (): React.ReactElement {
-  const [fileDetails] = useGdriveFile()
+  const [fileDetails] = useFile()
   const {
     draftFiles,
     discardDraft,

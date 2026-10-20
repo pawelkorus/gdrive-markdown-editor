@@ -1,13 +1,13 @@
 import React, { useCallback, useRef } from 'react'
 import { TextArea, TextAreaHandle } from './textarea'
-import { useGdriveFile } from '@app/service/gdrivefile'
+import { useFile } from '@app/service/file'
 import { uploadFileToDrive } from '@app/google'
 
 type SourceEditorProps = React.ComponentProps<typeof TextArea>
 
 const SourceEditor: React.FC<SourceEditorProps> = (props) => {
   const textAreaRef = useRef<TextAreaHandle | null>(null)
-  const [fileDetails] = useGdriveFile()
+  const [fileDetails] = useFile()
   
   const handleFileDrop = useCallback(
     async (event: React.DragEvent<HTMLDivElement>) => {

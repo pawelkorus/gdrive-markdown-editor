@@ -1,10 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { FileDetails } from './types'
-import { useGdriveFile } from '../gdrivefile'
+import { useFile } from '../file'
 import * as googleApi from '../../google'
 
 export function useDraftFile(draftId: string | undefined) {
-  const [origFileDetails] = useGdriveFile()
+  const [origFileDetails] = useFile()
   const creatingRef = useRef<Promise<FileDetails> | null>(null)
   const [draftDetails, setDraftDetails] = useState<FileDetails | null>(null)
 

@@ -8,7 +8,7 @@ import {
   RootView,
 } from '@app/ui'
 import { CommandsContextProvider } from '@app/service/command'
-import { GdriveFileContextProvider } from '@app/service/gdrivefile/GdriveFileContext'
+import { FileContextProvider } from '@app/service/file/FileContext'
 import { UserContextProvider } from '@app/service/user'
 import {
   createBrowserRouter,
@@ -64,7 +64,7 @@ export default (): React.ReactElement => {
   return (
     <StrictMode>
       <UserContextProvider>
-        <GdriveFileContextProvider>
+        <FileContextProvider>
           <CommandsContextProvider>
             <CommandPaletteProvider>
               <NotificationProvider>
@@ -74,7 +74,7 @@ export default (): React.ReactElement => {
               </NotificationProvider>
             </CommandPaletteProvider>
           </CommandsContextProvider>
-        </GdriveFileContextProvider>
+        </FileContextProvider>
       </UserContextProvider>
     </StrictMode>
   )

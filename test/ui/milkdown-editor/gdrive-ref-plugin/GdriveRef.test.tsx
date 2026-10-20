@@ -2,7 +2,7 @@ import React from 'react'
 import { render, act } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 import { useNavigateTo } from '@app/service/navigate'
-import { useGdriveFileMetadata } from '@app/service/gdrivefiles'
+import { useFileMetadata } from '@app/service/files'
 import { TestMilkdownEditor } from '@test/test-utils'
 
 const defaultFileDetails = {
@@ -12,9 +12,9 @@ const defaultFileDetails = {
   url: 'http://example.com',
 }
 
-vi.mock('@app/service/gdrivefiles', () => {
+vi.mock('@app/service/files', () => {
   return {
-    useGdriveFileMetadata: vi.fn(() => defaultFileDetails),
+    useFileMetadata: vi.fn(() => defaultFileDetails),
   }
 })
 
@@ -83,7 +83,7 @@ test('should navigate to file view when clicked and mime type is markdown', asyn
 test('should navigate to file view when clicked and file name extension is md', async () => {
   const fileDetails = { ...defaultFileDetails, name: 'file.md', mimeType: 'text/plain' }
   const { navigateToFileView } = useNavigateTo()
-  vi.mocked(useGdriveFileMetadata).mockImplementationOnce(() => fileDetails)
+  vi.mocked(useFileMetadata).mockImplementationOnce(() => fileDetails)
 
   const SAMPLE_CONTENT = `:gdrive-ref{src="${defaultFileDetails.id}"}`
   const container = await act(async () => {
@@ -103,7 +103,7 @@ test('should navigate to file view when clicked and file name extension is md', 
 test('should not navigate to file view when clicked and not markdown file', async () => {
   const fileDetails = { ...defaultFileDetails, name: 'file', mimeType: 'text/plain' }
   const { navigateToFileView } = useNavigateTo()
-  vi.mocked(useGdriveFileMetadata).mockImplementationOnce(() => fileDetails)
+  vi.mocked(useFileMetadata).mockImplementationOnce(() => fileDetails)
 
   const SAMPLE_CONTENT = `:gdrive-ref{src="${defaultFileDetails.id}"}`
   const container = await act(async () => {

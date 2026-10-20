@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getFileMetadata, FileDetailsWithLink } from '../../google'
 
-export function useGdriveFileMetadata(fileId: string): FileDetailsWithLink | null {
+export function useFileMetadata(fileId: string): FileDetailsWithLink | null {
   const [fileMetadata, setFileMetadata] = useState<FileDetailsWithLink | null>(null)
 
   useEffect(() => {

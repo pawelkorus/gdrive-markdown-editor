@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { MilkdownEditor } from './milkdown-editor'
-import { useGdriveFile, useGdriveFileCommands } from '../service/gdrivefile'
+import { useFile, useFileCommands } from '../service/file'
 import { FileDetails, useDraftFile } from '../service/draftfile'
 import { useNavigateTo } from '../service/navigate'
 import { useFileEditParams } from '../service/navigate'
@@ -14,10 +14,10 @@ export default function EditorView(): React.ReactElement {
   const [isDirty, setIsDirty] = useState(false)
   const [lastSavedTimestamp, setLastSavedTimestamp] = useState<Date>(null)
   const [editFileNameEnabled, setEditFileNameEnabled] = useState(false)
-  const [fileDetails] = useGdriveFile()
+  const [fileDetails] = useFile()
   const [initialContent, setInitialContent] = useState(fileDetails.content)
   const [updatedContent, setUpdatedContent] = useState(fileDetails.content)
-  const { updateContent: updateGdriveContent, updateFileName,  } = useGdriveFileCommands()
+  const { updateContent, updateFileName,  } = useFileCommands()
   const {
     draftDetails,
     select: selectDraft,
@@ -59,14 +59,14 @@ export default function EditorView(): React.ReactElement {
   }, [paramsFileEdit.draftId])
 
   const onCommitContentChange = useCallback(function () {
-    void updateGdriveContent(updatedContent)
+    void updateContent(updatedContent)
     void saveDraft(updatedContent)
     setLastSavedTimestamp(new Date())
     setIsDirty(false)
-  }, [updatedContent, updateGdriveContent, saveDraft])
+  }, [updatedContent, updateContent, saveDraft])
 
   const onCloseClicked = useCallback(async function onCloseClicked() {
-    await updateGdriveContent(updatedContent)
+    await updateContent(updatedContent)
     await discardDraft()
     exitEditor()
   }, [updatedContent, discardDraft])

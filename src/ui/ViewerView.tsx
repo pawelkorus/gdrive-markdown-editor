@@ -1,12 +1,12 @@
 import React from 'react'
 import { MilkdownEditor } from '@app/ui/milkdown-editor'
-import { useGdriveFile } from '@app/service/gdrivefile'
+import { useFile } from '@app/service/file'
 import { useNavigateTo } from '@app/service/navigate'
 import { Panel, PanelButton } from '@app/ui/nav'
 import { useMainMenuSlot } from '@app/service/navbar'
 
 export default function ViewerView(): React.ReactElement {
-  const [fileDetails] = useGdriveFile()
+  const [fileDetails] = useFile()
   const { addPanel } = useMainMenuSlot()
   const { navigateToFileEdit, navigateToFileSource } = useNavigateTo()
 
