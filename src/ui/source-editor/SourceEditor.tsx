@@ -1,13 +1,14 @@
 import React, { useCallback, useRef } from 'react'
 import { TextArea, TextAreaHandle } from './textarea'
 import { useFile } from '@app/service/file'
-import { uploadFileToDrive } from '@app/google'
+import { useUploadFile } from '@app/service/files'
 
 type SourceEditorProps = React.ComponentProps<typeof TextArea>
 
 const SourceEditor: React.FC<SourceEditorProps> = (props) => {
   const textAreaRef = useRef<TextAreaHandle | null>(null)
   const [fileDetails] = useFile()
+  const uploadFile = useUploadFile()
   
   const handleFileDrop = useCallback(
     async (event: React.DragEvent<HTMLDivElement>) => {
@@ -19,14 +20,14 @@ const SourceEditor: React.FC<SourceEditorProps> = (props) => {
         const parentId = fileDetails.folderId // Assuming fileDetails contains the parent directory ID
 
         try {
-          const uploadedFile = await uploadFileToDrive(file, parentId)
+          const uploadedFile = await uploadFile(file, parentId)
           textAreaRef.current.insertText(`::gdrive{src="${uploadedFile.id}"}`)
         } catch (error) {
           console.error('Error uploading file:', error)
         }
       }
     },
-    [uploadFileToDrive, fileDetails],
+    [uploadFile, fileDetails],
   )
 
   return <div onDrop={(event) => { void handleFileDrop(event) }}>

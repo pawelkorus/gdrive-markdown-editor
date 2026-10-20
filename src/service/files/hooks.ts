@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getFileMetadata, FileDetailsWithLink } from '@app/google'
+import { getFileMetadata, uploadFileToDrive, FileDetails, FileDetailsWithLink } from '@app/google'
 
 export function useFileMetadata(fileId: string): FileDetailsWithLink | null {
   const [fileMetadata, setFileMetadata] = useState<FileDetailsWithLink | null>(null)
@@ -14,4 +14,8 @@ export function useFileMetadata(fileId: string): FileDetailsWithLink | null {
   }, [fileId])
 
   return fileMetadata
+}
+
+export function useUploadFile(): (file: File, parentId: string) => Promise<FileDetails> {
+  return uploadFileToDrive
 }
