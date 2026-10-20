@@ -14,7 +14,6 @@ export {
   type FileDetails,
   type FileDetailsWithContent,
   type FileDetailsWithLink,
-  type About,
 } from './api'
 
 export {

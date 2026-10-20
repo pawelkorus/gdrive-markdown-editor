@@ -19,10 +19,6 @@ export type FileDetailsWithLink = FileDetails & {
   url: string
 }
 
-export interface About {
-  appInstalled: boolean
-}
-
 export async function initializeGapiClient() {
   await loadGapiClient
 
