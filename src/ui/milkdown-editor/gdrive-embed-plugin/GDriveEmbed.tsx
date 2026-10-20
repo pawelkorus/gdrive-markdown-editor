@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { loadBinaryFile } from '../../../google'
+import { loadBinaryFile } from '@app/google'
 import { useNodeViewContext } from '@prosemirror-adapter/react'
 
 export default function (): React.ReactElement {

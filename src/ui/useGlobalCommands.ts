@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
-import { Command, useCommandManager } from '../service/command'
-import { showFolderPicker, showMarkdownPicker } from '../google'
-import { useNavigateTo } from '../service/navigate'
+import { Command, useCommandManager } from '@app/service/command'
+import { showFolderPicker, showMarkdownPicker } from '@app/google'
+import { useNavigateTo } from '@app/service/navigate'
 
 export const openMarkdownFileCmd = 'openMarkdownFile'
 

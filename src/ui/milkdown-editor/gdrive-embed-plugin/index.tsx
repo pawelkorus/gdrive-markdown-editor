@@ -5,7 +5,7 @@ import { expectDomTypeError } from '@milkdown/exception'
 import { EditorState, Transaction } from '@milkdown/kit/prose/state'
 import { withMeta } from './with-meta'
 import { InputRule } from '@milkdown/kit/prose/inputrules'
-import { showPicker } from '../../../google'
+import { showPicker } from '@app/google'
 import { useNodeViewFactory } from '@prosemirror-adapter/react'
 import { gdriveNodeView } from './view'
 

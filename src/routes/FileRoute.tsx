@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { useFile } from '../service/file'
-import { useCommandManager } from '../service/command'
-import { useNavigateTo, useFileViewParams } from '../service/navigate'
+import { useFile } from '@app/service/file'
+import { useCommandManager } from '@app/service/command'
+import { useNavigateTo, useFileViewParams } from '@app/service/navigate'
 import { Spinner } from 'react-bootstrap'
 
 export default function (): React.ReactElement {

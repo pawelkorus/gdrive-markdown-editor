@@ -1,8 +1,8 @@
 import React from 'react'
-import { useDraftFiles } from '../service/draftfile'
-import { useFile } from '../service/file'
-import { useNavigateTo } from '../service/navigate'
-import { useMainMenuSlot } from '../service/navbar'
+import { useDraftFiles } from '@app/service/draftfile'
+import { useFile } from '@app/service/file'
+import { useNavigateTo } from '@app/service/navigate'
+import { useMainMenuSlot } from '@app/service/navbar'
 import { Panel, PanelButton } from './nav'
 
 export default function (): React.ReactElement {

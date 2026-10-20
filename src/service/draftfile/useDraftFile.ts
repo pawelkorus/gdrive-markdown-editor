@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { FileDetails } from './types'
 import { useFile } from '../file'
-import * as googleApi from '../../google'
+import * as googleApi from '@app/google'
 
 export function useDraftFile(draftId: string | undefined) {
   const [origFileDetails] = useFile()

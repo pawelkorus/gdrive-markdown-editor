@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, createContext, useEffect, useState } from 'react'
-import { authenticateUser } from '../../google'
+import { authenticateUser } from '@app/google'
 
 export interface User {
   id: string

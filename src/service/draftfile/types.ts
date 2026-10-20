@@ -1,4 +1,4 @@
-import * as googleApi from '../../google'
+import * as googleApi from '@app/google'
 
 export type FileDetails = googleApi.FileDetails
 

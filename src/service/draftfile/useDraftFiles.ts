@@ -4,7 +4,7 @@ import {
   deleteFileFromAppDirectory,
   createFileInAppDirectory,
   save,
-} from '../../google'
+} from '@app/google'
 import { FileDetails } from './types'
 
 export const useDraftFiles = (origFileDetails: FileDetails) => {

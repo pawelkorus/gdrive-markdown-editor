@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react'
-import { useFileCommands, useFile } from '../service/file'
+import { useFileCommands, useFile } from '@app/service/file'
 import { useSearchParams } from 'react-router-dom'
 import { Spinner } from 'react-bootstrap'
-import { useNavigateTo } from '../service/navigate'
+import { useNavigateTo } from '@app/service/navigate'
 
 export default function (): React.ReactElement {
   const { createFile } = useFileCommands()

@@ -1,5 +1,5 @@
 import React from 'react'
-import { useUser } from '../../service/user'
+import { useUser } from '@app/service/user'
 
 interface Props {
   className?: string

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getFileMetadata, FileDetailsWithLink } from '../../google'
+import { getFileMetadata, FileDetailsWithLink } from '@app/google'
 
 export function useFileMetadata(fileId: string): FileDetailsWithLink | null {
   const [fileMetadata, setFileMetadata] = useState<FileDetailsWithLink | null>(null)

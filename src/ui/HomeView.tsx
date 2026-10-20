@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { getUserRecentlyModifiedFiles } from '../google'
-import { useNavigateTo } from '../service/navigate'
+import { getUserRecentlyModifiedFiles } from '@app/google'
+import { useNavigateTo } from '@app/service/navigate'
 
 const InstalledView = (): React.ReactElement => {
   const [files, setFiles] = useState<{ id: string, name: string, mimeType: string, viewedByMeTime: string }[]>([])

@@ -1,5 +1,5 @@
 import { useInstance } from '@milkdown/react'
-import { useCommandManager } from '../../service/command'
+import { useCommandManager } from '@app/service/command'
 import {
   wrapInHeadingCommand,
   turnIntoTextCommand,

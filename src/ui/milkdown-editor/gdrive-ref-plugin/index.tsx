@@ -6,7 +6,7 @@ import { expectDomTypeError } from '@milkdown/exception'
 import { withMeta } from './with-meta'
 import { useNodeViewFactory } from '@prosemirror-adapter/react'
 import GDriveRef from './GDriveRef'
-import { showPicker } from '../../../google'
+import { showPicker } from '@app/google'
 import type { NodeViewConstructor } from '@milkdown/kit/prose/view'
 
 const node = $node('gdrive-ref', () => ({
