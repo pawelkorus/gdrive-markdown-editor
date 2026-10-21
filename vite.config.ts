@@ -7,8 +7,8 @@ export default defineConfig({
   plugins: [react(), basicSsl()],
   resolve: {
     alias: {
-      '@app': path.resolve(__dirname, 'src'),
-      '@test': path.resolve(__dirname, 'test'),
+      '@app': path.resolve(import.meta.dirname, 'src'),
+      '@test': path.resolve(import.meta.dirname, 'test'),
     },
   },
   css: {
