@@ -35,8 +35,6 @@ export function CommandsContextProvider(props: Props): React.ReactElement {
     })
 
     if (Object.values(additionalCommands).length > 0) {
-      console.log('Registering commands', additionalCommands)
-      console.log('Existing commands', commandRegistry)
       commandRegistryRef.current = { ...commandRegistry, ...additionalCommands }
 
       setCommands(Object.values(commandRegistryRef.current))

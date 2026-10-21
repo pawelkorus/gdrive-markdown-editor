@@ -1,7 +1,6 @@
 import React, { PropsWithChildren, useCallback, useState } from 'react'
-import * as googleApi from '@app/google'
-
-export type FileDetails = googleApi.FileDetailsWithContent
+import type { FileDetailsWithContent } from '@app/storage'
+import { useStorageApi } from '../storage'
 
 export interface CreateFileParams {
   folderId: string
@@ -10,7 +9,7 @@ export interface CreateFileParams {
 }
 
 export interface FileContextState {
-  fileDetails: FileDetails
+  fileDetails: FileDetailsWithContent
   loadFile: (fileId: string, userId?: string) => Promise<void>
   createFile: (params: CreateFileParams) => Promise<void>
   updateContent: (content: string) => Promise<void>
@@ -29,7 +28,8 @@ export const FileContext = React.createContext<FileContextState>({
 type Props = PropsWithChildren<object>
 
 export function FileContextProvider(props: Props): React.ReactElement {
-  const [fileDetails, setFileDetails] = useState<FileDetails>({
+  const api = useStorageApi()
+  const [fileDetails, setFileDetails] = useState<FileDetailsWithContent>({
     id: undefined,
     name: '',
     mimeType: '',
@@ -37,28 +37,28 @@ export function FileContextProvider(props: Props): React.ReactElement {
   })
 
   const loadFile = useCallback(async (fileId: string) => {
-    const fileDetails = await googleApi.loadFile(fileId)
+    const fileDetails = await api.loadFile(fileId)
     setFileDetails(fileDetails)
-  }, [])
+  }, [api])
 
   const updateContent = useCallback(async (content: string) => {
-    await googleApi.save(fileDetails.id, content)
+    await api.save(fileDetails.id, content)
     setFileDetails({ ...fileDetails, content })
-  }, [fileDetails])
+  }, [api, fileDetails])
 
   const updateFileName = useCallback(async (fileName: string) => {
-    await googleApi.updateFileName(fileDetails.id, fileName)
+    await api.updateFileName(fileDetails.id, fileName)
     setFileDetails({ ...fileDetails, name: fileName })
-  }, [fileDetails])
+  }, [api, fileDetails])
 
   const createFile = useCallback(async (params: CreateFileParams) => {
-    const fileDetails = await googleApi.createFile({
+    const fileDetails = await api.createFile({
       filename: params.fileName || 'New file',
       content: '# Hello world',
       parent: params.folderId,
     })
     setFileDetails(fileDetails)
-  }, [])
+  }, [api])
 
   const value = {
     fileDetails,

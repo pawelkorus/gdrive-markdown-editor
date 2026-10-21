@@ -1,23 +1,14 @@
 import { API_KEY, DISCOVERY_DOC } from './const'
 import { ensurePermissionGranted, Permissions } from './authorization'
 import { loadGapiClient } from './load'
-
-export interface FileDetails {
-  id: string
-  name: string
-  mimeType: string | undefined
-  folderId?: string // Added folderId property
-}
-
-export type FolderDetails = FileDetails
-
-export type FileDetailsWithContent = FileDetails & {
-  content: string
-}
-
-export type FileDetailsWithLink = FileDetails & {
-  url: string
-}
+import type {
+  StorageApi,
+  FileDetails,
+  FileDetailsWithContent,
+  FileDetailsWithLink,
+  RecentFileDetails,
+  CreateFileParams,
+} from '@app/storage'
 
 export async function initializeGapiClient() {
   await loadGapiClient
@@ -66,12 +57,6 @@ export async function loadBinaryFile(fileId: string): Promise<string> {
   return btoa(response.body)
 }
 
-interface CreateFileParams {
-  filename: string
-  content: string
-  parent: string
-}
-
 export async function createFile(params: CreateFileParams): Promise<FileDetailsWithContent> {
   await ensurePermissionGranted(Permissions.SAVE_SELECTED_FILE)
 
@@ -93,7 +78,7 @@ export async function createFile(params: CreateFileParams): Promise<FileDetailsW
   }
 }
 
-export async function save(fileId: string, content: string) {
+export async function save(fileId: string, content: string): Promise<void> {
   await ensurePermissionGranted(Permissions.SAVE_SELECTED_FILE)
 
   // according to https://stackoverflow.com/questions/40600725/google-drive-api-v3-javascript-update-file-contents
@@ -109,7 +94,7 @@ export async function save(fileId: string, content: string) {
 }
 
 // generate method that will update gdrive file name
-export async function updateFileName(fileId: string, filename: string) {
+export async function updateFileName(fileId: string, filename: string): Promise<void> {
   await ensurePermissionGranted(Permissions.SAVE_SELECTED_FILE)
 
   await gapi.client.request({
@@ -136,7 +121,7 @@ export async function getFileMetadata(fileId: string): Promise<FileDetailsWithLi
   }
 }
 
-export async function getUserRecentlyModifiedFiles(): Promise<(FileDetails & { viewedByMeTime: string })[]> {
+export async function getUserRecentlyModifiedFiles(): Promise<RecentFileDetails[]> {
   await ensurePermissionGranted(Permissions.BROWSE_FILES)
 
   const response = await gapi.client.drive.files.list({
@@ -257,4 +242,18 @@ export async function uploadFileToDrive(file: File, parentId: string): Promise<F
     name: responseResult.name,
     mimeType: responseResult.mimeType,
   }
+}
+
+export const googleDriveApi: StorageApi = {
+  loadFile,
+  loadBinaryFile,
+  createFile,
+  save,
+  updateFileName,
+  getFileMetadata,
+  getUserRecentlyModifiedFiles,
+  createFileInAppDirectory,
+  findFileInAppDirectory,
+  deleteFileFromAppDirectory,
+  uploadFileToDrive,
 }

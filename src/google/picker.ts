@@ -1,4 +1,4 @@
-import { FolderDetails } from './api'
+import type { FolderDetails } from '@app/storage'
 import { currentToken, ensurePermissionGranted, Permissions } from './authorization'
 import { API_KEY, CLIENT_ID } from './const'
 import { loadPicker } from './load'

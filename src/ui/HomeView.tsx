@@ -1,19 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { getUserRecentlyModifiedFiles } from '@app/google'
+import React from 'react'
+import { useRecentFiles } from '@app/service/files'
 import { useNavigateTo } from '@app/service/navigate'
 
 const InstalledView = (): React.ReactElement => {
-  const [files, setFiles] = useState<{ id: string, name: string, mimeType: string, viewedByMeTime: string }[]>([])
+  const files = useRecentFiles()
   const { navigateToFileEdit, navigateToFileSource, navigateToFileView } = useNavigateTo()
-
-  useEffect(() => {
-    const fetchFiles = async () => {
-      const files = await getUserRecentlyModifiedFiles()
-      setFiles(files)
-    }
-
-    void fetchFiles()
-  }, [])
 
   const handleNavigateToFileEdit = (e: React.MouseEvent, fileId: string) => {
     e.stopPropagation()

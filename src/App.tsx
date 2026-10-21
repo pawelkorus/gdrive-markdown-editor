@@ -17,6 +17,8 @@ import {
 import { FileNewRoute, FileRoute } from '@app/routes'
 import { NavbarProvider } from '@app/service/navbar'
 import { CommandPaletteProvider } from '@app/ui/commandPalette'
+import { StorageApiProvider } from '@app/service/storage'
+import { googleDriveApi } from '@app/google'
 import { NotificationProvider } from '@app/service/notification'
 
 const router = createBrowserRouter([
@@ -63,19 +65,21 @@ const router = createBrowserRouter([
 export default (): React.ReactElement => {
   return (
     <StrictMode>
-      <UserContextProvider>
-        <FileContextProvider>
-          <CommandsContextProvider>
-            <CommandPaletteProvider>
-              <NotificationProvider>
-                <NavbarProvider>
-                  <RouterProvider router={router} />
-                </NavbarProvider>
-              </NotificationProvider>
-            </CommandPaletteProvider>
-          </CommandsContextProvider>
-        </FileContextProvider>
-      </UserContextProvider>
+      <StorageApiProvider api={googleDriveApi}>
+        <UserContextProvider>
+          <FileContextProvider>
+            <CommandsContextProvider>
+              <CommandPaletteProvider>
+                <NotificationProvider>
+                  <NavbarProvider>
+                    <RouterProvider router={router} />
+                  </NavbarProvider>
+                </NotificationProvider>
+              </CommandPaletteProvider>
+            </CommandsContextProvider>
+          </FileContextProvider>
+        </UserContextProvider>
+      </StorageApiProvider>
     </StrictMode>
   )
 }

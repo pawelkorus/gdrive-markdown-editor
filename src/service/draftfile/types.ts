@@ -1,6 +1,4 @@
-import * as googleApi from '@app/google'
-
-export type FileDetails = googleApi.FileDetails
+import type { FileDetails } from '@app/storage'
 
 export type DraftFileDetails = FileDetails & {
   isNew: boolean

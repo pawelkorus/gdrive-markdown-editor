@@ -1,9 +1,10 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { FileDetails } from './types'
+import { FileDetails } from '@app/storage'
 import { useFile } from '../file'
-import * as googleApi from '@app/google'
+import { useStorageApi } from '../storage'
 
 export function useDraftFile(draftId: string | undefined) {
+  const api = useStorageApi()
   const [origFileDetails] = useFile()
   const creatingRef = useRef<Promise<FileDetails> | null>(null)
   const [draftDetails, setDraftDetails] = useState<FileDetails | null>(null)
@@ -11,7 +12,7 @@ export function useDraftFile(draftId: string | undefined) {
   useEffect(() => {
     async function initialize() {
       if (draftId) {
-        const draftDetails = await googleApi.loadFile(draftId)
+        const draftDetails = await api.loadFile(draftId)
         setDraftDetails(draftDetails)
       }
       else {
@@ -21,12 +22,12 @@ export function useDraftFile(draftId: string | undefined) {
     }
 
     void initialize()
-  }, [])
+  }, [api])
 
   const select = useCallback(async (newDraftId: string) => {
-    const existingDraftDetails = await googleApi.loadFile(newDraftId)
+    const existingDraftDetails = await api.loadFile(newDraftId)
     setDraftDetails(existingDraftDetails)
-  }, [])
+  }, [api])
 
   const createNewDraft = useCallback(async () => {
     if (creatingRef.current !== null) {
@@ -34,32 +35,32 @@ export function useDraftFile(draftId: string | undefined) {
     }
 
     creatingRef.current = (async () => {
-      const draftDetails = await googleApi.createFileInAppDirectory('draft_' + origFileDetails.id)
-      await googleApi.save(draftDetails.id, origFileDetails.content)
+      const draftDetails = await api.createFileInAppDirectory('draft_' + origFileDetails.id)
+      await api.save(draftDetails.id, origFileDetails.content)
       return { ...draftDetails, content: origFileDetails.content }
     })()
 
     return creatingRef.current
-  }, [origFileDetails])
+  }, [api, origFileDetails])
 
   const discard = useCallback(async () => {
     if (draftDetails) {
-      await googleApi.deleteFileFromAppDirectory(draftDetails.id)
+      await api.deleteFileFromAppDirectory(draftDetails.id)
       setDraftDetails(null)
     }
-  }, [draftDetails])
+  }, [api, draftDetails])
 
   const loadContent = useCallback(async () => {
     if (!draftDetails) throw new Error('Draft not set')
 
-    return (await googleApi.loadFile(draftDetails.id)).content
-  }, [draftDetails])
+    return (await api.loadFile(draftDetails.id)).content
+  }, [api, draftDetails])
 
   const saveContent = useCallback(async (content: string) => {
     if (!draftDetails) throw new Error('Draft not set')
 
-    await googleApi.save(draftDetails.id, content)
-  }, [draftDetails])
+    await api.save(draftDetails.id, content)
+  }, [api, draftDetails])
 
   return {
     draftDetails,

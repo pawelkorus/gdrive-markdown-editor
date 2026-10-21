@@ -1,19 +1,6 @@
 export {
-  save,
-  updateFileName,
-  createFile,
-  loadBinaryFile,
-  loadFile,
+  googleDriveApi,
   initializeGapiClient,
-  getFileMetadata,
-  getUserRecentlyModifiedFiles,
-  createFileInAppDirectory,
-  deleteFileFromAppDirectory,
-  findFileInAppDirectory,
-  uploadFileToDrive,
-  type FileDetails,
-  type FileDetailsWithContent,
-  type FileDetailsWithLink,
 } from './api'
 
 export {

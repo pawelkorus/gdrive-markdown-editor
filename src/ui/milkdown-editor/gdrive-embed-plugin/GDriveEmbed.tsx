@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import { loadBinaryFile } from '@app/google'
+import { useStorageApi } from '@app/service/storage'
 import { useNodeViewContext } from '@prosemirror-adapter/react'
 
 export default function (): React.ReactElement {
+  const api = useStorageApi()
   const [imageContent, setImageContent] = useState('')
   const { contentRef, node } = useNodeViewContext()
 
   useEffect(() => {
-    loadBinaryFile(node.attrs.src as string)
+    api.loadBinaryFile(node.attrs.src as string)
     .then((fileBody) => {
       setImageContent('data:image/jpg;base64,' + fileBody)
     })
     .catch(err => console.error(err))
-  }, [])
+  }, [api, node.attrs.src])
 
   return (
     <div data-type="gdrive" className="text-center" data-src={node.attrs.src as string} ref={contentRef}>

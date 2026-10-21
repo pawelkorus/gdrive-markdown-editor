@@ -1,8 +1,8 @@
 import { useContext } from 'react'
 import { CreateFileParams, FileContext } from './FileContext'
-import { FileDetails } from './FileContext'
+import { FileDetailsWithContent } from '@app/storage'
 
-export function useFile(): [FileDetails, (fileId: string, userId?: string) => Promise<void>] {
+export function useFile(): [FileDetailsWithContent, (fileId: string, userId?: string) => Promise<void>] {
   const fileContext = useContext(FileContext)
 
   return [fileContext.fileDetails, fileContext.loadFile]
