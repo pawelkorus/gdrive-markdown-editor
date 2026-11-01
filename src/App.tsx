@@ -6,9 +6,11 @@ import {
   ErrorView,
   DraftsView,
   RootView,
+  SettingsView,
 } from '@app/ui'
 import { CommandsContextProvider } from '@app/service/command'
 import { FileContextProvider } from '@app/service/file/FileContext'
+import { AppConfigProvider } from '@app/service/appconfig'
 import { UserContextProvider } from '@app/service/user'
 import {
   createBrowserRouter,
@@ -30,6 +32,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <HomeView />,
+      },
+      {
+        path: 'settings',
+        element: <SettingsView />,
       },
       {
         path: 'file/new',
@@ -67,17 +73,19 @@ export default (): React.ReactElement => {
     <StrictMode>
       <StorageApiProvider api={googleDriveApi}>
         <UserContextProvider>
-          <FileContextProvider>
-            <CommandsContextProvider>
-              <CommandPaletteProvider>
-                <NotificationProvider>
-                  <NavbarProvider>
-                    <RouterProvider router={router} />
-                  </NavbarProvider>
-                </NotificationProvider>
-              </CommandPaletteProvider>
-            </CommandsContextProvider>
-          </FileContextProvider>
+          <AppConfigProvider>
+            <FileContextProvider>
+              <CommandsContextProvider>
+                <CommandPaletteProvider>
+                  <NotificationProvider>
+                    <NavbarProvider>
+                      <RouterProvider router={router} />
+                    </NavbarProvider>
+                  </NotificationProvider>
+                </CommandPaletteProvider>
+              </CommandsContextProvider>
+            </FileContextProvider>
+          </AppConfigProvider>
         </UserContextProvider>
       </StorageApiProvider>
     </StrictMode>

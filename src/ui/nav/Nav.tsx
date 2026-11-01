@@ -1,5 +1,6 @@
 import React from 'react'
-import { Container, Navbar, Form } from 'react-bootstrap'
+import { Container, Navbar, Form, Nav } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 import { useNavbarSlots } from '@app/service/navbar'
 import GoogleSSO from '../googleSSO'
 import logo from '@app/assets/logo.png'
@@ -22,7 +23,11 @@ const CustomNav = (): React.ReactElement => {
         <Form style={{ lineHeight: 1, fontSize: '1.5rem' }} className="ms-0 ms-lg-2 order-lg-last">
           <GoogleSSO style={{ width: '2.5rem', borderRadius: '1.5rem' }}></GoogleSSO>
         </Form>
-        <Navbar.Collapse id="navbarSupportedContent" className="justify-content-end mt-2 mt-lg-0" ref={mainMenuSlot}>
+        <Navbar.Collapse id="navbarSupportedContent" className="justify-content-end mt-2 mt-lg-0">
+          <div ref={mainMenuSlot}></div>
+          <Nav>
+            <Nav.Link as={Link} to="/settings" title="Settings" aria-label="Settings"><i className="bi bi-gear"></i></Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Navbar>
     </Container>
