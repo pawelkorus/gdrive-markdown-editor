@@ -79,7 +79,7 @@ describe('Google storage contexts', () => {
     }))
     expect(request.mock.calls[0][0].body).toContain('AP8B')
     expect(ensurePermissionGranted).toHaveBeenCalledExactlyOnceWith(Permissions.SAVE_SELECTED_FILE)
-    expect(result).not.toHaveProperty('content')
+    expect(result).toHaveProperty('content', 'AP8B')
   })
 
   it('uses a binary MIME type when an upload has no type', async () => {
@@ -94,16 +94,18 @@ describe('Google storage contexts', () => {
       const params = { fileId: 'draft-id', context }
       await expect(api.loadFile(params)).resolves.toMatchObject({ id: 'draft-id', content: 'content' })
       await expect(api.loadBinaryFile(params)).resolves.toBe(btoa('content'))
-      await expect(api.getFileMetadata(params)).resolves.toMatchObject({ id: 'draft-id', url: 'link' })
-      await api.save({ ...params, content: '# Changed' })
-      await api.updateFileName({ ...params, filename: 'renamed' })
+      await expect(api.loadFileMetadata(params)).resolves.toMatchObject({ id: 'draft-id', url: 'link' })
+      await api.saveFile({ ...params, content: '# Changed', filename: 'renamed' })
       await api.deleteFile(params)
       expect(vi.mocked(ensurePermissionGranted).mock.calls).toEqual(
-        Array.from({ length: 6 }, () => [Permissions.MAINTAIN_APP_DATA]),
+        Array.from({ length: 5 }, () => [Permissions.MAINTAIN_APP_DATA]),
       )
       expect(deleteFile).toHaveBeenCalledExactlyOnceWith({ fileId: 'draft-id' })
       expect(request).toHaveBeenCalledWith(expect.objectContaining({
         path: '/upload/drive/v3/files/draft-id', method: 'PATCH', body: '# Changed',
+      }))
+      expect(request).toHaveBeenCalledWith(expect.objectContaining({
+        path: '/drive/v3/files/draft-id', method: 'PATCH', body: { name: 'renamed' },
       }))
     },
   )
@@ -111,14 +113,22 @@ describe('Google storage contexts', () => {
   it('defaults ID-based operations to ordinary Drive permissions', async () => {
     await api.loadFile({ fileId: 'id' })
     await api.loadBinaryFile({ fileId: 'id' })
-    await api.getFileMetadata({ fileId: 'id' })
-    await api.save({ fileId: 'id', content: '' })
-    await api.updateFileName({ fileId: 'id', filename: 'new.md' })
+    await api.loadFileMetadata({ fileId: 'id' })
+    await api.saveFile({ fileId: 'id', content: '', filename: 'new.md' })
     await api.deleteFile({ fileId: 'id' })
     expect(vi.mocked(ensurePermissionGranted).mock.calls).toEqual([
       [Permissions.READ_SELECTED_FILE], [Permissions.READ_FILE], [Permissions.READ_SELECTED_FILE],
-      [Permissions.SAVE_SELECTED_FILE], [Permissions.SAVE_SELECTED_FILE], [Permissions.SAVE_SELECTED_FILE],
+      [Permissions.SAVE_SELECTED_FILE], [Permissions.SAVE_SELECTED_FILE],
     ])
+  })
+
+  it('renames a file through saveFile without changing its content', async () => {
+    await api.saveFile({ fileId: 'id', filename: 'renamed.md' })
+    expect(request).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
+      path: '/drive/v3/files/id',
+      method: 'PATCH',
+      body: { name: 'renamed.md' },
+    }))
   })
 
   it('finds app-data files across all pages, preserving ordering', async () => {

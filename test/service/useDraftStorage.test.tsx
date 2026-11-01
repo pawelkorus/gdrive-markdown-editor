@@ -12,7 +12,7 @@ const original = { id: 'original', name: 'notes.md', mimeType: 'text/markdown', 
 const draft = { id: 'draft', name: 'draft_original', mimeType: 'text/markdown', content: '# Draft' }
 const createFile = vi.fn()
 const loadFile = vi.fn()
-const save = vi.fn()
+const saveFile = vi.fn()
 const findFiles = vi.fn()
 const deleteFile = vi.fn()
 
@@ -20,13 +20,13 @@ beforeEach(() => {
   vi.resetAllMocks()
   createFile.mockResolvedValue(draft)
   loadFile.mockResolvedValue(draft)
-  save.mockResolvedValue(undefined)
+  saveFile.mockResolvedValue(undefined)
   findFiles.mockResolvedValue([draft])
   deleteFile.mockResolvedValue(undefined)
 })
 
 function createApi() {
-  return createFakeStorageApi({ createFile, loadFile, save, findFiles, deleteFile })
+  return createFakeStorageApi({ createFile, loadFile, saveFile, findFiles, deleteFile })
 }
 
 function wrapper(api: StorageApi) {
@@ -55,7 +55,7 @@ describe('draft storage operations', () => {
     expect(createFile).toHaveBeenCalledExactlyOnceWith({
       filename: 'draft_original', content: '# Original', context: StorageContext.Temp,
     })
-    expect(save).not.toHaveBeenCalled()
+    expect(saveFile).not.toHaveBeenCalled()
     await act(async () => {
       expect(await result.current.loadContent()).toBe('# Draft')
       await result.current.saveContent('# Changed')
@@ -63,7 +63,7 @@ describe('draft storage operations', () => {
     })
     expect(loadFile).toHaveBeenCalledWith({ fileId: 'draft', context: StorageContext.Temp })
     expect(loadFile).toHaveBeenCalledWith({ fileId: 'other-draft', context: StorageContext.Temp })
-    expect(save).toHaveBeenCalledExactlyOnceWith({
+    expect(saveFile).toHaveBeenCalledExactlyOnceWith({
       fileId: 'draft', content: '# Changed', context: StorageContext.Temp,
     })
     await act(() => result.current.discard())
@@ -91,7 +91,7 @@ describe('draft storage operations', () => {
     expect(createFile).toHaveBeenCalledExactlyOnceWith({
       filename: 'draft_original', content: '# New', context: StorageContext.Temp,
     })
-    expect(save).not.toHaveBeenCalled()
+    expect(saveFile).not.toHaveBeenCalled()
     expect(result.current.draftFiles).toHaveLength(2)
     await act(() => result.current.discardDraft('new-draft'))
     expect(deleteFile).toHaveBeenCalledExactlyOnceWith({

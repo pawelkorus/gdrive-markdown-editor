@@ -8,12 +8,9 @@ import type {
   FileDetailsWithLink,
   RecentFileDetails,
   CreateFileParams,
-  CreateTextFileParams,
-  CreateUploadFileParams,
   FileParams,
   FindFilesParams,
   SaveFileParams,
-  UpdateFileNameParams,
 } from '@app/storage'
 import { StorageContext } from '@app/storage'
 
@@ -89,10 +86,7 @@ export async function loadBinaryFile({ fileId, context }: FileParams): Promise<s
   return btoa(response.body)
 }
 
-export function createFile(params: CreateTextFileParams): Promise<FileDetailsWithContent>
-export function createFile(params: CreateUploadFileParams): Promise<FileDetails>
-export function createFile(params: CreateFileParams): Promise<FileDetails | FileDetailsWithContent>
-export async function createFile(params: CreateFileParams): Promise<FileDetails | FileDetailsWithContent> {
+export async function createFile(params: CreateFileParams): Promise<FileDetailsWithContent> {
   const { parent } = resolveContext(params.context)
   if (!parent) throw new Error('A storage context is required to create a file')
   await ensureContextPermission(params.context, Permissions.SAVE_SELECTED_FILE)
@@ -126,7 +120,10 @@ export async function createFile(params: CreateFileParams): Promise<FileDetails 
     mimeType: result.mimeType,
     folderId: result.parents?.[0],
   }
-  return isUpload ? fileDetails : { ...fileDetails, content: params.content }
+  return {
+    ...fileDetails,
+    content: isUpload ? body : params.content,
+  }
 }
 
 function readBase64(file: Blob): Promise<string> {
@@ -145,35 +142,30 @@ function readBase64(file: Blob): Promise<string> {
   })
 }
 
-export async function save({ fileId, content, context }: SaveFileParams): Promise<void> {
+export async function saveFile({ fileId, content, filename, context }: SaveFileParams): Promise<void> {
   await ensureContextPermission(context, Permissions.SAVE_SELECTED_FILE)
 
-  // according to https://stackoverflow.com/questions/40600725/google-drive-api-v3-javascript-update-file-contents
-  // google drive javascript library doesn't support body upload
-  await gapi.client.request({
-    path: '/upload/drive/v3/files/' + fileId,
-    method: 'PATCH',
-    params: {
-      uploadType: 'media',
-    },
-    body: content,
-  })
+  if (filename !== undefined) {
+    await gapi.client.request({
+      path: '/drive/v3/files/' + fileId,
+      method: 'PATCH',
+      body: { name: filename },
+    })
+  }
+
+  if (content !== undefined) {
+    // according to https://stackoverflow.com/questions/40600725/google-drive-api-v3-javascript-update-file-contents
+    // google drive javascript library doesn't support body upload
+    await gapi.client.request({
+      path: '/upload/drive/v3/files/' + fileId,
+      method: 'PATCH',
+      params: { uploadType: 'media' },
+      body: content,
+    })
+  }
 }
 
-// generate method that will update gdrive file name
-export async function updateFileName({ fileId, filename, context }: UpdateFileNameParams): Promise<void> {
-  await ensureContextPermission(context, Permissions.SAVE_SELECTED_FILE)
-
-  await gapi.client.request({
-    path: '/drive/v3/files/' + fileId,
-    method: 'PATCH',
-    body: {
-      name: filename,
-    },
-  })
-}
-
-export async function getFileMetadata({ fileId, context }: FileParams): Promise<FileDetailsWithLink> {
+export async function loadFileMetadata({ fileId, context }: FileParams): Promise<FileDetailsWithLink> {
   await ensureContextPermission(context, Permissions.READ_SELECTED_FILE)
   const response = await gapi.client.drive.files.get({
     fileId: fileId,
@@ -246,9 +238,8 @@ export const googleDriveApi: StorageApi = {
   loadFile,
   loadBinaryFile,
   createFile,
-  save,
-  updateFileName,
-  getFileMetadata,
+  saveFile,
+  loadFileMetadata,
   getUserRecentlyModifiedFiles,
   findFiles,
   deleteFile,

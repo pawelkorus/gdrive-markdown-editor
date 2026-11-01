@@ -11,7 +11,6 @@ export type {
   FileParams,
   FindFilesParams,
   SaveFileParams,
-  UpdateFileNameParams,
 } from './types'
 
 export { StorageContext } from './types'

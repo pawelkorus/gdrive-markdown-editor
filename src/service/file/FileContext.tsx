@@ -42,12 +42,12 @@ export function FileContextProvider(props: Props): React.ReactElement {
   }, [api])
 
   const updateContent = useCallback(async (content: string) => {
-    await api.save({ fileId: fileDetails.id, content })
+    await api.saveFile({ fileId: fileDetails.id, content })
     setFileDetails({ ...fileDetails, content })
   }, [api, fileDetails])
 
   const updateFileName = useCallback(async (fileName: string) => {
-    await api.updateFileName({ fileId: fileDetails.id, filename: fileName })
+    await api.saveFile({ fileId: fileDetails.id, filename: fileName })
     setFileDetails({ ...fileDetails, name: fileName })
   }, [api, fileDetails])
 

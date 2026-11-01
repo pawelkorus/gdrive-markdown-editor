@@ -9,13 +9,12 @@ New `src/storage/types.ts` (neutral location, so `google/` and `service/` both d
 - Move the provider-neutral types here: `FileDetails`, `FolderDetails`, `FileDetailsWithContent`, `FileDetailsWithLink`, plus a named `RecentFileDetails = FileDetails & { viewedByMeTime: string }` for `getUserRecentlyModifiedFiles`.
 - Add `src/storage/index.ts` to re-export the public types from `./types` (`StorageApi`, `FileDetails`, `FolderDetails`, `FileDetailsWithContent`, `FileDetailsWithLink`, `RecentFileDetails`, `CreateFileParams`), so imports from `@app/storage` resolve through the directory barrel.
 - Declare `interface StorageApi` with these methods:
-  - Explicit return types, so Google response shapes don't leak into the interface: `save` and `updateFileName` return `Promise<void>`; `getFileMetadata` returns `Promise<FileDetailsWithLink>`; `loadFile` and `createFile` return `Promise<FileDetailsWithContent>`.
+  - Explicit return types, so Google response shapes don't leak into the interface: `saveFile` returns `Promise<void>`; `loadFileMetadata` returns `Promise<FileDetailsWithLink>`; `loadFile` and `createFile` return `Promise<FileDetailsWithContent>`.
   - `loadFile(id)`
   - `loadBinaryFile(id)`
   - `createFile({filename, content, parent})`
-  - `save(id, content)`
-  - `updateFileName(id, name)`
-  - `getFileMetadata(id)`
+  - `saveFile(id, content)`
+  - `loadFileMetadata(id)`
   - `getUserRecentlyModifiedFiles()`
   - `createFileInAppDirectory(name)`
   - `findFileInAppDirectory(name)`
@@ -60,7 +59,7 @@ Existing tests do not mock `@app/google`. They mock service modules (`@app/servi
 
 ## 6. Tests and verification
 - Run `tsc --noEmit`, eslint and vitest.
-- Run `grep` for the `api.ts` function names (`loadFile`, `loadBinaryFile`, `createFile`, `save`, `updateFileName`, `getFileMetadata`, `getUserRecentlyModifiedFiles`, `*AppDirectory`, `uploadFileToDrive`) imported from `@app/google`. None may remain anywhere except the composition root (`App.tsx`, which imports `googleDriveApi`). Also confirm `ui/` imports only pickers from `@app/google`. Picker and auth imports (including `service/user` and `service/gdrive`) are the accepted exceptions.
+- Run `grep` for the `api.ts` function names (`loadFile`, `loadBinaryFile`, `createFile`, `saveFile`, `loadFileMetadata`, `getUserRecentlyModifiedFiles`, `*AppDirectory`, `uploadFileToDrive`) imported from `@app/google`. None may remain anywhere except the composition root (`App.tsx`, which imports `googleDriveApi`). Also confirm `ui/` imports only pickers from `@app/google`. Picker and auth imports (including `service/user` and `service/gdrive`) are the accepted exceptions.
 
 ## Decisions
 - Keep the current method names.

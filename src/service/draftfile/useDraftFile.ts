@@ -59,7 +59,7 @@ export function useDraftFile(draftId: string | undefined) {
   const saveContent = useCallback(async (content: string) => {
     if (!draftDetails) throw new Error('Draft not set')
 
-    await api.save({ fileId: draftDetails.id, content, context: StorageContext.Temp })
+    await api.saveFile({ fileId: draftDetails.id, content, context: StorageContext.Temp })
   }, [api, draftDetails])
 
   return {

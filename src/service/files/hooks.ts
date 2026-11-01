@@ -8,7 +8,7 @@ export function useFileMetadata(fileId: string): FileDetailsWithLink | null {
 
   useEffect(() => {
     const fetchFileMetadata = async () => {
-      const metadata = await api.getFileMetadata({ fileId })
+      const metadata = await api.loadFileMetadata({ fileId })
       setFileMetadata(metadata)
     }
 

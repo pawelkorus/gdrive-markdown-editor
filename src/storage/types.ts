@@ -45,24 +45,23 @@ export interface FindFilesParams {
   context: string | StorageContext
 }
 
-export interface SaveFileParams extends FileParams {
-  content: string
-}
-
-export interface UpdateFileNameParams extends FileParams {
-  filename: string
-}
+export type SaveFileParams = FileParams & {
+  content?: string
+  filename?: string
+} & ({ content: string } | { filename: string })
 
 export interface StorageApi {
-  loadFile(params: FileParams): Promise<FileDetailsWithContent>
-  loadBinaryFile(params: FileParams): Promise<string>
-  createFile(params: CreateTextFileParams): Promise<FileDetailsWithContent>
-  createFile(params: CreateUploadFileParams): Promise<FileDetails>
-  createFile(params: CreateFileParams): Promise<FileDetails | FileDetailsWithContent>
-  save(params: SaveFileParams): Promise<void>
-  updateFileName(params: UpdateFileNameParams): Promise<void>
-  getFileMetadata(params: FileParams): Promise<FileDetailsWithLink>
-  getUserRecentlyModifiedFiles(): Promise<RecentFileDetails[]>
   findFiles(params: FindFilesParams): Promise<FileDetails[]>
+
+  loadFile(params: FileParams): Promise<FileDetailsWithContent>
+  loadFileMetadata(params: FileParams): Promise<FileDetailsWithLink>
+  loadBinaryFile(params: FileParams): Promise<string>
+
+  createFile(params: CreateFileParams): Promise<FileDetailsWithContent>
+
+  saveFile(params: SaveFileParams): Promise<void>
+
   deleteFile(params: FileParams): Promise<void>
+
+  getUserRecentlyModifiedFiles(): Promise<RecentFileDetails[]>
 }
