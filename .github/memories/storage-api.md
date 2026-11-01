@@ -9,6 +9,15 @@ value (`Temp` or `AppConfig`). The Google adapter treats strings as Drive folder
 IDs (not filesystem paths), and maps both special values to `appDataFolder`.
 These two contexts share the same directory; they are not isolated namespaces.
 
+`src/storage` is the provider-neutral source of truth for the storage types and
+`StorageApi` interface. The Google implementation is exposed as the stable
+`googleDriveApi` object; the app injects it through `StorageApiProvider`, and
+consumers access it with `useStorageApi()` from `src/service/storage`. Keep
+Google API calls behind that service boundary rather than importing storage
+operations from `src/google` in UI or other consumers. The root may compose the
+Google adapter, and Google-specific initialization, authentication, and picker
+functions remain Google-specific.
+
 ```ts
 await api.createFile({ filename: 'notes.md', content: '# Notes', context: folderId })
 await api.createFile({ file: uploadedFile, context: folderId })
@@ -36,4 +45,8 @@ ordinary Drive permissions. Recent files remain a user-level, no-argument query.
 `saveFile` accepts content, a filename, or both; filename changes are part of the
 same API method, although the Google adapter makes separate Drive requests for
 metadata and content when both are supplied.
-UI code accesses storage through service hooks, not the Google adapter directly.
+When testing consumers, provide a stable fake `StorageApi` through
+`StorageApiProvider`; give the fake resolving defaults for methods used by
+effects and plugins. The provider should pass the supplied API through unchanged
+so hook dependencies remain stable. Pickers and authentication are not part of
+`StorageApi` and may continue to use their Google-specific service paths.
