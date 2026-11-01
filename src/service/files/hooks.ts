@@ -8,7 +8,7 @@ export function useFileMetadata(fileId: string): FileDetailsWithLink | null {
 
   useEffect(() => {
     const fetchFileMetadata = async () => {
-      const metadata = await api.getFileMetadata(fileId)
+      const metadata = await api.getFileMetadata({ fileId })
       setFileMetadata(metadata)
     }
 
@@ -20,7 +20,7 @@ export function useFileMetadata(fileId: string): FileDetailsWithLink | null {
 
 export function useUploadFile(): (file: File, parentId: string) => Promise<FileDetails> {
   const api = useStorageApi()
-  return useCallback((file: File, parentId: string) => api.uploadFileToDrive(file, parentId), [api])
+  return useCallback((file: File, parentId: string) => api.createFile({ file, context: parentId }), [api])
 }
 
 export function useRecentFiles(): RecentFileDetails[] {

@@ -17,22 +17,52 @@ export type FileDetailsWithLink = FileDetails & {
 
 export type RecentFileDetails = FileDetails & { viewedByMeTime: string }
 
-export interface CreateFileParams {
+export enum StorageContext {
+  Temp,
+  AppConfig,
+}
+
+export interface FileParams {
+  fileId: string
+  context?: string | StorageContext
+}
+
+export interface CreateTextFileParams {
   filename: string
   content: string
-  parent: string
+  context: string | StorageContext
+}
+
+export interface CreateUploadFileParams {
+  file: File
+  context: string | StorageContext
+}
+
+export type CreateFileParams = CreateTextFileParams | CreateUploadFileParams
+
+export interface FindFilesParams {
+  filename: string
+  context: string | StorageContext
+}
+
+export interface SaveFileParams extends FileParams {
+  content: string
+}
+
+export interface UpdateFileNameParams extends FileParams {
+  filename: string
 }
 
 export interface StorageApi {
-  loadFile(fileId: string): Promise<FileDetailsWithContent>
-  loadBinaryFile(fileId: string): Promise<string>
-  createFile(params: CreateFileParams): Promise<FileDetailsWithContent>
-  save(fileId: string, content: string): Promise<void>
-  updateFileName(fileId: string, filename: string): Promise<void>
-  getFileMetadata(fileId: string): Promise<FileDetailsWithLink>
+  loadFile(params: FileParams): Promise<FileDetailsWithContent>
+  loadBinaryFile(params: FileParams): Promise<string>
+  createFile(params: CreateTextFileParams): Promise<FileDetailsWithContent>
+  createFile(params: CreateUploadFileParams): Promise<FileDetails>
+  createFile(params: CreateFileParams): Promise<FileDetails | FileDetailsWithContent>
+  save(params: SaveFileParams): Promise<void>
+  updateFileName(params: UpdateFileNameParams): Promise<void>
+  getFileMetadata(params: FileParams): Promise<FileDetailsWithLink>
   getUserRecentlyModifiedFiles(): Promise<RecentFileDetails[]>
-  createFileInAppDirectory(filename: string): Promise<FileDetails>
-  findFileInAppDirectory(filename: string): Promise<FileDetails[]>
-  deleteFileFromAppDirectory(fileId: string): Promise<void>
-  uploadFileToDrive(file: File, parentId: string): Promise<FileDetails>
+  findFiles(params: FindFilesParams): Promise<FileDetails[]>
+  deleteFile(params: FileParams): Promise<void>
 }

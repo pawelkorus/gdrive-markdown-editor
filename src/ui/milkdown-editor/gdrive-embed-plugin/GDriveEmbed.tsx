@@ -8,7 +8,7 @@ export default function (): React.ReactElement {
   const { contentRef, node } = useNodeViewContext()
 
   useEffect(() => {
-    api.loadBinaryFile(node.attrs.src as string)
+    api.loadBinaryFile({ fileId: node.attrs.src as string })
     .then((fileBody) => {
       setImageContent('data:image/jpg;base64,' + fileBody)
     })

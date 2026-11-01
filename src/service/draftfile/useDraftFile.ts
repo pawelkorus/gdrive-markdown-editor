@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { FileDetails } from '@app/storage'
+import { FileDetails, StorageContext } from '@app/storage'
 import { useFile } from '../file'
 import { useStorageApi } from '../storage'
 
@@ -12,7 +12,7 @@ export function useDraftFile(draftId: string | undefined) {
   useEffect(() => {
     async function initialize() {
       if (draftId) {
-        const draftDetails = await api.loadFile(draftId)
+        const draftDetails = await api.loadFile({ fileId: draftId, context: StorageContext.Temp })
         setDraftDetails(draftDetails)
       }
       else {
@@ -25,7 +25,7 @@ export function useDraftFile(draftId: string | undefined) {
   }, [api])
 
   const select = useCallback(async (newDraftId: string) => {
-    const existingDraftDetails = await api.loadFile(newDraftId)
+    const existingDraftDetails = await api.loadFile({ fileId: newDraftId, context: StorageContext.Temp })
     setDraftDetails(existingDraftDetails)
   }, [api])
 
@@ -34,18 +34,18 @@ export function useDraftFile(draftId: string | undefined) {
       return creatingRef.current
     }
 
-    creatingRef.current = (async () => {
-      const draftDetails = await api.createFileInAppDirectory('draft_' + origFileDetails.id)
-      await api.save(draftDetails.id, origFileDetails.content)
-      return { ...draftDetails, content: origFileDetails.content }
-    })()
+    creatingRef.current = api.createFile({
+      filename: 'draft_' + origFileDetails.id,
+      content: origFileDetails.content,
+      context: StorageContext.Temp,
+    })
 
     return creatingRef.current
   }, [api, origFileDetails])
 
   const discard = useCallback(async () => {
     if (draftDetails) {
-      await api.deleteFileFromAppDirectory(draftDetails.id)
+      await api.deleteFile({ fileId: draftDetails.id, context: StorageContext.Temp })
       setDraftDetails(null)
     }
   }, [api, draftDetails])
@@ -53,13 +53,13 @@ export function useDraftFile(draftId: string | undefined) {
   const loadContent = useCallback(async () => {
     if (!draftDetails) throw new Error('Draft not set')
 
-    return (await api.loadFile(draftDetails.id)).content
+    return (await api.loadFile({ fileId: draftDetails.id, context: StorageContext.Temp })).content
   }, [api, draftDetails])
 
   const saveContent = useCallback(async (content: string) => {
     if (!draftDetails) throw new Error('Draft not set')
 
-    await api.save(draftDetails.id, content)
+    await api.save({ fileId: draftDetails.id, content, context: StorageContext.Temp })
   }, [api, draftDetails])
 
   return {

@@ -10,10 +10,8 @@ export function createFakeStorageApi(overrides: Partial<StorageApi> = {}): Stora
     updateFileName: vi.fn().mockResolvedValue(undefined),
     getFileMetadata: vi.fn().mockResolvedValue({ id: '', name: '', mimeType: undefined, url: '' }),
     getUserRecentlyModifiedFiles: vi.fn().mockResolvedValue([]),
-    createFileInAppDirectory: vi.fn().mockResolvedValue({ id: '', name: '', mimeType: undefined }),
-    findFileInAppDirectory: vi.fn().mockResolvedValue([]),
-    deleteFileFromAppDirectory: vi.fn().mockResolvedValue(undefined),
-    uploadFileToDrive: vi.fn().mockResolvedValue({ id: '', name: '', mimeType: undefined }),
+    findFiles: vi.fn().mockResolvedValue([]),
+    deleteFile: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }

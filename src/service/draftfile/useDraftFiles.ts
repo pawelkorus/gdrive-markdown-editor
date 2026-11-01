@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useStorageApi } from '../storage'
-import { FileDetails } from '@app/storage'
+import { FileDetails, StorageContext } from '@app/storage'
 
 
 export const useDraftFiles = (origFileDetails: FileDetails) => {
@@ -14,7 +14,10 @@ export const useDraftFiles = (origFileDetails: FileDetails) => {
     const fetchDraftFiles = async () => {
       try {
         setLoading(true)
-        const response = await api.findFileInAppDirectory('draft_' + origFileDetails.id)
+        const response = await api.findFiles({
+          filename: 'draft_' + origFileDetails.id,
+          context: StorageContext.Temp,
+        })
         setDraftFiles(response.map(file => ({ ...file, isNew: false })))
       }
       catch (err) {
@@ -35,8 +38,11 @@ export const useDraftFiles = (origFileDetails: FileDetails) => {
   const createDraft = async (content: string): Promise<string> => {
     if (creatingRef.current === null) {
       creatingRef.current = (async () => {
-        const fileDetails = await api.createFileInAppDirectory('draft_' + origFileDetails.id)
-        await api.save(fileDetails.id, content)
+        const fileDetails = await api.createFile({
+          filename: 'draft_' + origFileDetails.id,
+          content,
+          context: StorageContext.Temp,
+        })
 
         setDraftFiles(prevDraftFiles => [...prevDraftFiles, fileDetails])
 
@@ -47,7 +53,7 @@ export const useDraftFiles = (origFileDetails: FileDetails) => {
   }
 
   const discardDraft = async (draftId: string) => {
-    await api.deleteFileFromAppDirectory(draftId)
+    await api.deleteFile({ fileId: draftId, context: StorageContext.Temp })
     setDraftFiles(prevDraftFiles => prevDraftFiles.filter(draft => draft.id !== draftId))
   }
 

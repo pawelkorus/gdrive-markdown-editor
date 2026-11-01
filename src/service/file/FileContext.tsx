@@ -37,17 +37,17 @@ export function FileContextProvider(props: Props): React.ReactElement {
   })
 
   const loadFile = useCallback(async (fileId: string) => {
-    const fileDetails = await api.loadFile(fileId)
+    const fileDetails = await api.loadFile({ fileId })
     setFileDetails(fileDetails)
   }, [api])
 
   const updateContent = useCallback(async (content: string) => {
-    await api.save(fileDetails.id, content)
+    await api.save({ fileId: fileDetails.id, content })
     setFileDetails({ ...fileDetails, content })
   }, [api, fileDetails])
 
   const updateFileName = useCallback(async (fileName: string) => {
-    await api.updateFileName(fileDetails.id, fileName)
+    await api.updateFileName({ fileId: fileDetails.id, filename: fileName })
     setFileDetails({ ...fileDetails, name: fileName })
   }, [api, fileDetails])
 
@@ -55,7 +55,7 @@ export function FileContextProvider(props: Props): React.ReactElement {
     const fileDetails = await api.createFile({
       filename: params.fileName || 'New file',
       content: '# Hello world',
-      parent: params.folderId,
+      context: params.folderId,
     })
     setFileDetails(fileDetails)
   }, [api])

@@ -1,5 +1,6 @@
 import React from 'react'
-import { FileDetails, useDraftFiles } from '@app/service/draftfile'
+import { useDraftFiles } from '@app/service/draftfile'
+import type { FileDetails } from '@app/storage'
 import { useFile } from '@app/service/file'
 import { useNavigateTo } from '@app/service/navigate'
 import { Button } from 'react-bootstrap'
